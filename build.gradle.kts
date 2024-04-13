@@ -33,6 +33,7 @@ dependencies {
 
 	// 스프링 시큐리티
 	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("org.bouncycastle:bcprov-jdk15on:1.70")
 
 	// 아임포트
 	implementation("com.github.iamport:iamport-rest-client-java:0.2.23")
