@@ -1,4 +1,4 @@
-package com.pawland.order.domain;
+package com.pawland.product.domain;
 
 import com.pawland.user.domain.User;
 import jakarta.persistence.*;
@@ -8,9 +8,8 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Order {
+public class FavoriteItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
