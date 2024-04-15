@@ -1,6 +1,6 @@
 package com.pawland.auth.controller;
 
-import com.pawland.auth.service.AuthService;
+import com.pawland.auth.facade.AuthFacade;
 import com.pawland.auth.dto.request.SignupRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
+    private final AuthFacade authFacade;
 
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity signup(@RequestBody SignupRequest request) {
-        authService.signup(request);
+        authFacade.signup(request);
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body("회원가입 되었습니다");
