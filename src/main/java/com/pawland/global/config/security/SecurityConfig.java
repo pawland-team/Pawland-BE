@@ -21,7 +21,7 @@ public class SecurityConfig {
         return web -> web.ignoring()
             .requestMatchers("/favicon.ico")
             .requestMatchers("/error")
-            .requestMatchers(toH2Console()); // toH2Console() = new AntPathRequestMatcher("/h2-console/**")
+            .requestMatchers(toH2Console());
     }
 
     @Bean

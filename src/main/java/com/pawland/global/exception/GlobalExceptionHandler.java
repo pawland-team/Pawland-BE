@@ -12,6 +12,6 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
             .status(e.getStatusCode())
-            .body(null);
+            .body(e.getMessage());
     }
 }
