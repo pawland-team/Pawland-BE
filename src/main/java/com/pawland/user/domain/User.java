@@ -3,7 +3,6 @@ package com.pawland.user.domain;
 import com.pawland.order.domain.Order;
 import com.pawland.post.domain.FavoritePost;
 import com.pawland.post.domain.Post;
-import com.pawland.product.domain.WishItem;
 import com.pawland.product.domain.Product;
 import com.pawland.review.domain.Review;
 import jakarta.persistence.*;
@@ -53,7 +52,7 @@ public class User {
     private List<Product> productList = new ArrayList<>();
     // 찜한 상품
     @OneToMany(mappedBy = "user")
-    private List<WishItem> wishItemList = new ArrayList<>();
+    private List<Product> favoriteItemList = new ArrayList<>();
     // 내가 쓴 글
     @OneToMany(mappedBy = "author")
     private List<Post> postList = new ArrayList<>();
