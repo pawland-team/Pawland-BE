@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.pawland.user.domain.UserType.NORMAL;
+
 @Entity
 @Getter
 @Table(name = "users")
@@ -33,11 +35,11 @@ public class User {
     private String introduce;
     // 회원 유형(구글, 카카오, 일반)
     @Enumerated(EnumType.STRING)
-    private UserType type;
+    private UserType type = NORMAL;
     // 전화번호
     private String phoneNumber;
     // 이메일 인증 여부
-    private boolean EmailVerified = false;
+    private boolean emailVerified = false;
     // 이미지
     private String image;
     // 남긴 리뷰
@@ -66,7 +68,7 @@ public class User {
         this.introduce = introduce;
         this.type = type;
         this.phoneNumber = phoneNumber;
-        EmailVerified = emailVerified;
+        this.emailVerified = emailVerified;
         this.image = image;
     }
 }
