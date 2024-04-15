@@ -1,5 +1,6 @@
 package com.pawland.review.domain;
 
+import com.pawland.product.domain.Product;
 import com.pawland.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -15,6 +16,9 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private User user;
+    @ManyToOne
+    private Product product;
+
+    @ManyToOne
+    private User author;
 }

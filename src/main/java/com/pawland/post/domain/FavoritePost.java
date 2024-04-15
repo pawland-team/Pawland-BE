@@ -15,6 +15,9 @@ public class FavoritePost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne
     private User user;
+
+    @ManyToOne
+    private Post post;
 }
