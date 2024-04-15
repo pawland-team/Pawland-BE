@@ -2,6 +2,7 @@ package com.pawland.auth.controller;
 
 import com.pawland.auth.facade.AuthFacade;
 import com.pawland.auth.dto.request.SignupRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class AuthController {
     private final AuthFacade authFacade;
 
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity signup(@RequestBody SignupRequest request) {
+    public ResponseEntity signup(@Valid @RequestBody SignupRequest request) {
         authFacade.signup(request);
         return ResponseEntity
             .status(HttpStatus.CREATED)
