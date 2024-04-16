@@ -29,6 +29,9 @@ public enum Category {
     }
 
     public static Category getInstance(String category) {
-        return Arrays.stream(Category.values()).filter(c -> c.getName().equals(category)).findFirst().orElseThrow(IllegalArgumentException::new);
+        return Arrays.stream(Category.values()).
+                filter(c -> c.getName().equals(category))
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
     }
 }
