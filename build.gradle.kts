@@ -28,6 +28,9 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 
+	// swagger
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4")
+
 	// 스프링 시큐리티
 	implementation("org.springframework.boot:spring-boot-starter-security")
 
