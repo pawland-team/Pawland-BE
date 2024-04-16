@@ -1,12 +1,13 @@
 package com.pawland.global.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pawland.global.config.security.filter.ExcludeUrlsRequestMatcher;
 import com.pawland.global.config.security.filter.JsonAuthFilter;
+import com.pawland.global.config.security.filter.JwtAuthFilter;
 import com.pawland.global.config.security.handler.Http401Handler;
 import com.pawland.global.config.security.handler.Http403Handler;
 import com.pawland.global.config.security.handler.LoginFailHandler;
 import com.pawland.global.config.security.handler.LoginSuccessHandler;
-import com.pawland.user.domain.User;
 import com.pawland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -29,13 +29,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity(debug = true) // TODO: 운영 환경에선 제거
 @RequiredArgsConstructor
-@Slf4j
 public class SecurityConfig {
 
     private final ObjectMapper objectMapper;
+    private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
 
@@ -44,7 +45,7 @@ public class SecurityConfig {
         return web -> web.ignoring()
             .requestMatchers("/favicon.ico")
             .requestMatchers("/error")
-            .requestMatchers(toH2Console());
+            .requestMatchers(toH2Console()); // TODO: 배포 시 제거
     }
 
     @Bean
@@ -58,10 +59,14 @@ public class SecurityConfig {
                     "/api/v1/auth/**",
                     "/swagger-ui/**",
                     "/swagger-resources/**",
-                    "/v3/api-docs/**"
-                ).permitAll()
+                    "/v3/api-docs/**").permitAll()
+                .requestMatchers("/**").permitAll() // TODO: 배포 시 제거
                 .anyRequest().authenticated()
             )
+//            .addFilterBefore(
+//                new JwtAuthFilter(jwtUtils, new ExcludeUrlsRequestMatcher("/api/auth/signup", "/api/auth/login")),
+//                UsernamePasswordAuthenticationFilter.class
+//            )  // TODO: 배포 시 스웨거 관련 URL 추가 후 활성화
             .addFilterBefore(jsonAuthFilter(), UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(e -> {
                 e.authenticationEntryPoint(new Http401Handler(objectMapper));
@@ -82,18 +87,9 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService(userRepository));
+        provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(provider);
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepository) {
-        return email -> {
-            User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(email + "을 찾을 수 없습니다."));
-            return new UserPrincipal(user);
-        };
     }
 
     @Bean
