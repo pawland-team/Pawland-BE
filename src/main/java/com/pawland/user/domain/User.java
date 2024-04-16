@@ -43,19 +43,19 @@ public class User {
     // 이미지
     private String image;
     // 남긴 리뷰
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "author")
     private List<Review> reviewList = new ArrayList<>();
     // 주문 내역
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "buyer")
     private List<Order> orderList = new ArrayList<>();
     // 등록한 상품
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "seller")
     private List<Product> productList = new ArrayList<>();
     // 찜한 상품
     @OneToMany(mappedBy = "user")
     private List<WishItem> wishItemList = new ArrayList<>();
     // 내가 쓴 글
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "author")
     private List<Post> postList = new ArrayList<>();
     // 추천 누른 글
     @OneToMany(mappedBy = "user")
