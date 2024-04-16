@@ -13,17 +13,18 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import java.io.IOException;
 
 @Slf4j
-public class EmailPasswordAuthFilter extends AbstractAuthenticationProcessingFilter {
+public class JsonAuthFilter extends AbstractAuthenticationProcessingFilter {
 
     private final ObjectMapper objectMapper;
 
-    public EmailPasswordAuthFilter(String loginUrl, ObjectMapper objectMapper) {
+    public JsonAuthFilter(String loginUrl, ObjectMapper objectMapper) {
         super(loginUrl);
         this.objectMapper = objectMapper;
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+        log.info("[로그인 시도] ");
         LoginRequest emailPassword = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
 
         UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(

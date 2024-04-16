@@ -1,7 +1,9 @@
 package com.pawland.global.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pawland.global.config.security.filter.EmailPasswordAuthFilter;
+import com.pawland.global.config.security.filter.JsonAuthFilter;
+import com.pawland.global.config.security.handler.Http401Handler;
+import com.pawland.global.config.security.handler.Http403Handler;
 import com.pawland.global.config.security.handler.LoginFailHandler;
 import com.pawland.global.config.security.handler.LoginSuccessHandler;
 import com.pawland.user.domain.User;
@@ -22,11 +24,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true) // TODO: 운영 환경에선 제거
 @RequiredArgsConstructor
 @Slf4j
 public class SecurityConfig {
@@ -46,16 +50,29 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+            .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/**").permitAll()
+                .requestMatchers("/api/auth/signup").permitAll()
+                .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers(
+                    "/api/v1/auth/**",
+                    "/swagger-ui/**",
+                    "/swagger-resources/**",
+                    "/v3/api-docs/**"
+                ).permitAll()
+                .anyRequest().authenticated()
             )
+            .addFilterBefore(jsonAuthFilter(), UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling(e -> {
+                e.authenticationEntryPoint(new Http401Handler(objectMapper));
+                e.accessDeniedHandler(new Http403Handler(objectMapper));
+            })
             .csrf(AbstractHttpConfigurer::disable)
             .build();
     }
 
-    @Bean
-    public EmailPasswordAuthFilter usernamePasswordAuthenticationFilter() {
-        EmailPasswordAuthFilter filter = new EmailPasswordAuthFilter("/api/auth/login", objectMapper);
+    public JsonAuthFilter jsonAuthFilter() {
+        JsonAuthFilter filter = new JsonAuthFilter("/api/auth/login", objectMapper);
         filter.setAuthenticationManager(authenticationManager());
         filter.setAuthenticationSuccessHandler(new LoginSuccessHandler(objectMapper, jwtUtils));
         filter.setAuthenticationFailureHandler(new LoginFailHandler(objectMapper));
@@ -71,7 +88,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService (UserRepository userRepository) {
+    public UserDetailsService userDetailsService(UserRepository userRepository) {
         return email -> {
             User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email + "을 찾을 수 없습니다."));
