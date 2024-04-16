@@ -1,4 +1,4 @@
-package com.pawland.global.config.security;
+package com.pawland.global.config.security.domain;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;

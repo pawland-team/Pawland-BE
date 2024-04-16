@@ -2,6 +2,7 @@ package com.pawland.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pawland.auth.dto.request.SignupRequest;
+import com.pawland.global.config.security.domain.LoginRequest;
 import com.pawland.user.domain.User;
 import com.pawland.user.repository.UserRepository;
 import org.hamcrest.Matchers;

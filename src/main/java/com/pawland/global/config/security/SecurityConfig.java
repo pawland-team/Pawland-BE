@@ -1,14 +1,11 @@
 package com.pawland.global.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pawland.global.config.security.filter.ExcludeUrlsRequestMatcher;
 import com.pawland.global.config.security.filter.JsonAuthFilter;
-import com.pawland.global.config.security.filter.JwtAuthFilter;
 import com.pawland.global.config.security.handler.Http401Handler;
 import com.pawland.global.config.security.handler.Http403Handler;
 import com.pawland.global.config.security.handler.LoginFailHandler;
 import com.pawland.global.config.security.handler.LoginSuccessHandler;
-import com.pawland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -37,7 +34,6 @@ public class SecurityConfig {
 
     private final ObjectMapper objectMapper;
     private final UserDetailsService userDetailsService;
-    private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
 
     @Bean

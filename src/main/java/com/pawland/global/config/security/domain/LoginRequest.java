@@ -1,4 +1,4 @@
-package com.pawland.global.config.security.filter;
+package com.pawland.global.config.security.domain;
 
 import lombok.Builder;
 import lombok.Getter;

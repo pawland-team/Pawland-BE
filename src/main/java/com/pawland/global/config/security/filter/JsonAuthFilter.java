@@ -1,6 +1,7 @@
 package com.pawland.global.config.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pawland.global.config.security.domain.LoginRequest;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,7 +25,6 @@ public class JsonAuthFilter extends AbstractAuthenticationProcessingFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
-        log.info("[로그인 시도] ");
         LoginRequest emailPassword = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
 
         UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.unauthenticated(
