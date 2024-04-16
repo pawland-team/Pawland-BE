@@ -2,6 +2,8 @@ package com.pawland.product.domain;
 
 import lombok.Getter;
 
+import java.util.Arrays;
+
 @Getter
 public enum Category {
     FOOD("사료"),
@@ -24,5 +26,9 @@ public enum Category {
 
     Category(String name) {
         this.name = name;
+    }
+
+    public static Category getInstance(String category) {
+        return Arrays.stream(Category.values()).filter(c -> c.getName().equals(category)).findFirst().orElseThrow(IllegalArgumentException::new);
     }
 }

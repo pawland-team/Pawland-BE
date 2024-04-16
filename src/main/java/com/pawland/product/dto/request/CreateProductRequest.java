@@ -1,9 +1,11 @@
 package com.pawland.product.dto.request;
 
+import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@Data
 public class CreateProductRequest {
     // 이름
     private String name;
