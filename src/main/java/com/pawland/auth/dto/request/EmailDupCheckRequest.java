@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class emailDupCheckRequest {
+public class EmailDupCheckRequest {
 
     @NotBlank(message = "이메일을 입력해주세요.")
     private String email;
 
-    public emailDupCheckRequest(String email) {
+    public EmailDupCheckRequest(String email) {
         this.email = email;
     }
 }

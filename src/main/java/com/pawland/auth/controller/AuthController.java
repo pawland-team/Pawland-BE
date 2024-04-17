@@ -1,6 +1,6 @@
 package com.pawland.auth.controller;
 
-import com.pawland.auth.dto.request.emailDupCheckRequest;
+import com.pawland.auth.dto.request.EmailDupCheckRequest;
 import com.pawland.auth.dto.request.VerifyEmailReqeust;
 import com.pawland.auth.facade.AuthFacade;
 import com.pawland.auth.dto.request.SignupRequest;
@@ -28,7 +28,7 @@ public class AuthController {
     private final AuthFacade authFacade;
 
     @PostMapping(value = "/email-dupcheck", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity emailDupCheck(@Valid @RequestBody emailDupCheckRequest request) {
+    public ResponseEntity emailDupCheck(@Valid @RequestBody EmailDupCheckRequest request) {
         authFacade.checkEmailDuplicate(request.getEmail());
         return ResponseEntity
             .status(OK)

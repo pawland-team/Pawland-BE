@@ -2,7 +2,7 @@ package com.pawland.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pawland.auth.dto.request.VerifyEmailReqeust;
-import com.pawland.auth.dto.request.emailDupCheckRequest;
+import com.pawland.auth.dto.request.EmailDupCheckRequest;
 import com.pawland.auth.dto.request.SignupRequest;
 import com.pawland.auth.facade.AuthFacade;
 import com.pawland.global.config.security.domain.LoginRequest;
@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -51,7 +50,7 @@ class AuthControllerTest {
     @Test
     void emailDupCheck1() throws Exception {
         // given
-        emailDupCheckRequest request = new emailDupCheckRequest("midcon@nav.com");
+        EmailDupCheckRequest request = new EmailDupCheckRequest("midcon@nav.com");
 
         String json = objectMapper.writeValueAsString(request);
 
@@ -76,7 +75,7 @@ class AuthControllerTest {
             .build();
         userRepository.save(user);
 
-        emailDupCheckRequest request = new emailDupCheckRequest("midcon@nav.com");
+        EmailDupCheckRequest request = new EmailDupCheckRequest("midcon@nav.com");
 
         String json = objectMapper.writeValueAsString(request);
 
