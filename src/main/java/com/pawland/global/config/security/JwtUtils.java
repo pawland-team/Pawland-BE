@@ -48,9 +48,9 @@ public class JwtUtils {
         }
         return Arrays.stream(cookies)
             .filter(cookie -> cookie.getName().equals(JWT_NAME))
+            .map(Cookie::getValue)
             .findFirst()
-            .orElse(null)
-            .getValue();
+            .orElse(null);
     }
 
     public Authentication getAuthentication(String jwt) {
