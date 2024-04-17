@@ -2,6 +2,7 @@ package com.pawland.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pawland.auth.dto.request.SignupRequest;
+import com.pawland.global.config.security.domain.LoginRequest;
 import com.pawland.user.domain.User;
 import com.pawland.user.repository.UserRepository;
 import org.hamcrest.Matchers;
@@ -11,13 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -34,6 +35,9 @@ class AuthControllerTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @AfterEach
     void tearDown() {
@@ -115,7 +119,7 @@ class AuthControllerTest {
 
         SignupRequest request = SignupRequest.builder()
             .email("midcon@nav.com")
-            .password("asd123")
+            .password("asd123123")
             .phoneNumber("010-1234-5678")
             .build();
 
@@ -129,5 +133,92 @@ class AuthControllerTest {
             .andDo(print())
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$").value("이미 존재하는 유저입니다."));
+    }
+
+    @DisplayName("등록된 유저와 이메일, 비밀번호가 일치하면 로그인에 성공한다.")
+    @Test
+    void login1() throws Exception {
+        // given
+        User user = User.builder()
+            .email("midcon@nav.com")
+            .password(passwordEncoder.encode("asd123123"))
+            .phoneNumber("010-1234-5678")
+            .build();
+        userRepository.save(user);
+
+        LoginRequest request = LoginRequest.builder()
+            .email("midcon@nav.com")
+            .password("asd123123")
+            .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        // expected
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(APPLICATION_JSON)
+                .content(json)
+            )
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").value("로그인에 성공했습니다."))
+            .andExpect(cookie().exists("jwt"));
+    }
+
+    @DisplayName("틀린 비밀번호로 로그인 요청 시 로그인에 실패한다.")
+    @Test
+    void login2() throws Exception {
+        // given
+        User user = User.builder()
+            .email("midcon@nav.com")
+            .password(passwordEncoder.encode("asd123"))
+            .phoneNumber("010-1234-5678")
+            .build();
+        userRepository.save(user);
+
+        LoginRequest request = LoginRequest.builder()
+            .email("midcon@nav.com")
+            .password("asd123123")
+            .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        // expected
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(APPLICATION_JSON)
+                .content(json)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$").value("아이디 혹은 비밀번호가 올바르지 않습니다."))
+            .andExpect(cookie().doesNotExist("jwt"));
+    }
+
+    @DisplayName("등록되지 않는 이메일로 로그인 요청 시 로그인에 실패한다.")
+    @Test
+    void login3() throws Exception {
+        // given
+        User user = User.builder()
+            .email("midcon@nav.com")
+            .password("asd123123")
+            .phoneNumber("010-1234-5678")
+            .build();
+        userRepository.save(user);
+
+        LoginRequest request = LoginRequest.builder()
+            .email("mid@nav.com")
+            .password("asd123123")
+            .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        // expected
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(APPLICATION_JSON)
+                .content(json)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$").value("아이디 혹은 비밀번호가 올바르지 않습니다."))
+            .andExpect(cookie().doesNotExist("jwt"));
     }
 }

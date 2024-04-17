@@ -33,13 +33,20 @@ dependencies {
 
 	// 스프링 시큐리티
 	implementation("org.springframework.boot:spring-boot-starter-security")
-	implementation("org.bouncycastle:bcprov-jdk15on:1.70")
+	implementation("org.springframework.security:spring-security-test")
 
 	// 아임포트
 	implementation("com.github.iamport:iamport-rest-client-java:0.2.23")
 
 	// 웹소켓
 	implementation("org.springframework.boot:spring-boot-starter-websocket")
+
+	// JWT
+	implementation("io.jsonwebtoken:jjwt-api:0.12.1")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.1")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.1")
+	implementation("org.springframework.security:spring-security-crypto")
+	implementation("org.bouncycastle:bcprov-jdk15on:1.70")
 
 	// QueryDSL
 	implementation("com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta")
