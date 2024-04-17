@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -31,9 +32,6 @@ class AuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @MockBean
-    private AuthFacade authFacade;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -97,6 +95,7 @@ class AuthControllerTest {
     void requestEmailVerification1() throws Exception {
         // given
         VerifyEmailReqeust request = new VerifyEmailReqeust("midcon@nav.com");
+        AuthFacade authFacade = mock(AuthFacade.class);
         doNothing().when(authFacade).requestEmailVerification(request.getEmail());
 
         String json = objectMapper.writeValueAsString(request);
