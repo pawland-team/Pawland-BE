@@ -4,6 +4,7 @@ import com.pawland.auth.dto.request.EmailDupCheckRequest;
 import com.pawland.auth.dto.request.VerifyEmailReqeust;
 import com.pawland.auth.facade.AuthFacade;
 import com.pawland.auth.dto.request.SignupRequest;
+import com.pawland.global.config.security.domain.LoginRequest;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,5 +50,10 @@ public class AuthController {
         return ResponseEntity
             .status(CREATED)
             .body("회원가입 되었습니다.");
+    }
+
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void login(@Valid @RequestBody LoginRequest request) {
+        
     }
 }
