@@ -1,7 +1,10 @@
 package com.pawland.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pawland.auth.dto.request.VerifyEmailReqeust;
+import com.pawland.auth.dto.request.emailDupCheckRequest;
 import com.pawland.auth.dto.request.SignupRequest;
+import com.pawland.auth.facade.AuthFacade;
 import com.pawland.global.config.security.domain.LoginRequest;
 import com.pawland.user.domain.User;
 import com.pawland.user.repository.UserRepository;
@@ -12,9 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -27,8 +32,8 @@ class AuthControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private AuthController authController;
+    @MockBean
+    private AuthFacade authFacade;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -42,6 +47,68 @@ class AuthControllerTest {
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
+    }
+
+    @DisplayName("가입되지 않은 이메일로 중복 확인 시 성공 메시지를 반환한다.")
+    @Test
+    void emailDupCheck1() throws Exception {
+        // given
+        emailDupCheckRequest request = new emailDupCheckRequest("midcon@nav.com");
+
+        String json = objectMapper.writeValueAsString(request);
+
+        // expected
+        mockMvc.perform(post("/api/auth/email-dupcheck")
+                .contentType(APPLICATION_JSON)
+                .content(json)
+            )
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").value("사용할 수 있는 이메일입니다."));
+    }
+
+    @DisplayName("이미 가입된 이메일로 중복 확인 시 오류 메시지를 반환한다.")
+    @Test
+    void emailDupCheck2() throws Exception {
+        // given
+        User user = User.builder()
+            .email("midcon@nav.com")
+            .password("asd123123")
+            .phoneNumber("010-1234-5678")
+            .build();
+        userRepository.save(user);
+
+        emailDupCheckRequest request = new emailDupCheckRequest("midcon@nav.com");
+
+        String json = objectMapper.writeValueAsString(request);
+
+        // expected
+        mockMvc.perform(post("/api/auth/email-dupcheck")
+                .contentType(APPLICATION_JSON)
+                .content(json)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$").value("이미 존재하는 유저입니다."));
+    }
+
+    @DisplayName("인증 메일 요청에 성공한다.")
+    @Test
+    void requestEmailVerification1() throws Exception {
+        // given
+        VerifyEmailReqeust request = new VerifyEmailReqeust("midcon@nav.com");
+        doNothing().when(authFacade).requestEmailVerification(request.getEmail());
+
+        String json = objectMapper.writeValueAsString(request);
+
+        // expected
+        mockMvc.perform(post("/api/auth/email-verification-request")
+                .contentType(APPLICATION_JSON)
+                .content(json)
+            )
+            .andDo(print())
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$").value("인증 메일이 발송 되었습니다."));
     }
 
     @DisplayName("올바른 정보를 입력하면 회원가입에 성공한다.")
