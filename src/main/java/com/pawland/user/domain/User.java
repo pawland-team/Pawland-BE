@@ -4,6 +4,7 @@ import com.pawland.order.domain.Order;
 import com.pawland.post.domain.FavoritePost;
 import com.pawland.post.domain.Post;
 import com.pawland.product.domain.Product;
+import com.pawland.product.domain.WishItem;
 import com.pawland.review.domain.Review;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -57,7 +58,7 @@ public class User {
     private List<Product> productList = new ArrayList<>();    // 등록한 상품
 
     @OneToMany(mappedBy = "user")
-    private List<Product> favoriteItemList = new ArrayList<>(); // 찜한 상품
+    private List<WishItem> WishItemList = new ArrayList<>(); // 찜한 상품
 
     @OneToMany(mappedBy = "author")
     private List<Post> postList = new ArrayList<>();    // 내가 쓴 글
