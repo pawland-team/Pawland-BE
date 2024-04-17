@@ -11,17 +11,17 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class MailVerificationService implements MailService{
 
     private final MailConfig mailConfig;
     private final JavaMailSender mailSender;
 
     @Override
-    public void sendEmail(String toEmail, String title, String text) throws MessagingException, UnsupportedEncodingException {
-        MimeMessage message = getEmailVa(toEmail);
+    public void sendEmail(String toEmail) throws MessagingException, UnsupportedEncodingException {
+        MimeMessage message = createEmailVerificationMessage(toEmail);
         try {
             mailSender.send(message);
         } catch (RuntimeException e) {
@@ -30,25 +30,22 @@ public class MailVerificationService implements MailService{
         }
     }
 
-    private MimeMessage getEmailVa(String toEmail) throws MessagingException, UnsupportedEncodingException {
+    private MimeMessage createEmailVerificationMessage(String toEmail) throws MessagingException, UnsupportedEncodingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
         helper.setFrom(mailConfig.getFromEmail(), "나는짱");
         helper.setTo(toEmail);
         helper.setSubject("PAWLAND 이메일 인증");
+        String template = createTemplate();
+        helper.setText(template);
+        return message;
+    }
 
+    private static String createTemplate() {
         String template = "";
         template += "<div style='margin:20px;'>";
         template += "<h1> 안녕하세요, PAWLAND 입니다. </h1>";
-        template += "<br>";
-        template += "<br>";
-        template += "<p>감사합니다.<p>";
-        template += "<br>";
-        template += "<div align='center' style='border:1px solid black; font-family:verdana';>";
-        template += "<h3 style='color:blue;'>회원가입 인증 링크입니다.</h3>";
-        template += "LINK : <strong>";
         template += "</div>";
-        helper.setText(template);
-        return message;
+        return template;
     }
 }

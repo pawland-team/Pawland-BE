@@ -8,5 +8,5 @@ import java.io.UnsupportedEncodingException;
 @Service
 public interface MailService {
 
-    public void sendEmail(String toEmail, String title, String text) throws MessagingException, UnsupportedEncodingException;
+    public void sendEmail(String toEmail) throws MessagingException, UnsupportedEncodingException;
 }
