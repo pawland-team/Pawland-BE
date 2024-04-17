@@ -60,9 +60,15 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
 //            .addFilterBefore(
-//                new JwtAuthFilter(jwtUtils, new ExcludeUrlsRequestMatcher("/api/auth/signup", "/api/auth/login")),
-//                UsernamePasswordAuthenticationFilter.class
-//            )  // TODO: 배포 시 스웨거 관련 URL 추가 후 활성화
+//                new JwtAuthFilter(jwtUtils,
+//                    new ExcludeUrlsRequestMatcher(
+//                        "/api/auth/signup",
+//                        "/api/auth/login",
+//                        "/api/v1/auth/**",
+//                        "/swagger-ui/**",
+//                        "/swagger-resources/**",
+//                        "/v3/api-docs/**")),
+//                UsernamePasswordAuthenticationFilter.class)  // TODO: 배포 시 스웨거 관련 URL 추가 후 활성화
             .addFilterBefore(jsonAuthFilter(), UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(e -> {
                 e.authenticationEntryPoint(new Http401Handler(objectMapper));
