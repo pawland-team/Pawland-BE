@@ -28,7 +28,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 
 @Slf4j
 @Configuration
-@EnableWebSecurity(debug = true) // TODO: 운영 환경에선 제거
+@EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
