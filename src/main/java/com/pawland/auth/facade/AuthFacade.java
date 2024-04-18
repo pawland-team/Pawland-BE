@@ -23,7 +23,7 @@ public class AuthFacade {
         userService.checkEmailDuplicate(email);
     }
 
-    public void requestEmailVerification(String email) throws MessagingException, UnsupportedEncodingException {
+    public void sendVerificationCode(String email) throws MessagingException, UnsupportedEncodingException {
         mailVerificationService.sendEmail(email);
     }
 
@@ -34,5 +34,9 @@ public class AuthFacade {
             .phoneNumber(request.getPhoneNumber())
             .build();
         userService.register(user);
+    }
+
+    public void verifyCode(String code) {
+
     }
 }

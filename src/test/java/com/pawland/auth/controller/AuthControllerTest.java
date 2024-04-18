@@ -1,7 +1,7 @@
 package com.pawland.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pawland.auth.dto.request.VerifyEmailReqeust;
+import com.pawland.auth.dto.request.SendVerificationCodeRequest;
 import com.pawland.auth.dto.request.EmailDupCheckRequest;
 import com.pawland.auth.dto.request.SignupRequest;
 import com.pawland.auth.facade.AuthFacade;
@@ -93,14 +93,14 @@ class AuthControllerTest {
     @Test
     void requestEmailVerification1() throws Exception {
         // given
-        VerifyEmailReqeust request = new VerifyEmailReqeust("midcon@nav.com");
+        SendVerificationCodeRequest request = new SendVerificationCodeRequest("midcon@nav.com");
         AuthFacade authFacade = mock(AuthFacade.class);
-        doNothing().when(authFacade).requestEmailVerification(request.getEmail());
+        doNothing().when(authFacade).sendVerificationCode(request.getEmail());
 
         String json = objectMapper.writeValueAsString(request);
 
         // expected
-        mockMvc.perform(post("/api/auth/email-verification-request")
+        mockMvc.perform(post("/api/auth/send-verification-code")
                 .contentType(APPLICATION_JSON)
                 .content(json)
             )
