@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pawland.auth.dto.request.SendVerificationCodeRequest;
 import com.pawland.auth.dto.request.EmailDupCheckRequest;
 import com.pawland.auth.dto.request.SignupRequest;
-import com.pawland.auth.facade.AuthFacade;
 import com.pawland.global.config.security.domain.LoginRequest;
 import com.pawland.user.domain.User;
 import com.pawland.user.repository.UserRepository;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,14 +16,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mail.MailAuthenticationException;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.filter.CharacterEncodingFilter;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -43,6 +44,9 @@ class AuthControllerTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @MockBean
+    private JavaMailSender mailSender;
 
     @AfterEach
     void tearDown() {
@@ -97,16 +101,13 @@ class AuthControllerTest {
     void sendVerificationCode1() throws Exception {
         // given
         SendVerificationCodeRequest request = new SendVerificationCodeRequest("hyukkind@naver.com");
-        AuthFacade authFacade = mock(AuthFacade.class);
-        doNothing().when(authFacade).sendVerificationCode(request.getEmail());
-        AuthController mockAuthController = new AuthController(authFacade);
-        MockMvc mockMvcWithMockAuthFacade = MockMvcBuilders.standaloneSetup(mockAuthController)
-            .build();
+        MimeMessage mimeMessage = new MimeMessage((Session) null);
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
 
         String json = objectMapper.writeValueAsString(request);
 
         // expected
-        mockMvcWithMockAuthFacade.perform(post("/api/auth/send-verification-code")
+        mockMvc.perform(post("/api/auth/send-verification-code")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .content(json)
@@ -114,6 +115,30 @@ class AuthControllerTest {
             .andDo(print())
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$").value("인증 메일이 발송 되었습니다."));
+    }
+
+    @DisplayName("인증 메일 요청에 실패 시 에러 메시지를 출력한다.")
+    @Test
+    void sendVerificationCode2() throws Exception {
+        // given
+        SendVerificationCodeRequest request = new SendVerificationCodeRequest("hyukkind@naver.com");
+        MimeMessage mimeMessage = new MimeMessage((Session) null);
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        doThrow(new MailAuthenticationException("Authentication failed"))
+            .when(mailSender)
+            .send(mimeMessage);
+
+        String json = objectMapper.writeValueAsString(request);
+
+        // expected
+        mockMvc.perform(post("/api/auth/send-verification-code")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .content(json)
+            )
+            .andDo(print())
+            .andExpect(status().isInternalServerError())
+            .andExpect(jsonPath("$").value("메일 전송에 실패했습니다."));
     }
 
     @DisplayName("올바른 정보를 입력하면 회원가입에 성공한다.")

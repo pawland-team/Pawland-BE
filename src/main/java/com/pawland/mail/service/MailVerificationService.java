@@ -5,6 +5,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ import java.io.UnsupportedEncodingException;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MailVerificationService implements MailService{
+public class MailVerificationService implements MailService {
 
     private final MailConfig mailConfig;
     private final JavaMailSender mailSender;
@@ -26,7 +27,7 @@ public class MailVerificationService implements MailService{
             mailSender.send(message);
         } catch (RuntimeException e) {
             log.error("[메일 전송 실패]");
-            throw new IllegalArgumentException(e.getMessage()); // TODO: 커스텀 예외 생성
+            throw new MailSendException("메일 전송에 실패했습니다.");
         }
     }
 

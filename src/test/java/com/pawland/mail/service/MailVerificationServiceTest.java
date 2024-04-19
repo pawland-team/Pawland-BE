@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mail.MailAuthenticationException;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.io.UnsupportedEncodingException;
@@ -63,7 +64,7 @@ class MailVerificationServiceTest {
 
         // expected
         assertThatThrownBy(() -> mailVerificationService.sendEmail(toEmail))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("Authentication failed");
+            .isInstanceOf(MailSendException.class)
+            .hasMessage("메일 전송에 실패했습니다.");
     }
 }
