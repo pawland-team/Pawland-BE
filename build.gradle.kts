@@ -35,6 +35,9 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.security:spring-security-test")
 
+	// 이메일 인증
+	implementation ("org.springframework.boot:spring-boot-starter-mail")
+
 	// 아임포트
 	implementation("com.github.iamport:iamport-rest-client-java:0.2.23")
 

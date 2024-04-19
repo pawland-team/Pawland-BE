@@ -62,8 +62,7 @@ public class SecurityConfig {
 //            .addFilterBefore(
 //                new JwtAuthFilter(jwtUtils,
 //                    new ExcludeUrlsRequestMatcher(
-//                        "/api/auth/signup",
-//                        "/api/auth/login",
+//                        "/api/auth/**",
 //                        "/api/v1/auth/**",
 //                        "/swagger-ui/**",
 //                        "/swagger-resources/**",
