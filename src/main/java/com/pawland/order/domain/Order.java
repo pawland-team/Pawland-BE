@@ -26,4 +26,18 @@ public class Order extends BaseTimeEntity {
 
     @ManyToOne
     private Product product;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
+    public Order(User seller, User buyer, Product product) {
+        this.seller = seller;
+        this.buyer = buyer;
+        this.product = product;
+        this.status = OrderStatus.PROCEEDING;
+    }
+
+    public void changeStatus(OrderStatus orderStatus) {
+        this.status = orderStatus;
+    }
 }
