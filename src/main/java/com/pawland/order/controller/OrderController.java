@@ -38,8 +38,14 @@ public class OrderController {
     }
 
     @Operation(summary = "거래 완료")
-    @PutMapping("/{orderId}")
-    public ResponseEntity<Boolean> finishedOrder(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long orderId) {
-        return ResponseEntity.ok(orderService.finishedOrder(userPrincipal.getUserId(), orderId));
+    @PutMapping("/done/{orderId}")
+    public ResponseEntity<Boolean> doneOrder(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long orderId) {
+        return ResponseEntity.ok(orderService.doneOrder(userPrincipal.getUserId(), orderId));
+    }
+
+    @Operation(summary = "거래 취소")
+    @PutMapping("/cancel/{orderId}")
+    public ResponseEntity<Boolean> cancelOrder(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long orderId) {
+        return ResponseEntity.ok(orderService.cancelOrder(userPrincipal.getUserId(), orderId));
     }
 }

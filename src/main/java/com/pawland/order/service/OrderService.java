@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OrderService {
     private final OrderJpaRepository orderJpaRepository;
     private final UserRepository userRepository;
@@ -72,7 +73,7 @@ public class OrderService {
     }
 
     @Transactional
-    public boolean finishedOrder(Long userId, Long orderId) {
+    public boolean doneOrder(Long userId, Long orderId) {
         canUpdate(userId, orderId);
 
         Order order = getOrderById(orderId);
@@ -82,6 +83,17 @@ public class OrderService {
         Product product = order.getProduct();
 
         product.sold();
+
+        return true;
+    }
+
+    @Transactional
+    public Boolean cancelOrder(Long userId, Long orderId) {
+        canUpdate(userId, orderId);
+
+        Order order = getOrderById(orderId);
+
+        order.changeStatus(OrderStatus.CANCEL);
 
         return true;
     }

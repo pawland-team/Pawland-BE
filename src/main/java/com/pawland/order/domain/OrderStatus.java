@@ -7,7 +7,8 @@ import java.util.Arrays;
 @Getter
 public enum OrderStatus {
     DONE("완료"),
-    PROCEEDING("진행중");
+    PROCEEDING("진행중"),
+    CANCEL("취소");
 
     private final String name;
 
