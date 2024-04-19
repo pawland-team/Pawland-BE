@@ -29,7 +29,7 @@ public class AuthController {
 
     private final AuthFacade authFacade;
 
-    @PostMapping(value = "/email-dupcheck", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/email-dupcheck", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity emailDupCheck(@Valid @RequestBody EmailDupCheckRequest request) {
         authFacade.checkEmailDuplicate(request.getEmail());
         return ResponseEntity
@@ -37,7 +37,7 @@ public class AuthController {
             .body("사용할 수 있는 이메일입니다.");
     }
 
-    @PostMapping(value = "/send-verification-code", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/send-verification-code", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity sendVerificationCode(@Valid @RequestBody SendVerificationCodeRequest request) throws MessagingException, UnsupportedEncodingException {
         authFacade.sendVerificationCode(request.getEmail());
         return ResponseEntity
@@ -45,7 +45,7 @@ public class AuthController {
             .body("인증 메일이 발송 되었습니다.");
     }
 
-    @PostMapping(value = "/verify-code", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/verify-code", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity verifyCode(@Valid @RequestBody VerifyCodeRequest request) {
         authFacade.verifyCode(request.getCode());
         return ResponseEntity
@@ -53,7 +53,7 @@ public class AuthController {
             .body("이메일 인증이 완료되었습니다.");
     }
 
-    @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity signup(@Valid @RequestBody SignupRequest request) {
         authFacade.signup(request);
         return ResponseEntity
@@ -61,7 +61,7 @@ public class AuthController {
             .body("회원가입 되었습니다.");
     }
 
-    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
     public void login(@Valid @RequestBody LoginRequest request) {
         
     }
