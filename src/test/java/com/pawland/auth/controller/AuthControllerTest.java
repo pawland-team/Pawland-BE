@@ -15,8 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -91,16 +94,20 @@ class AuthControllerTest {
 
     @DisplayName("인증 메일 요청에 성공한다.")
     @Test
-    void requestEmailVerification1() throws Exception {
+    void sendVerificationCode1() throws Exception {
         // given
-        SendVerificationCodeRequest request = new SendVerificationCodeRequest("midcon@nav.com");
+        SendVerificationCodeRequest request = new SendVerificationCodeRequest("hyukkind@naver.com");
         AuthFacade authFacade = mock(AuthFacade.class);
         doNothing().when(authFacade).sendVerificationCode(request.getEmail());
+        AuthController mockAuthController = new AuthController(authFacade);
+        MockMvc mockMvcWithMockAuthFacade = MockMvcBuilders.standaloneSetup(mockAuthController)
+            .build();
 
         String json = objectMapper.writeValueAsString(request);
 
         // expected
-        mockMvc.perform(post("/api/auth/send-verification-code")
+        mockMvcWithMockAuthFacade.perform(post("/api/auth/send-verification-code")
+                .accept(MediaType.APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .content(json)
             )
