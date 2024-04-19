@@ -11,6 +11,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Random;
 
 @Slf4j
 @Service
@@ -38,15 +39,23 @@ public class MailVerificationService implements MailService {
         helper.setTo(toEmail);
         helper.setSubject("PAWLAND 이메일 인증");
         String template = createTemplate();
-        helper.setText(template);
+        helper.setText(template, true);
         return message;
     }
 
-    private static String createTemplate() {
-        String template = "";
-        template += "<div style='margin:20px;'>";
-        template += "<h1> 안녕하세요, PAWLAND 입니다. </h1>";
-        template += "</div>";
+    private String createTemplate() {
+        String template = "<html><body>";
+        template += "<p>안녕하세요, PAWLAND입니다.</p>";
+        template += "<p>인증 번호는 아래와 같습니다:</p>";
+        template += "<h2>" + generateVerificationCode() + "</h2>";
+        template += "<p>이 인증 번호를 입력하여 인증을 완료해주세요.</p>";
+        template += "</body></html>";
         return template;
+    }
+
+    private String generateVerificationCode() {
+        Random random = new Random();
+        int randomNumber = random.nextInt(999999) + 1;
+        return String.format("%06d", randomNumber);
     }
 }

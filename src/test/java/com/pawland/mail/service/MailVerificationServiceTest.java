@@ -4,12 +4,11 @@ import com.pawland.global.config.MailConfig;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -25,15 +24,11 @@ class MailVerificationServiceTest {
     @Autowired
     private MailConfig mailConfig;
 
-    @Mock
+    @MockBean
     private JavaMailSender mailSender;
 
+    @Autowired
     private MailVerificationService mailVerificationService;
-
-    @BeforeEach
-    void setUp() {
-        mailVerificationService = new MailVerificationService(mailConfig, mailSender);
-    }
 
     @DisplayName("이메일 전송 성공 Mock 테스트")
     @Test
