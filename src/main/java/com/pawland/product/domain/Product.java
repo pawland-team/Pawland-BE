@@ -19,20 +19,23 @@ public class Product extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    // 상품카테고리
+
     private Category category;
-    // 상품이름
+
     private String name;
-    // 상품가격
+
     private int price;
-    // 상품설명
+
     private String content;
-    // 지역 (주소 api 를 사용할것인가 ?)
+
     private String region;
-    // private Users seller;
+
     private int view;
     @ManyToOne
     private User seller;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @ElementCollection
     private List<String> imageUrls = new ArrayList<>();
@@ -47,9 +50,28 @@ public class Product extends BaseTimeEntity {
         this.view = view;
         this.imageUrls = imageUrls;
         this.seller = user;
+        this.status = Status.SELLING;
     }
 
     public void update(UpdateProductRequest updateProductRequest) {
+        if (updateProductRequest.getName() != null) {
+            this.name = updateProductRequest.getName();
+        }
+        if (updateProductRequest.getPrice() != 0) {
+            this.price = updateProductRequest.getPrice();
+        }
+        if (updateProductRequest.getContent() != null) {
+            this.content = updateProductRequest.getContent();
+        }
+        if (updateProductRequest.getRegion() != null) {
+            this.region = updateProductRequest.getRegion();
+        }
+        if (updateProductRequest.getImages() != null && !updateProductRequest.getImages().isEmpty()) {
+            this.imageUrls.clear();
+        }
+    }
 
+    public void sold() {
+        this.status = Status.DONE;
     }
 }
