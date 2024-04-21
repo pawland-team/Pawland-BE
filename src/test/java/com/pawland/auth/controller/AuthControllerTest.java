@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pawland.auth.dto.request.SendVerificationCodeRequest;
 import com.pawland.auth.dto.request.EmailDupCheckRequest;
 import com.pawland.auth.dto.request.SignupRequest;
+import com.pawland.auth.dto.request.VerifyCodeRequest;
 import com.pawland.global.config.security.domain.LoginRequest;
 import com.pawland.user.domain.User;
 import com.pawland.user.repository.UserRepository;
@@ -17,11 +18,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.MediaType;
 import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.Duration;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -48,9 +54,16 @@ class AuthControllerTest {
     @MockBean
     private JavaMailSender mailSender;
 
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
+        redisTemplate.execute((RedisCallback<Object>) connection -> {
+            connection.serverCommands().flushDb();
+            return null;
+        });
     }
 
     @DisplayName("가입되지 않은 이메일로 중복 확인 시 성공 메시지를 반환한다.")
@@ -139,6 +152,89 @@ class AuthControllerTest {
             .andDo(print())
             .andExpect(status().isInternalServerError())
             .andExpect(jsonPath("$").value("메일 전송에 실패했습니다."));
+    }
+
+    @DisplayName("올바른 인증번호로 인증 요청 시 성공 메시지를 반환한다.")
+    @Test
+    void verifyCode1() throws Exception {
+        // given
+        String email = "test@example.com";
+        String verificationCode = "123456";
+        ValueOperations<String, String> values = redisTemplate.opsForValue();
+        values.set(email, verificationCode, Duration.ofMinutes(3));
+
+        VerifyCodeRequest request = VerifyCodeRequest.builder()
+            .email(email)
+            .code(verificationCode)
+            .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        // expected
+        mockMvc.perform(post("/api/auth/verify-code")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .content(json)
+            )
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").value("이메일 인증이 완료되었습니다."));
+    }
+
+    @DisplayName("틀린 인증번호로 인증 요청 시 실패 메시지를 반환한다.")
+    @Test
+    void verifyCode2() throws Exception {
+        // given
+        String email = "test@example.com";
+        String verificationCode = "123456";
+        String WrongCode = "111111";
+        ValueOperations<String, String> values = redisTemplate.opsForValue();
+        values.set(email, verificationCode, Duration.ofMinutes(3));
+
+        VerifyCodeRequest request = VerifyCodeRequest.builder()
+            .email(email)
+            .code(WrongCode)
+            .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        // expected
+        mockMvc.perform(post("/api/auth/verify-code")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .content(json)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$").value("인증번호를 확인해주세요."));
+    }
+
+    @DisplayName("메일 인증을 요청하지 않은 이메일로 인증번호 입력 시 실패 메시지를 반환한다.")
+    @Test
+    void verifyCode3() throws Exception {
+        // given
+        String email = "test@example.com";
+        String notRequestedEmail = "midcon@nav.com";
+        String verificationCode = "123456";
+        ValueOperations<String, String> values = redisTemplate.opsForValue();
+        values.set(email, verificationCode, Duration.ofMinutes(3));
+
+        VerifyCodeRequest request = VerifyCodeRequest.builder()
+            .email(notRequestedEmail)
+            .code(verificationCode)
+            .build();
+
+        String json = objectMapper.writeValueAsString(request);
+
+        // expected
+        mockMvc.perform(post("/api/auth/verify-code")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .content(json)
+            )
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$").value("인증번호를 확인해주세요."));
     }
 
     @DisplayName("올바른 정보를 입력하면 회원가입에 성공한다.")
