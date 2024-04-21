@@ -28,6 +28,10 @@ public class AuthFacade {
         mailVerificationService.sendVerificationCode(email);
     }
 
+    public void verifyCode(VerifyCodeRequest request) {
+        mailVerificationService.verifyCode(request.getEmail(), request.getCode());
+    }
+
     public void signup(SignupRequest request) {
         User user = User.builder()
             .email(request.getEmail())
@@ -35,9 +39,5 @@ public class AuthFacade {
             .phoneNumber(request.getPhoneNumber())
             .build();
         userService.register(user);
-    }
-
-    public void verifyCode(VerifyCodeRequest request) {
-        mailVerificationService.verifyCode(request.getEmail(), request.getCode());
     }
 }
