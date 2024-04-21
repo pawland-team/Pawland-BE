@@ -1,6 +1,7 @@
 package com.pawland.auth.facade;
 
 import com.pawland.auth.dto.request.SignupRequest;
+import com.pawland.auth.dto.request.VerifyCodeRequest;
 import com.pawland.mail.service.MailVerificationService;
 import com.pawland.user.domain.User;
 import com.pawland.user.service.UserService;
@@ -24,7 +25,7 @@ public class AuthFacade {
     }
 
     public void sendVerificationCode(String email) throws MessagingException, UnsupportedEncodingException {
-        mailVerificationService.sendEmail(email);
+        mailVerificationService.sendVerificationCode(email);
     }
 
     public void signup(SignupRequest request) {
@@ -36,7 +37,7 @@ public class AuthFacade {
         userService.register(user);
     }
 
-    public void verifyCode(String code) {
-
+    public void verifyCode(VerifyCodeRequest request) {
+        mailVerificationService.verifyCode(request.getEmail(), request.getCode());
     }
 }

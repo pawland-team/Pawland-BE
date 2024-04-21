@@ -47,7 +47,7 @@ public class AuthController {
 
     @PostMapping(value = "/verify-code", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity verifyCode(@Valid @RequestBody VerifyCodeRequest request) {
-        authFacade.verifyCode(request.getCode());
+        authFacade.verifyCode(request);
         return ResponseEntity
             .status(OK)
             .body("이메일 인증이 완료되었습니다.");
