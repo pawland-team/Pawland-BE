@@ -17,6 +17,7 @@ import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.io.UnsupportedEncodingException;
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -89,51 +90,49 @@ class MailVerificationServiceTest {
 
     @DisplayName("올바른 인증번호를 입력하면 redis에 성공 여부를 저장한다.")
     @Test
-    void verifyCode1() throws MessagingException, UnsupportedEncodingException {
+    void verifyCode1() {
         // given
-        String toEmail = "test@example.com";
-        MimeMessage mimeMessage = new MimeMessage((Session) null);
-        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        String email = "test@example.com";
+        String verificationCode = "123456";
+        ValueOperations<String, String> values = redisTemplate.opsForValue();
+        values.set(email, verificationCode, Duration.ofMinutes(3));
 
         // when
-        mailVerificationService.sendVerificationCode(toEmail);
-        ValueOperations<String, String> values = redisTemplate.opsForValue();
-        String verificationCode = values.get(toEmail);
-        mailVerificationService.verifyCode(toEmail, verificationCode);
-        String result = values.get(toEmail);
+        mailVerificationService.verifyCode(email, verificationCode);
+        String result = values.get(email);
 
         // then
+        assertThat(result).isNotNull();
         assertThat(result).isEqualTo("ok");
     }
 
     @DisplayName("틀린 인증번호를 입력하면 예외를 던진다.")
     @Test
-    void verifyCode2() throws MessagingException, UnsupportedEncodingException {
+    void verifyCode2() {
         // given
-        String toEmail = "test@example.com";
-        MimeMessage mimeMessage = new MimeMessage((Session) null);
-        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        String email = "test@example.com";
+        String verificationCode = "123456";
+        String WrongCode = "111111";
+        ValueOperations<String, String> values = redisTemplate.opsForValue();
+        values.set(email, verificationCode, Duration.ofMinutes(3));
 
-        // when
-        mailVerificationService.sendVerificationCode(toEmail);
-        String verificationCode = "1234";
-        assertThatThrownBy(() -> mailVerificationService.verifyCode(toEmail, verificationCode))
+        // expected
+        assertThatThrownBy(() -> mailVerificationService.verifyCode(email, WrongCode))
             .isInstanceOf(InvalidCodeException.class)
             .hasMessage("인증번호를 확인해주세요.");
     }
 
     @DisplayName("메일 인증을 요청하지 않은 이메일로 인증 번호를 입력하면 예외를 던진다.")
     @Test
-    void verifyCode3() throws MessagingException, UnsupportedEncodingException {
+    void verifyCode3() {
         // given
-        String toEmail = "test@example.com";
-        String notRequestedEmail = "test2@example.com";
-        MimeMessage mimeMessage = new MimeMessage((Session) null);
-        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        String email = "test@example.com";
+        String notRequestedEmail = "midcon@nav.com";
+        String verificationCode = "123456";
+        ValueOperations<String, String> values = redisTemplate.opsForValue();
+        values.set(email, verificationCode, Duration.ofMinutes(3));
 
-        // when
-        mailVerificationService.sendVerificationCode(toEmail);
-        String verificationCode = "1234";
+        // expected
         assertThatThrownBy(() -> mailVerificationService.verifyCode(notRequestedEmail, verificationCode))
             .isInstanceOf(InvalidCodeException.class)
             .hasMessage("인증번호를 확인해주세요.");
