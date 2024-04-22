@@ -1,11 +1,11 @@
 package com.pawland.order.controller;
 
 import com.pawland.global.config.security.domain.UserPrincipal;
-import com.pawland.order.dto.request.UpdateOrderRequest;
 import com.pawland.order.dto.response.OrderResponse;
 import com.pawland.order.service.OrderService;
-import com.pawland.order.dto.request.OrderSearchCondition;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/order")
+@Tag(name = "OrderController", description = "주문 관련 컨트롤러 입니다.")
+@SecurityRequirement(name = "Bearer Authentication")
 public class OrderController {
     private final OrderService orderService;
 
@@ -29,12 +31,6 @@ public class OrderController {
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long orderId) {
         return ResponseEntity.ok(orderService.getOneOrderById(orderId));
-    }
-
-    @Operation(summary = "주문 수정")
-    @PutMapping("/{orderId}")
-    public ResponseEntity<OrderResponse> updateOrder(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long orderId, @RequestBody UpdateOrderRequest updateOrderRequest) {
-        return ResponseEntity.ok(orderService.updateOrder(userPrincipal.getUserId(), orderId, updateOrderRequest));
     }
 
     @Operation(summary = "거래 완료")

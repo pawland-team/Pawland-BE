@@ -2,13 +2,14 @@ package com.pawland.order.service;
 
 import com.pawland.order.domain.Order;
 import com.pawland.order.domain.OrderStatus;
-import com.pawland.order.dto.request.UpdateOrderRequest;
 import com.pawland.order.dto.response.OrderResponse;
+import com.pawland.order.exception.OrderException;
 import com.pawland.order.respository.OrderJpaRepository;
 import com.pawland.product.domain.Product;
-import com.pawland.order.dto.request.OrderSearchCondition;
+import com.pawland.product.exception.ProductException;
 import com.pawland.product.respository.ProductJpaRepository;
 import com.pawland.user.domain.User;
+import com.pawland.user.exception.UserException;
 import com.pawland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,63 +39,60 @@ public class OrderService {
         return OrderResponse.of(order);
     }
 
-    @Transactional
-    public OrderResponse updateOrder(Long userId, Long orderId, UpdateOrderRequest updateOrderRequest) {
-        canUpdate(userId, orderId);
-        Order order = getOrderById(orderId);
 
-        OrderStatus orderStatus = OrderStatus.getInstance(updateOrderRequest.getStatus());
-
-        order.changeStatus(orderStatus);
-
-        return OrderResponse.of(order);
-    }
-
-    private User getUserById(Long buyerId) {
-        return userRepository.findById(buyerId).orElseThrow(IllegalArgumentException::new);
-    }
-
-    private Product getProductById(Long productId) {
-        return productJpaRepository.findById(productId).orElseThrow(IllegalArgumentException::new);
-    }
-
-    private Order getOrderById(Long orderId) {
-        return orderJpaRepository.findById(orderId).orElseThrow(IllegalArgumentException::new);
-    }
-
-    private boolean canUpdate(Long userId, Long orderId) {
-        Order order = getOrderById(orderId);
-
-        if (order.getSeller().getId().equals(userId)) {
-            return true;
-        } else {
-            throw new IllegalStateException();
-        }
-    }
 
     @Transactional
     public boolean doneOrder(Long userId, Long orderId) {
-        canUpdate(userId, orderId);
+        if (isSeller(userId, orderId)) {
+            Order order = getOrderById(orderId);
+            order.setSellerCheck(true);
+            return true;
+        } else if (isBuyer(userId, orderId)) {
+            Order order = getOrderById(orderId);
+            order.setBuyerCheck(true);
+            return true;
+        } else {
+            throw new OrderException.AccessDeniedException();
+        }
 
-        Order order = getOrderById(orderId);
-
-        order.changeStatus(OrderStatus.DONE);
-
-        Product product = order.getProduct();
-
-        product.sold();
-
-        return true;
     }
 
     @Transactional
     public Boolean cancelOrder(Long userId, Long orderId) {
-        canUpdate(userId, orderId);
+        if (isSeller(userId, orderId) || isBuyer(userId, orderId)) {
+            Order order = getOrderById(orderId);
 
+            order.changeStatus(OrderStatus.CANCEL);
+
+            return true;
+        } else {
+            throw new OrderException.AccessDeniedException();
+        }
+
+
+    }
+
+    private User getUserById(Long buyerId) {
+        return userRepository.findById(buyerId).orElseThrow(UserException.NotFoundUser::new);
+    }
+
+    private Product getProductById(Long productId) {
+        return productJpaRepository.findById(productId).orElseThrow(ProductException.NotFoundProduct::new);
+    }
+
+    private Order getOrderById(Long orderId) {
+        return orderJpaRepository.findById(orderId).orElseThrow(OrderException.NotFoundOrder::new);
+    }
+
+    private boolean isSeller(Long userId, Long orderId) {
         Order order = getOrderById(orderId);
 
-        order.changeStatus(OrderStatus.CANCEL);
+        return order.getSeller().getId().equals(userId);
+    }
 
-        return true;
+    private boolean isBuyer(Long userId, Long orderId) {
+        Order order = getOrderById(orderId);
+
+        return order.getBuyer().getId().equals(userId);
     }
 }
