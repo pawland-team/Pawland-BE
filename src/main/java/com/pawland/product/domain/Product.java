@@ -41,7 +41,7 @@ public class Product extends BaseTimeEntity {
     private List<String> imageUrls = new ArrayList<>();
 
     @Builder
-    public Product(Category category, String name, int price, String content, String region, int view, List<String> imageUrls,User user) {
+    public Product(Category category, String name, int price, String content, String region, int view, List<String> imageUrls,User seller) {
         this.category = category;
         this.name = name;
         this.price = price;
@@ -49,7 +49,7 @@ public class Product extends BaseTimeEntity {
         this.region = region;
         this.view = view;
         this.imageUrls = imageUrls;
-        this.seller = user;
+        this.seller = seller;
         this.status = Status.SELLING;
     }
 
@@ -69,9 +69,5 @@ public class Product extends BaseTimeEntity {
         if (updateProductRequest.getImages() != null && !updateProductRequest.getImages().isEmpty()) {
             this.imageUrls.clear();
         }
-    }
-
-    public void sold() {
-        this.status = Status.DONE;
     }
 }
