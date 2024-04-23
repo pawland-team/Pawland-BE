@@ -2,6 +2,7 @@ package com.pawland.auth.facade;
 
 import com.pawland.auth.dto.request.SignupRequest;
 import com.pawland.auth.dto.request.VerifyCodeRequest;
+import com.pawland.global.config.security.JwtUtils;
 import com.pawland.mail.service.MailVerificationService;
 import com.pawland.user.domain.User;
 import com.pawland.user.service.UserService;
@@ -11,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
@@ -19,6 +21,7 @@ public class AuthFacade {
     private final UserService userService;
     private final MailVerificationService mailVerificationService;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
     public void checkEmailDuplicate(String email) {
         userService.checkEmailDuplicate(email);
@@ -32,7 +35,7 @@ public class AuthFacade {
         mailVerificationService.verifyCode(request.getEmail(), request.getCode());
     }
 
-    public void signup(SignupRequest request) {
+    public String signup(SignupRequest request) {
         mailVerificationService.checkEmailVerification(request.getEmail());
         User user = User.builder()
             .email(request.getEmail())
@@ -40,5 +43,8 @@ public class AuthFacade {
             .nickname(request.getNickname())
             .build();
         userService.register(user);
+
+        return jwtUtils.generateAccessToken(request.getEmail(), new Date());
     }
+
 }
