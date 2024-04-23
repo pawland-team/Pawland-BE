@@ -5,7 +5,6 @@ import com.pawland.post.domain.FavoritePost;
 import com.pawland.post.domain.Post;
 import com.pawland.product.domain.Product;
 import com.pawland.product.domain.WishItem;
-import com.pawland.review.domain.Review;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
@@ -47,9 +46,6 @@ public class User {
     private boolean emailVerified = false;    // 이메일 인증 여부
 
     private String image;    // 이미지
-
-    @OneToMany(mappedBy = "author")
-    private List<Review> reviewList = new ArrayList<>();    // 남긴 리뷰
 
     @OneToMany(mappedBy = "buyer")
     private List<Order> orderList = new ArrayList<>();    // 주문 내역
