@@ -2,6 +2,7 @@ package com.pawland.mail.service;
 
 import com.pawland.global.config.MailConfig;
 import com.pawland.global.exception.InvalidCodeException;
+import com.pawland.global.exception.InvalidUserException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -42,15 +43,26 @@ public class MailVerificationService {
         }
     }
 
-    public void verifyCode(String toEmail, String code) {
+    @Transactional
+    public void verifyCode(String email, String code) {
         ValueOperations<String, String> values = redisTemplate.opsForValue();
-        String savedVerificationCode = values.get(toEmail);
-        boolean isVerified = code.equals(savedVerificationCode);
-        if (isVerified) {
-            values.set(toEmail, "ok", Duration.ofMinutes(5));
+        String savedVerificationCode = values.get(email);
+        boolean isMatched = code.equals(savedVerificationCode);
+        if (isMatched) {
+            values.set(email, "ok", Duration.ofMinutes(5));
         } else {
             log.error("[메일 인증 실패]");
             throw new InvalidCodeException();
+        }
+    }
+
+    public void checkEmailVerification(String email) {
+        ValueOperations<String, String> values = redisTemplate.opsForValue();
+        String savedCode = values.get(email);
+        boolean isVerifiedEmail = savedCode != null && savedCode.equals("ok");
+        if (!isVerifiedEmail) {
+            log.error("[이메일 인증이 안된 유저]");
+            throw new InvalidUserException();
         }
     }
 
