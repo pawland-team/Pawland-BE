@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @SecurityScheme(
         name = "cookie",
         type = SecuritySchemeType.APIKEY,
-        in = SecuritySchemeIn.HEADER, paramName = "jwt"
+        in = SecuritySchemeIn.HEADER
 )
 public class SwaggerConfig {
 
