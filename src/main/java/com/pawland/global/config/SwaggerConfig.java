@@ -10,16 +10,16 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @SecurityScheme(
-        name = "cookie",
-        type = SecuritySchemeType.APIKEY,
-        in = SecuritySchemeIn.HEADER
+    name = "cookie",
+    type = SecuritySchemeType.APIKEY,
+    in = SecuritySchemeIn.HEADER
 )
 public class SwaggerConfig {
 
     @Bean
     public OpenAPI serverApiConfig() {
         return new OpenAPI()
-                .info(new Info().title("PAWLAND API")
-                        .description("PAWLAND API SWAGGER UI입니다."));
+            .info(new Info().title("PAWLAND API")
+                .description("PAWLAND API SWAGGER UI입니다."));
     }
 }

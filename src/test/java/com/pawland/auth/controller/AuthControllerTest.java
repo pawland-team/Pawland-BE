@@ -91,7 +91,7 @@ class AuthControllerTest {
         User user = User.builder()
             .email("midcon@nav.com")
             .password("asd123123")
-            .phoneNumber("010-1234-5678")
+            .nickname("나는짱")
             .build();
         userRepository.save(user);
 
@@ -244,7 +244,7 @@ class AuthControllerTest {
         SignupRequest request = SignupRequest.builder()
             .email("midcon@nav.com")
             .password("1234")
-            .phoneNumber("010-1234-5678")
+            .nickname("나는짱")
             .build();
 
         String json = objectMapper.writeValueAsString(request);
@@ -276,7 +276,7 @@ class AuthControllerTest {
             )
             .andDo(print())
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$", Matchers.hasItems("전화번호를 입력해주세요.")));
+            .andExpect(jsonPath("$", Matchers.hasItems("닉네임을 입력해주세요.")));
     }
 
     @DisplayName("필수 정보를 여러개 누락하면 회원가입에 실패하고, 누락된 필드들의 메시지를 출력한다.")
@@ -296,7 +296,7 @@ class AuthControllerTest {
             )
             .andDo(print())
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$", Matchers.hasItems("비밀번호를 입력해주세요.", "전화번호를 입력해주세요.")));
+            .andExpect(jsonPath("$", Matchers.hasItems("비밀번호를 입력해주세요.", "닉네임을 입력해주세요.")));
     }
 
     @DisplayName("이미 가입된 이메일로 가입 시 회원가입에 실패한다.")
@@ -306,14 +306,14 @@ class AuthControllerTest {
         User user = User.builder()
             .email("midcon@nav.com")
             .password("asd123123")
-            .phoneNumber("010-1234-5678")
+            .nickname("나는짱")
             .build();
         userRepository.save(user);
 
         SignupRequest request = SignupRequest.builder()
             .email("midcon@nav.com")
             .password("asd123123")
-            .phoneNumber("010-1234-5678")
+            .nickname("나는짱")
             .build();
 
         String json = objectMapper.writeValueAsString(request);
@@ -335,7 +335,7 @@ class AuthControllerTest {
         User user = User.builder()
             .email("midcon@nav.com")
             .password(passwordEncoder.encode("asd123123"))
-            .phoneNumber("010-1234-5678")
+            .nickname("나는짱")
             .build();
         userRepository.save(user);
 
@@ -364,7 +364,7 @@ class AuthControllerTest {
         User user = User.builder()
             .email("midcon@nav.com")
             .password(passwordEncoder.encode("asd123"))
-            .phoneNumber("010-1234-5678")
+            .nickname("나는짱")
             .build();
         userRepository.save(user);
 
@@ -393,7 +393,7 @@ class AuthControllerTest {
         User user = User.builder()
             .email("midcon@nav.com")
             .password("asd123123")
-            .phoneNumber("010-1234-5678")
+            .nickname("나는짱")
             .build();
         userRepository.save(user);
 

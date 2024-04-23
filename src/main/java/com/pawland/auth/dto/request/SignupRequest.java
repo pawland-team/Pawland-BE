@@ -2,7 +2,6 @@ package com.pawland.auth.dto.request;
 
 import lombok.*;
 import jakarta.validation.constraints.NotBlank;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -15,17 +14,13 @@ public class SignupRequest {
     @NotBlank(message = "비밀번호를 입력해주세요.")
     private String password;
 
-    @NotBlank(message = "전화번호를 입력해주세요.")
-    private String phoneNumber;
+    @NotBlank(message = "닉네임을 입력해주세요.")
+    private String nickname;
 
     @Builder
-    public SignupRequest(String email, String password, String phoneNumber) {
+    public SignupRequest(String email, String password, String nickname) {
         this.email = email;
         this.password = password;
-        this.phoneNumber = phoneNumber;
-    }
-
-    public void encodePassword(PasswordEncoder passwordEncoder) {
-        this.password = passwordEncoder.encode(password);
+        this.nickname = nickname;
     }
 }

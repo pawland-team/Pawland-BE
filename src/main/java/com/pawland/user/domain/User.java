@@ -33,10 +33,8 @@ public class User {
     @NotBlank(message = "비밀번호를 입력해주세요.")
     private String password;   // 비밀번호
 
-    @NotBlank(message = "전화번호를 입력해주세요.")
-    private String phoneNumber;    // 전화번호
-
-    private String name;     // 이름(닉네임)
+    @NotBlank(message = "닉네임을 입력해주세요.")
+    private String nickname;    // 전화번호
 
     private String introduce;   // 소개
 
@@ -63,14 +61,18 @@ public class User {
     private List<FavoritePost> favoritePostList = new ArrayList<>();    // 추천 누른 글
 
     @Builder
-    public User(String email, String password, String name, String introduce, UserType type, String phoneNumber, boolean emailVerified, String image) {
+    public User(String email, String password, String introduce, UserType type, String nickname, boolean emailVerified, String image) {
         this.email = email;
         this.password = password;
-        this.name = name;
         this.introduce = introduce;
         this.type = type;
-        this.phoneNumber = phoneNumber;
+        this.nickname = nickname;
         this.emailVerified = emailVerified;
         this.image = image;
+    }
+
+    @Deprecated
+    public String getName() {
+        return nickname;
     }
 }

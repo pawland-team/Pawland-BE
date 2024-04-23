@@ -7,16 +7,16 @@ import lombok.Data;
 public class UserResponse {
     private Long id;
     private String email;
-    private String name;
+    private String nickname;
 
-    private UserResponse(Long id, String email, String name) {
+    private UserResponse(Long id, String email, String nickname) {
         this.id = id;
         this.email = email;
-        this.name = name;
+        this.nickname = nickname;
     }
 
     public static UserResponse of(User user) {
-        return new UserResponse(user.getId(), user.getEmail(), user.getName());
+        return new UserResponse(user.getId(), user.getEmail(), user.getNickname());
     }
 
 

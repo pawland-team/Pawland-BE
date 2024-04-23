@@ -36,7 +36,7 @@ public class AuthFacade {
         User user = User.builder()
             .email(request.getEmail())
             .password(passwordEncoder.encode(request.getPassword()))
-            .phoneNumber(request.getPhoneNumber())
+            .nickname(request.getNickname())
             .build();
         userService.register(user);
     }
