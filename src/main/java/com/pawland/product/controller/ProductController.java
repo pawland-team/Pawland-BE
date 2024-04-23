@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/product")
 @Tag(name = "ProductController", description = "상품 관련 컨트롤러 입니다.")
-@SecurityRequirement(name = "Bearer Authentication")
+@SecurityRequirement(name = "jwt")
 public class ProductController {
 
     private final ProductService productService;

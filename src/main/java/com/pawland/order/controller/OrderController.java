@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/order")
 @Tag(name = "OrderController", description = "주문 관련 컨트롤러 입니다.")
-@SecurityRequirement(name = "Bearer Authentication")
+@SecurityRequirement(name = "jwt")
 public class OrderController {
     private final OrderService orderService;
 

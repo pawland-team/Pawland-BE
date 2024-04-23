@@ -15,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class OrderServiceTest {
@@ -28,6 +31,8 @@ class OrderServiceTest {
     @Autowired
     ProductService productService;
 
+    private final List<User> list = new ArrayList<>();
+
     @PostConstruct
     void init() {
         User tester = User.builder().email("test@test.com")
@@ -39,6 +44,8 @@ class OrderServiceTest {
                 .emailVerified(true).build();
 
         userRepository.save(tester);
+
+        list.add(tester);
 
         User tester2 = User.builder().email("test2@test.com")
                 .password("123123")
@@ -57,6 +64,8 @@ class OrderServiceTest {
                 "사료",
                 null);
 
+        list.add(tester2);
+
         productService.createProduct(1L, createProductRequest);
     }
 
@@ -64,13 +73,16 @@ class OrderServiceTest {
     @Test
     void createOrder() {
         //given
+        User seller = list.get(0);
+        User buyer = list.get(1);
+
         //when
-        OrderResponse orderResponse = orderService.createOrder(2L, 1L);
+        OrderResponse orderResponse = orderService.createOrder(buyer.getId(), 1L);
 
         //then
         Assertions.assertEquals(1L,orderResponse.getId());
-        Assertions.assertEquals("tester",orderResponse.getSeller().getName());
-        Assertions.assertEquals("tester2",orderResponse.getBuyer().getName());
+        Assertions.assertEquals(seller.getName(),orderResponse.getSeller().getName());
+        Assertions.assertEquals(buyer.getName(),orderResponse.getBuyer().getName());
         Assertions.assertEquals("상품1",orderResponse.getProduct().getName());
     }
 
@@ -78,15 +90,17 @@ class OrderServiceTest {
     @Test
     void getOneOrderById() {
         //given
-        orderService.createOrder(2L, 1L);
+        User seller = list.get(0);
+        User buyer = list.get(1);
+        orderService.createOrder(buyer.getId(), 1L);
 
         //when
         OrderResponse oneOrderById = orderService.getOneOrderById(1L);
 
         //then
         Assertions.assertEquals(1L,oneOrderById.getId());
-        Assertions.assertEquals("tester",oneOrderById.getSeller().getName());
-        Assertions.assertEquals("tester2",oneOrderById.getBuyer().getName());
+        Assertions.assertEquals(seller.getName(),oneOrderById.getSeller().getName());
+        Assertions.assertEquals(buyer.getName(),oneOrderById.getBuyer().getName());
         Assertions.assertEquals("상품1",oneOrderById.getProduct().getName());
     }
 
@@ -94,10 +108,12 @@ class OrderServiceTest {
     @Test
     void doneOrderBySeller() {
         //given
-        orderService.createOrder(2L, 1L);
+        User seller = list.get(0);
+        User buyer = list.get(1);
+        orderService.createOrder(buyer.getId(), 1L);
 
         //when
-        orderService.doneOrder(1L, 1L);
+        orderService.doneOrder(seller.getId(), 1L);
         OrderResponse oneOrderById = orderService.getOneOrderById(1L);
 
         //then
@@ -110,10 +126,11 @@ class OrderServiceTest {
     @Test
     void doneOrderByBuyer() {
         //given
-        orderService.createOrder(2L, 1L);
+        User buyer = list.get(1);
+        orderService.createOrder(buyer.getId(), 1L);
 
         //when
-        orderService.doneOrder(2L, 1L);
+        orderService.doneOrder(buyer.getId(), 1L);
         OrderResponse oneOrderById = orderService.getOneOrderById(1L);
 
         //then
@@ -126,11 +143,13 @@ class OrderServiceTest {
     @Test
     void doneOrderBoth() {
         //given
-        orderService.createOrder(2L, 1L);
+        User seller = list.get(0);
+        User buyer = list.get(1);
+        orderService.createOrder(buyer.getId(), 1L);
 
         //when
-        orderService.doneOrder(1L, 1L);
-        orderService.doneOrder(2L, 1L);
+        orderService.doneOrder(seller.getId(), 1L);
+        orderService.doneOrder(buyer.getId(), 1L);
         OrderResponse oneOrderById = orderService.getOneOrderById(1L);
 
         //then
@@ -143,10 +162,12 @@ class OrderServiceTest {
     @Test
     void cancelOrderBySeller() {
         //given
-        orderService.createOrder(2L, 1L);
+        User seller = list.get(0);
+        User buyer = list.get(1);
+        orderService.createOrder(buyer.getId(), 1L);
 
         //when
-        orderService.cancelOrder(1L, 1L);
+        orderService.cancelOrder(seller.getId(), 1L);
         OrderResponse oneOrderById = orderService.getOneOrderById(1L);
 
         //then
@@ -157,10 +178,11 @@ class OrderServiceTest {
     @Test
     void cancelOrderByBuyer() {
         //given
-        orderService.createOrder(2L, 1L);
+        User buyer = list.get(1);
+        orderService.createOrder(buyer.getId(), 1L);
 
         //when
-        orderService.cancelOrder(2L, 1L);
+        orderService.cancelOrder(buyer.getId(), 1L);
         OrderResponse oneOrderById = orderService.getOneOrderById(1L);
 
         //then
