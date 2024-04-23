@@ -152,7 +152,7 @@ class MailVerificationServiceTest {
             .hasMessage("인증번호를 확인해주세요.");
     }
 
-    @DisplayName("인증된 유저가 요청 시 성공한다.")
+    @DisplayName("이메일 인증된 유저가 회원가입 요청 시 성공한다.")
     @Test
     void checkEmailVerification1() {
         // given
@@ -169,7 +169,7 @@ class MailVerificationServiceTest {
         verify(values, times(1)).get(verifiedEmail);
     }
 
-    @DisplayName("인증되지 않은 유저가 요청 시 실패한다.")
+    @DisplayName("이메일을 인증하지 않은 유저가 회원가입 요청 시 실패한다.")
     @Test
     void checkEmailVerification2() {
         // given

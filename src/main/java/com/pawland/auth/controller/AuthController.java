@@ -79,7 +79,7 @@ public class AuthController {
             .domain("localhost")   // todo 서버 환경에 따라 설정파일로 분리해서 관리
             .path("/")
             .secure(false)
-            .maxAge(Duration.ofDays(30))  // 한달이 국룰
+            .maxAge(Duration.ofDays(30))
             .sameSite("Strict")
             .build();
 
