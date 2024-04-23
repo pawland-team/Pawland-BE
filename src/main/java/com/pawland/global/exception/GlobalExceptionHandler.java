@@ -1,5 +1,6 @@
 package com.pawland.global.exception;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "400", description = "입력 값이 올바르지 않습니다.")
     public ResponseEntity invalidRequestHandler(MethodArgumentNotValidException e) {
         String[] errorMessages = e.getFieldErrors().stream()
             .map(fieldError -> fieldError.getDefaultMessage())
@@ -39,6 +41,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(MailSendException.class)
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "500",description = "메시지 전송 오류")
     public ResponseEntity mailSendExceptionHandler(MailSendException e) {
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
