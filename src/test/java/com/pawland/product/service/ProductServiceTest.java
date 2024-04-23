@@ -28,12 +28,13 @@ class ProductServiceTest {
 
     @PostConstruct
     void init() {
-        User tester = User.builder().email("test@test.com")
+        User tester = User.builder()
+            .email("test@test.com")
                 .password("123123")
                 .nickname("tester")
                 .introduce("tester입니다.")
                 .type(UserType.GOOGLE)
-                .emailVerified(true).build();
+                .build();
 
         userRepository.save(tester);
     }

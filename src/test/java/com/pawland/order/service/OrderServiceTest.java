@@ -41,7 +41,7 @@ class OrderServiceTest {
                 .nickname("tester")
                 .introduce("tester입니다.")
                 .type(UserType.GOOGLE)
-                .emailVerified(true).build();
+                .build();
 
         userRepository.save(tester);
 
@@ -53,7 +53,7 @@ class OrderServiceTest {
                 .nickname("tester2")
                 .introduce("tester2입니다.")
                 .type(UserType.GOOGLE)
-                .emailVerified(true).build();
+                .build();
 
         userRepository.save(tester2);
 

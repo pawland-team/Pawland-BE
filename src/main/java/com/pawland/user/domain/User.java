@@ -41,8 +41,6 @@ public class User {
     @Enumerated(EnumType.STRING)    // 회원 유형(구글, 카카오, 일반)
     private UserType type = NORMAL;
 
-    private boolean emailVerified = false;    // 이메일 인증 여부
-
     private String image;    // 이미지
 
     @OneToMany(mappedBy = "buyer")
@@ -61,13 +59,12 @@ public class User {
     private List<FavoritePost> favoritePostList = new ArrayList<>();    // 추천 누른 글
 
     @Builder
-    public User(String email, String password, String introduce, UserType type, String nickname, boolean emailVerified, String image) {
+    public User(String email, String password, String introduce, UserType type, String nickname, String image) {
         this.email = email;
         this.password = password;
         this.introduce = introduce;
         this.type = type;
         this.nickname = nickname;
-        this.emailVerified = emailVerified;
         this.image = image;
     }
 
