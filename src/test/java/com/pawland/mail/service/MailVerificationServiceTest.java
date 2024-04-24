@@ -2,9 +2,11 @@ package com.pawland.mail.service;
 
 import com.pawland.global.config.MailConfig;
 import com.pawland.global.exception.InvalidCodeException;
+import com.pawland.global.exception.InvalidUserException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,18 @@ class MailVerificationServiceTest {
 
     @Autowired
     private MailVerificationService mailVerificationService;
+
+    private RedisTemplate<String, String> mockRedisTemplate;
+
+    private MailVerificationService mockMailService;
+
+    @BeforeEach
+    void setUp() {
+        mockRedisTemplate = mock(RedisTemplate.class);
+        ValueOperations<String, String> mockValues = mock(ValueOperations.class);
+        when(mockRedisTemplate.opsForValue()).thenReturn(mockValues);
+        mockMailService = new MailVerificationService(mailConfig, mailSender, mockRedisTemplate);
+    }
 
     @DisplayName("이메일 전송 성공 Mock 테스트")
     @Test
@@ -136,5 +150,52 @@ class MailVerificationServiceTest {
         assertThatThrownBy(() -> mailVerificationService.verifyCode(notRequestedEmail, verificationCode))
             .isInstanceOf(InvalidCodeException.class)
             .hasMessage("인증번호를 확인해주세요.");
+    }
+
+    @DisplayName("이메일 인증된 유저가 회원가입 요청 시 성공한다.")
+    @Test
+    void checkEmailVerification1() {
+        // given
+        String verifiedEmail = "test@example.com";
+        String authSuccessStatus = "ok";
+        ValueOperations<String, String> values = mockRedisTemplate.opsForValue();
+        when(values.get(verifiedEmail)).thenReturn(authSuccessStatus);
+
+        // when
+        mockMailService.checkEmailVerification(verifiedEmail);
+
+        // then
+        verify(values).get(verifiedEmail);
+        verify(values, times(1)).get(verifiedEmail);
+    }
+
+    @DisplayName("이메일을 인증하지 않은 유저가 회원가입 요청 시 실패한다.")
+    @Test
+    void checkEmailVerification2() {
+        // given
+        String authWaitingEmail = "test@example.com";
+        String authWaitingStatus = "123456";
+        ValueOperations<String, String> values = mockRedisTemplate.opsForValue();
+        when(values.get(authWaitingEmail)).thenReturn(authWaitingStatus);
+
+        // expected
+        assertThatThrownBy(() ->  mockMailService.checkEmailVerification(authWaitingEmail))
+            .isInstanceOf(InvalidUserException.class)
+            .hasMessage("이메일 인증이 인증되지 않은 유저입니다.");
+    }
+
+    @DisplayName("인증 요청을 하지 않았거나 인증한지 오래된 유저가 요청 시 실패한다.")
+    @Test
+    void checkEmailVerification3() {
+        // given
+        String authNotProcessingEmail = "test@example.com";
+        String authNotProcessingStatus = null;
+        ValueOperations<String, String> values = mockRedisTemplate.opsForValue();
+        when(values.get(authNotProcessingEmail)).thenReturn(authNotProcessingStatus);
+
+        // expected
+        assertThatThrownBy(() ->  mockMailService.checkEmailVerification(authNotProcessingEmail))
+            .isInstanceOf(InvalidUserException.class)
+            .hasMessage("이메일 인증이 인증되지 않은 유저입니다.");
     }
 }

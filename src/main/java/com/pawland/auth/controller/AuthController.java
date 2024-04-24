@@ -73,9 +73,19 @@ public class AuthController {
         })
     @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity signup(@Valid @RequestBody SignupRequest request) {
-        authFacade.signup(request);
+        String jwt = authFacade.signup(request);
+
+        ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
+            .domain("localhost")   // todo 서버 환경에 따라 설정파일로 분리해서 관리
+            .path("/")
+            .secure(false)
+            .maxAge(Duration.ofDays(30))
+            .sameSite("Strict")
+            .build();
+
         return ResponseEntity
             .status(CREATED)
+            .header(HttpHeaders.SET_COOKIE, cookie.toString())
             .body("회원가입 되었습니다.");
     }
 

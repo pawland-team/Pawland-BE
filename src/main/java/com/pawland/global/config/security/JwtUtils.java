@@ -37,7 +37,7 @@ public class JwtUtils {
         return Jwts.builder()
             .subject(name)
             .issuedAt(dateTime)
-            .expiration(new Date(dateTime.getTime() + 36000L)) // 한달짜리 jwt
+            .expiration(new Date(dateTime.getTime() + 24L * 60 * 60 * 1000)) // 하루짜리 jwt
             .signWith(secretKey)
             .compact();
     }

@@ -43,7 +43,7 @@ class UserServiceTest {
         User user = User.builder()
             .email("mid@nav.com")
             .password("asd123123")
-            .phoneNumber("010-1234-5678")
+            .nickname("나는짱")
             .build();
         userRepository.save(user);
 
@@ -60,7 +60,7 @@ class UserServiceTest {
         User user = User.builder()
             .email("mid@nav.com")
             .password("asd123123")
-            .phoneNumber("010-1234-5678")
+            .nickname("나는짱")
             .build();
 
         // when
@@ -70,8 +70,8 @@ class UserServiceTest {
 
         // then
         assertThat(result.getEmail()).isEqualTo(user.getEmail());
-        assertThat(result.getPhoneNumber()).isEqualTo(user.getPhoneNumber());
-        assertThat(result.getPhoneNumber()).isEqualTo(user.getPhoneNumber());
+        assertThat(result.getNickname()).isEqualTo(user.getNickname());
+        assertThat(result.getNickname()).isEqualTo(user.getNickname());
     }
 
     @DisplayName("정상적인 정보 입력 시 중복 이메일이 존재하면 실패한다.")
@@ -81,14 +81,14 @@ class UserServiceTest {
         User user = User.builder()
             .email("mid@nav.com")
             .password("asd123123")
-            .phoneNumber("010-1234-5678")
+            .nickname("나는짱")
             .build();
 
         userService.register(user);
         User duplicateUser = User.builder()
             .email("mid@nav.com")
             .password("asd123123")
-            .phoneNumber("010-1234-5678")
+            .nickname("나는짱")
             .build();
 
         // expected

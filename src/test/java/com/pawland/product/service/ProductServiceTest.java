@@ -28,13 +28,13 @@ class ProductServiceTest {
 
     @PostConstruct
     void init() {
-        User tester = User.builder().email("test@test.com")
+        User tester = User.builder()
+            .email("test@test.com")
                 .password("123123")
-                .phoneNumber("010-1111-1111")
-                .name("tester")
+                .nickname("tester")
                 .introduce("tester입니다.")
                 .type(UserType.GOOGLE)
-                .emailVerified(true).build();
+                .build();
 
         userRepository.save(tester);
     }
@@ -66,7 +66,7 @@ class ProductServiceTest {
 
         //then
         Assertions.assertEquals(1L, product.getId());
-        Assertions.assertEquals("tester",product.getSeller().getName());
+        Assertions.assertEquals("tester",product.getSeller().getNickname());
     }
 
 
@@ -82,7 +82,7 @@ class ProductServiceTest {
         //then
         Assertions.assertEquals(1L, oneProductById.getId());
         Assertions.assertEquals("상품1",oneProductById.getName());
-        Assertions.assertEquals("tester",oneProductById.getSeller().getName());
+        Assertions.assertEquals("tester",oneProductById.getSeller().getNickname());
     }
 
     @DisplayName("상품 수정")

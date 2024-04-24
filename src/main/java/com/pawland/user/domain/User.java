@@ -33,17 +33,13 @@ public class User {
     @NotBlank(message = "비밀번호를 입력해주세요.")
     private String password;   // 비밀번호
 
-    @NotBlank(message = "전화번호를 입력해주세요.")
-    private String phoneNumber;    // 전화번호
-
-    private String name;     // 이름(닉네임)
+    @NotBlank(message = "닉네임을 입력해주세요.")
+    private String nickname;    // 전화번호
 
     private String introduce;   // 소개
 
     @Enumerated(EnumType.STRING)    // 회원 유형(구글, 카카오, 일반)
     private UserType type = NORMAL;
-
-    private boolean emailVerified = false;    // 이메일 인증 여부
 
     private String image;    // 이미지
 
@@ -63,14 +59,17 @@ public class User {
     private List<FavoritePost> favoritePostList = new ArrayList<>();    // 추천 누른 글
 
     @Builder
-    public User(String email, String password, String name, String introduce, UserType type, String phoneNumber, boolean emailVerified, String image) {
+    public User(String email, String password, String introduce, UserType type, String nickname, String image) {
         this.email = email;
         this.password = password;
-        this.name = name;
         this.introduce = introduce;
         this.type = type;
-        this.phoneNumber = phoneNumber;
-        this.emailVerified = emailVerified;
+        this.nickname = nickname;
         this.image = image;
+    }
+
+    @Deprecated
+    public String getName() {
+        return nickname;
     }
 }

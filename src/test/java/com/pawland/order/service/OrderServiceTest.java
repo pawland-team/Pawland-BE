@@ -37,11 +37,11 @@ class OrderServiceTest {
     void init() {
         User tester = User.builder().email("test@test.com")
                 .password("123123")
-                .phoneNumber("010-1111-1111")
-                .name("tester")
+                .nickname("010-1111-1111")
+                .nickname("tester")
                 .introduce("tester입니다.")
                 .type(UserType.GOOGLE)
-                .emailVerified(true).build();
+                .build();
 
         userRepository.save(tester);
 
@@ -49,11 +49,11 @@ class OrderServiceTest {
 
         User tester2 = User.builder().email("test2@test.com")
                 .password("123123")
-                .phoneNumber("010-1111-2222")
-                .name("tester2")
+                .nickname("010-1111-2222")
+                .nickname("tester2")
                 .introduce("tester2입니다.")
                 .type(UserType.GOOGLE)
-                .emailVerified(true).build();
+                .build();
 
         userRepository.save(tester2);
 
@@ -81,8 +81,8 @@ class OrderServiceTest {
 
         //then
         Assertions.assertEquals(1L,orderResponse.getId());
-        Assertions.assertEquals(seller.getName(),orderResponse.getSeller().getName());
-        Assertions.assertEquals(buyer.getName(),orderResponse.getBuyer().getName());
+        Assertions.assertEquals(seller.getName(),orderResponse.getSeller().getNickname());
+        Assertions.assertEquals(buyer.getName(),orderResponse.getBuyer().getNickname());
         Assertions.assertEquals("상품1",orderResponse.getProduct().getName());
     }
 
@@ -99,8 +99,8 @@ class OrderServiceTest {
 
         //then
         Assertions.assertEquals(1L,oneOrderById.getId());
-        Assertions.assertEquals(seller.getName(),oneOrderById.getSeller().getName());
-        Assertions.assertEquals(buyer.getName(),oneOrderById.getBuyer().getName());
+        Assertions.assertEquals(seller.getName(),oneOrderById.getSeller().getNickname());
+        Assertions.assertEquals(buyer.getName(),oneOrderById.getBuyer().getNickname());
         Assertions.assertEquals("상품1",oneOrderById.getProduct().getName());
     }
 
