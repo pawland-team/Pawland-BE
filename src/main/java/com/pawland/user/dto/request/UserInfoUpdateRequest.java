@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserUpdateRequest {
+public class UserInfoUpdateRequest {
 
     @NotBlank(message = "닉네임을 입력해주세요.")
     private String nickname;
@@ -19,7 +19,7 @@ public class UserUpdateRequest {
     private String profileImage = "";
 
     @Builder
-    public UserUpdateRequest(String nickname, String introduce, String profileImage) {
+    public UserInfoUpdateRequest(String nickname, String introduce, String profileImage) {
         this.nickname = nickname;
         this.introduce = introduce;
         this.profileImage = profileImage;

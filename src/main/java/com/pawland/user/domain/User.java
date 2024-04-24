@@ -6,10 +6,7 @@ import com.pawland.post.domain.Post;
 import com.pawland.product.domain.Product;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,15 +52,19 @@ public class User extends BaseTimeEntity {
     public User(String email, String password, String introduce, LoginType type, String nickname, String profileImage) {
         this.email = email;
         this.password = password;
-        this.introduce = introduce;
-        this.type = type;
         this.nickname = nickname;
-        this.profileImage = profileImage;
+        this.type = type == null ? this.type : type;
+        this.profileImage = isBlank(profileImage) ? this.profileImage : profileImage;
+        this.introduce = isBlank(introduce) ? this.introduce : introduce;
     }
 
     public void update(User user) {
         this.nickname = user.getNickname();
-        this.profileImage = user.getProfileImage().equals("") ? profileImage : user.getProfileImage();
-        this.introduce = user.getIntroduce().equals("") ? introduce : user.getIntroduce();
+        this.profileImage = isBlank(user.getProfileImage()) ? profileImage : user.getProfileImage();
+        this.introduce = isBlank(user.getIntroduce()) ? introduce : user.getIntroduce();
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 }

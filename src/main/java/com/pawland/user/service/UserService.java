@@ -1,6 +1,6 @@
 package com.pawland.user.service;
 
-import com.pawland.user.dto.request.UserUpdateRequest;
+import com.pawland.user.dto.request.UserInfoUpdateRequest;
 import com.pawland.user.dto.response.UserInfoResponse;
 import com.pawland.user.exception.UserException;
 import lombok.RequiredArgsConstructor;
@@ -40,5 +40,14 @@ public class UserService {
         // TODO: 평점 조회 로직 구현 필요
 
         return new UserInfoResponse(user, 3.5);
+    }
+
+    @Transactional
+    public void updateUser(String email, UserInfoUpdateRequest request) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(UserException.NotFoundUser::new);
+
+        user.update(request.toUser());
+
     }
 }
