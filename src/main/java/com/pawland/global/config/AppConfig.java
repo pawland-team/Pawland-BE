@@ -11,4 +11,5 @@ public class AppConfig {
 
     private final String jwtKey;
     private final String frontUrl;
+    private final String defaultImage;
 }
