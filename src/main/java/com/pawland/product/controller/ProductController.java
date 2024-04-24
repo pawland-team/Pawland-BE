@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/product")
@@ -46,5 +48,11 @@ public class ProductController {
     @DeleteMapping("/{productId}")
     public ResponseEntity<Boolean> deleteProduct(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long productId) {
         return ResponseEntity.ok(productService.deleteProduct(userPrincipal.getUserId(), productId));
+    }
+
+    @Operation(summary = "상품 페이징 조회")
+    @GetMapping("/")
+    public List<ProductResponse> getProducts(@RequestParam(defaultValue = "1") int page) {
+        return productService.getProducts(page);
     }
 }

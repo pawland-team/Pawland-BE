@@ -57,11 +57,15 @@ class OrderServiceTest {
 
         userRepository.save(tester2);
 
-        CreateProductRequest createProductRequest = new CreateProductRequest("상품1",
+        CreateProductRequest createProductRequest = new CreateProductRequest(
+                "사료",
+                "CAT",
+                "NEW",
+                "상품1",
                 10000,
                 "상품입니다.",
                 "서울시 강서구",
-                "사료",
+                null,
                 null);
 
         list.add(tester2);
@@ -81,8 +85,8 @@ class OrderServiceTest {
 
         //then
         Assertions.assertEquals(1L,orderResponse.getId());
-        Assertions.assertEquals(seller.getName(),orderResponse.getSeller().getNickname());
-        Assertions.assertEquals(buyer.getName(),orderResponse.getBuyer().getNickname());
+        Assertions.assertEquals(seller.getNickname(),orderResponse.getSeller().getNickname());
+        Assertions.assertEquals(buyer.getNickname(),orderResponse.getBuyer().getNickname());
         Assertions.assertEquals("상품1",orderResponse.getProduct().getName());
     }
 
@@ -99,8 +103,8 @@ class OrderServiceTest {
 
         //then
         Assertions.assertEquals(1L,oneOrderById.getId());
-        Assertions.assertEquals(seller.getName(),oneOrderById.getSeller().getNickname());
-        Assertions.assertEquals(buyer.getName(),oneOrderById.getBuyer().getNickname());
+        Assertions.assertEquals(seller.getNickname(),oneOrderById.getSeller().getNickname());
+        Assertions.assertEquals(buyer.getNickname(),oneOrderById.getBuyer().getNickname());
         Assertions.assertEquals("상품1",oneOrderById.getProduct().getName());
     }
 

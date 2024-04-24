@@ -19,8 +19,12 @@ public class Product extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Enumerated(EnumType.STRING)
     private Category category;
+    @Enumerated(EnumType.STRING)
+    private Species species;
+    @Enumerated(EnumType.STRING)
+    private Condition condition;
 
     private String name;
 
@@ -37,23 +41,38 @@ public class Product extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    private String thumbnailImageUrl;
+
     @ElementCollection
     private List<String> imageUrls = new ArrayList<>();
 
     @Builder
-    public Product(Category category, String name, int price, String content, String region, int view, List<String> imageUrls,User seller) {
-        this.category = category;
+    public Product(String category,String species,String condition,String name, int price, String content, String region,User seller) {
+        this.category = Category.getInstance(category);
+        this.species = Species.getInstance(species);
+        this.condition = Condition.getInstance(condition);
         this.name = name;
         this.price = price;
         this.content = content;
         this.region = region;
-        this.view = view;
-        this.imageUrls = imageUrls;
+        this.view = 0;
         this.seller = seller;
         this.status = Status.SELLING;
+        //todo
+        this.thumbnailImageUrl = "";
+        this.imageUrls = new ArrayList<>();
     }
 
     public void update(UpdateProductRequest updateProductRequest) {
+        if (updateProductRequest.getCategory() != null) {
+            this.category = Category.getInstance(updateProductRequest.getCategory());
+        }
+        if (updateProductRequest.getSpecies() != null) {
+            this.species = Species.getInstance(updateProductRequest.getSpecies());
+        }
+        if (updateProductRequest.getCondition() != null) {
+            this.condition = Condition.getInstance(updateProductRequest.getCondition());
+        }
         if (updateProductRequest.getName() != null) {
             this.name = updateProductRequest.getName();
         }
@@ -66,8 +85,7 @@ public class Product extends BaseTimeEntity {
         if (updateProductRequest.getRegion() != null) {
             this.region = updateProductRequest.getRegion();
         }
-        if (updateProductRequest.getImages() != null && !updateProductRequest.getImages().isEmpty()) {
-            this.imageUrls.clear();
-        }
     }
+
+
 }

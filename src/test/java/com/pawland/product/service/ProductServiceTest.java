@@ -16,6 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest
 class ProductServiceTest {
@@ -39,26 +41,39 @@ class ProductServiceTest {
         userRepository.save(tester);
     }
 
-    private void createProduct(Long userId) {
-        CreateProductRequest createProductRequest = new CreateProductRequest("상품1",
-                10000,
-                "상품입니다.",
-                "서울시 강서구",
-                "사료",
-                null);
+    private void createProduct(Long userId,int size) {
 
-        productService.createProduct(userId, createProductRequest);
+        for (int i = 0; i < size; i++) {
+            CreateProductRequest createProductRequest = new CreateProductRequest(
+                    "사료",
+                    "CAT",
+                    "NEW",
+                    "상품"+i,
+                    10000,
+                    "상품입니다.",
+                    "서울시 강서구",
+                    null,
+                    null);
+
+            productService.createProduct(userId, createProductRequest);
+        }
+
+
     }
 
     @DisplayName("상품 등록")
     @Test
     void createProductTest() {
         //given
-        CreateProductRequest createProductRequest = new CreateProductRequest("상품1",
+        CreateProductRequest createProductRequest = new CreateProductRequest(
+                "사료",
+                "CAT",
+                "NEW",
+                "상품1",
                 10000,
                 "상품입니다.",
                 "서울시 강서구",
-                "사료",
+                null,
                 null);
 
         //when
@@ -74,7 +89,7 @@ class ProductServiceTest {
     @Test
     void getOneProductById() {
         //given
-        createProduct(1L);
+        createProduct(1L,1);
 
         //when
         ProductResponse oneProductById = productService.getOneProductById(1L);
@@ -89,7 +104,7 @@ class ProductServiceTest {
     @Test
     void updateProduct() {
         //given
-        createProduct(1L);
+        createProduct(1L,1);
 
         //when
         ProductResponse updatedProduct = productService.updateProduct(1L, 1L, UpdateProductRequest.builder().name("상품1수정").build());
@@ -103,7 +118,7 @@ class ProductServiceTest {
     @Transactional
     void deleteProduct() {
         //given
-        createProduct(1L);
+        createProduct(1L,1);
 
         //when
         productService.deleteProduct(1L, 1L);
@@ -111,5 +126,20 @@ class ProductServiceTest {
         //then
         Assertions.assertThrows(ProductException.class, () -> productService.getOneProductById(1L));
 
+    }
+
+    @DisplayName("상품 최신순 8개 조회")
+    @Test
+    @Transactional
+    void getProductsWithPaging() {
+        //given
+        createProduct(1L,10);
+
+        //when
+        List<ProductResponse> products = productService.getProducts(1);
+
+        //then
+        Assertions.assertEquals(8, products.size());
+        Assertions.assertEquals(10L,products.get(0).getId());
     }
 }

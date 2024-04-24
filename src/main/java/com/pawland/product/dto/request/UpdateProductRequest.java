@@ -13,10 +13,13 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class UpdateProductRequest {
+    private String category;
+    private String species;
+    private String condition;
     private String name;
     private int price;
     private String content;
     private String region;
-    private String category;
+    private MultipartFile thumbnailImage;
     private List<MultipartFile> images;
 }

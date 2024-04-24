@@ -1,11 +1,9 @@
 package com.pawland.product.dto.response;
 
-import com.pawland.product.domain.Category;
-import com.pawland.product.domain.Product;
+import com.pawland.product.domain.*;
 import com.pawland.user.dto.UserResponse;
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -13,26 +11,34 @@ public class ProductResponse {
     private Long id;
     private UserResponse seller;
     private Category category;
+    private Species species;
+    private Condition condition;
     private String name;
     private int price;
     private String content;
     private String region;
     private int view;
+    private Status status;
+    private String thumbnailUrl;
     private List<String> imageUrls;
 
-    private ProductResponse(Long id,UserResponse seller, Category category, String name, int price, String content, String region, int view, List<String> imageUrls) {
-        this.id = id;
-        this.seller = seller;
-        this.category = category;
-        this.name = name;
-        this.price = price;
-        this.content = content;
-        this.region = region;
-        this.view = view;
-        this.imageUrls = imageUrls;
+    public ProductResponse(Product product) {
+        this.id = product.getId();
+        this.seller = UserResponse.of(product.getSeller());
+        this.category = product.getCategory();
+        this.species = product.getSpecies();
+        this.condition = product.getCondition();
+        this.name = product.getName();
+        this.price = product.getPrice();
+        this.content = product.getContent();
+        this.region = product.getRegion();
+        this.view = product.getView();
+        this.status = product.getStatus();
+        this.thumbnailUrl = product.getThumbnailImageUrl();
+        this.imageUrls = product.getImageUrls();
     }
 
     public static ProductResponse of(Product product) {
-        return new ProductResponse(product.getId(), UserResponse.of(product.getSeller()), product.getCategory(), product.getName(), product.getPrice(), product.getContent(), product.getRegion(), product.getView(), product.getImageUrls());
+        return new ProductResponse(product);
     }
 }
