@@ -53,8 +53,7 @@ public class SecurityConfig {
         return http
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/auth/signup").permitAll()
-                .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(
                     "/api/v1/auth/**",
                     "/swagger-ui/**",
@@ -63,7 +62,7 @@ public class SecurityConfig {
                 .requestMatchers("/**").permitAll() // TODO: 배포 시 제거
                 .anyRequest().authenticated()
             )
-            .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)  // TODO: 배포 시 스웨거 관련 URL 추가 후 활성화
+            .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jsonAuthFilter(), UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(e -> {
                 e.authenticationEntryPoint(new Http401Handler(objectMapper));

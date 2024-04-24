@@ -1,7 +1,6 @@
 package com.pawland.global.utils;
 
 import com.pawland.global.config.security.domain.UserPrincipal;
-import com.pawland.user.domain.LoginType;
 import com.pawland.user.domain.User;
 import com.pawland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
