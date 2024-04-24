@@ -1,5 +1,6 @@
 package com.pawland.user.domain;
 
+import com.pawland.global.domain.BaseTimeEntity;
 import com.pawland.order.domain.Order;
 import com.pawland.post.domain.FavoritePost;
 import com.pawland.post.domain.Post;
@@ -15,33 +16,32 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.pawland.user.domain.UserType.NORMAL;
+import static com.pawland.user.domain.LoginType.NORMAL;
 
-@Entity
+@Entity(name = "users")
 @Getter
-@Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
+public class User extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "이메일을 입력해주세요.")
-    private String email;     // 이메일
+    private String email;
 
     @NotBlank(message = "비밀번호를 입력해주세요.")
-    private String password;   // 비밀번호
+    private String password;
 
     @NotBlank(message = "닉네임을 입력해주세요.")
-    private String nickname;    // 전화번호
+    private String nickname;
 
-    private String introduce;   // 소개
+    private String introduce = "";
 
-    @Enumerated(EnumType.STRING)    // 회원 유형(구글, 카카오, 일반)
-    private UserType type = NORMAL;
+    @Enumerated(EnumType.STRING)
+    private LoginType type = NORMAL;
 
-    private String image;    // 이미지
+    private String profileImage = "";
 
     @OneToMany(mappedBy = "buyer")
     private List<Order> orderList = new ArrayList<>();    // 주문 내역
@@ -59,17 +59,23 @@ public class User {
     private List<FavoritePost> favoritePostList = new ArrayList<>();    // 추천 누른 글
 
     @Builder
-    public User(String email, String password, String introduce, UserType type, String nickname, String image) {
+    public User(String email, String password, String introduce, LoginType type, String nickname, String profileImage) {
         this.email = email;
         this.password = password;
         this.introduce = introduce;
         this.type = type;
         this.nickname = nickname;
-        this.image = image;
+        this.profileImage = profileImage;
     }
 
     @Deprecated
     public String getName() {
         return nickname;
+    }
+
+    public void update(User user) {
+        this.nickname = user.getNickname();
+        this.profileImage = user.getProfileImage().equals("") ? profileImage : user.getProfileImage();
+        this.introduce = user.getIntroduce().equals("") ? introduce : user.getIntroduce();
     }
 }
