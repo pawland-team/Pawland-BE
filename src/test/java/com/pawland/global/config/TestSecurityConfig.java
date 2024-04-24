@@ -1,18 +1,15 @@
-package com.pawland.global.config.security;
+package com.pawland.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pawland.global.config.security.filter.ExcludeUrlsRequestMatcher;
+import com.pawland.global.config.security.JwtUtils;
 import com.pawland.global.config.security.filter.JsonAuthFilter;
-import com.pawland.global.config.security.filter.JwtAuthFilter;
 import com.pawland.global.config.security.handler.Http401Handler;
 import com.pawland.global.config.security.handler.Http403Handler;
 import com.pawland.global.config.security.handler.LoginFailHandler;
 import com.pawland.global.config.security.handler.LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -29,12 +26,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
-@Slf4j
-@Configuration
+@TestConfiguration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@Profile("!test")
-public class SecurityConfig {
+public class TestSecurityConfig {
 
     private final ObjectMapper objectMapper;
     private final UserDetailsService userDetailsService;
@@ -45,7 +40,7 @@ public class SecurityConfig {
         return web -> web.ignoring()
             .requestMatchers("/favicon.ico")
             .requestMatchers("/error")
-            .requestMatchers(toH2Console()); // TODO: 배포 시 제거
+            .requestMatchers(toH2Console());
     }
 
     @Bean
@@ -53,17 +48,9 @@ public class SecurityConfig {
         return http
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/auth/signup").permitAll()
-                .requestMatchers("/api/auth/login").permitAll()
-                .requestMatchers(
-                    "/api/v1/auth/**",
-                    "/swagger-ui/**",
-                    "/swagger-resources/**",
-                    "/v3/api-docs/**").permitAll()
-                .requestMatchers("/**").permitAll() // TODO: 배포 시 제거
+                .requestMatchers("/**").permitAll()
                 .anyRequest().authenticated()
             )
-            .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)  // TODO: 배포 시 스웨거 관련 URL 추가 후 활성화
             .addFilterBefore(jsonAuthFilter(), UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(e -> {
                 e.authenticationEntryPoint(new Http401Handler(objectMapper));
@@ -71,16 +58,6 @@ public class SecurityConfig {
             })
             .csrf(AbstractHttpConfigurer::disable)
             .build();
-    }
-
-    @Bean
-    public JwtAuthFilter jwtAuthFilter() {
-        return new JwtAuthFilter(jwtUtils, new ExcludeUrlsRequestMatcher(
-            "/api/auth/**",
-            "/api/v1/auth/**",
-            "/swagger-ui/**",
-            "/swagger-resources/**",
-            "/v3/api-docs/**"));
     }
 
     @Bean
