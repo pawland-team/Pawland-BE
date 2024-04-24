@@ -2,6 +2,7 @@ package com.pawland.user.service;
 
 import com.pawland.user.dto.request.UserInfoUpdateRequest;
 import com.pawland.user.dto.response.UserInfoResponse;
+import com.pawland.user.dto.response.UserInfoUpdateResponse;
 import com.pawland.user.exception.UserException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,11 +44,17 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(String email, UserInfoUpdateRequest request) {
+    public UserInfoUpdateResponse updateUser(String email, UserInfoUpdateRequest request) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(UserException.NotFoundUser::new);
 
         user.update(request.toUser());
 
+        return UserInfoUpdateResponse.builder()
+            .id(user.getId())
+            .profileImage(user.getProfileImage())
+            .nickname(user.getNickname())
+            .userDesc(user.getIntroduce())
+            .build();
     }
 }

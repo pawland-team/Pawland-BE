@@ -3,7 +3,6 @@ package com.pawland.user.dto.response;
 import com.pawland.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 public class UserInfoResponse {

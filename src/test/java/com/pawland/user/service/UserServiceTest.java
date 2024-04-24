@@ -3,15 +3,19 @@ package com.pawland.user.service;
 import com.pawland.global.config.AppConfig;
 import com.pawland.global.exception.AlreadyExistsUserException;
 import com.pawland.user.domain.User;
+import com.pawland.user.dto.request.UserInfoUpdateRequest;
 import com.pawland.user.dto.response.UserInfoResponse;
+import com.pawland.user.dto.response.UserInfoUpdateResponse;
 import com.pawland.user.exception.UserException;
 import com.pawland.user.repository.UserRepository;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.TransactionSystemException;
 
 import static com.pawland.user.exception.UserExceptionMessage.USER_NOT_FOUND;
 import static org.assertj.core.api.Assertions.*;
@@ -137,9 +141,9 @@ class UserServiceTest {
             assertThat(result.getUserDesc()).isEqualTo(user.getIntroduce());
             assertThat(result.getStars()).isEqualTo(tempStars);
             assertThat(result.getProfileImage()).isNotBlank();
-    }
+        }
 
-        @DisplayName("DB에 저장되지 않은 유저를 조회 시도 시 실패한다.")
+        @DisplayName("DB에 저장되지 않은 유저 조회 시도 시 실패한다.")
         @Test
         void getUserInfo2() {
             User user = User.builder()
@@ -155,6 +159,58 @@ class UserServiceTest {
             assertThatThrownBy(() -> userService.getUserInfo(toGetEmail))
                 .isInstanceOf(UserException.NotFoundUser.class)
                 .hasMessageContaining(USER_NOT_FOUND.getMessage());
+        }
+    }
+
+    @DisplayName("유저 정보 수정 시")
+    @Nested
+    class updateUser {
+        @DisplayName("요청한 정보만 수정된다.")
+        @Test
+        void updateUser1() {
+            // given
+            User user = User.builder()
+                .email("mid@nav.com")
+                .password("asd123123")
+                .nickname("나는짱")
+                .build();
+            userRepository.save(user);
+
+            String toUpdateUser = "mid@nav.com";
+            UserInfoUpdateRequest request = UserInfoUpdateRequest.builder()
+                .nickname("나는변경된짱")
+                .build();
+
+            // when
+            UserInfoUpdateResponse result = userService.updateUser(toUpdateUser, request);
+
+            // then
+            assertThat(result.getId()).isEqualTo(user.getId());
+            assertThat(result.getNickname()).isEqualTo("나는변경된짱");
+            assertThat(result.getUserDesc()).isEqualTo(user.getIntroduce());
+            assertThat(result.getProfileImage()).isEqualTo(user.getProfileImage());
+        }
+
+        @DisplayName("닉네임을 누락하거나 빈 값을 입력하면 유저 정보 수정에 실패한다.")
+        @Test
+        void updateUser2() {
+            // given
+            User user = User.builder()
+                .email("mid@nav.com")
+                .password("asd123123")
+                .nickname("나는짱")
+                .build();
+            userRepository.save(user);
+
+            String toUpdateUser = "mid@nav.com";
+            UserInfoUpdateRequest request = UserInfoUpdateRequest.builder()
+                .nickname("")
+                .build();
+
+            // expected
+            assertThatThrownBy(() -> userService.updateUser(toUpdateUser, request))
+                .isInstanceOf(TransactionSystemException.class)
+                .hasMessageContaining("Could not commit JPA transaction");
         }
     }
 }
