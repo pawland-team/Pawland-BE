@@ -3,6 +3,7 @@ package com.pawland.global.config.security.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pawland.global.config.security.JwtUtils;
 import com.pawland.global.config.security.domain.UserPrincipal;
+import com.pawland.global.dto.ApiMessageResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -46,6 +47,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         response.setCharacterEncoding(UTF_8.name());
         response.setStatus(SC_OK);
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        objectMapper.writeValue(response.getWriter(), "로그인에 성공했습니다."); // TODO: 메시지 Enum으로 관리
+        objectMapper.writeValue(response.getWriter(), new ApiMessageResponse("로그인에 성공했습니다.")); // TODO: 메시지 Enum으로 관리
     }
 }

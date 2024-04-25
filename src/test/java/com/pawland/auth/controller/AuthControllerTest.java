@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Duration;
 
+import static org.hamcrest.Matchers.oneOf;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -82,7 +83,7 @@ class AuthControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value("사용할 수 있는 이메일입니다."));
+                .andExpect(jsonPath("$.message").value("사용할 수 있는 이메일입니다."));
         }
 
         @DisplayName("이미 가입된 이메일로 중복 확인 시 오류 메시지를 반환한다.")
@@ -107,7 +108,7 @@ class AuthControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").value("이미 존재하는 유저입니다."));
+                .andExpect(jsonPath("$.message").value("이미 존재하는 유저입니다."));
         }
     }
 
@@ -132,7 +133,7 @@ class AuthControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$").value("인증 메일이 발송 되었습니다."));
+                .andExpect(jsonPath("$.message").value("인증 메일이 발송 되었습니다."));
         }
 
         @DisplayName("인증 메일 요청에 실패 시 에러 메시지를 출력한다.")
@@ -156,7 +157,7 @@ class AuthControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$").value("메일 전송에 실패했습니다."));
+                .andExpect(jsonPath("$.message").value("메일 전송에 실패했습니다."));
         }
     }
 
@@ -187,7 +188,7 @@ class AuthControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value("이메일 인증이 완료되었습니다."));
+                .andExpect(jsonPath("$.message").value("이메일 인증이 완료되었습니다."));
         }
 
         @DisplayName("틀린 인증번호로 인증 요청 시 실패 메시지를 반환한다.")
@@ -215,7 +216,7 @@ class AuthControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").value("인증번호를 확인해주세요."));
+                .andExpect(jsonPath("$.message").value("인증번호를 확인해주세요."));
         }
 
         @DisplayName("메일 인증을 요청하지 않은 이메일로 인증번호 입력 시 실패 메시지를 반환한다.")
@@ -243,7 +244,7 @@ class AuthControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").value("인증번호를 확인해주세요."));
+                .andExpect(jsonPath("$.message").value("인증번호를 확인해주세요."));
         }
     }
 
@@ -268,7 +269,7 @@ class AuthControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$", Matchers.hasItems("닉네임을 입력해주세요.")))
+                .andExpect(jsonPath("$.message").value("닉네임을 입력해주세요."))
                 .andExpect(cookie().doesNotExist("jwt"));
         }
 
@@ -289,7 +290,8 @@ class AuthControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$", Matchers.hasItems("비밀번호를 입력해주세요.", "닉네임을 입력해주세요.")))
+                .andExpect(jsonPath("$.message",
+                    Matchers.is(oneOf("비밀번호를 입력해주세요.", "닉네임을 입력해주세요."))))
                 .andExpect(cookie().doesNotExist("jwt"));
         }
 
@@ -317,7 +319,7 @@ class AuthControllerTest {
                     )
                     .andDo(print())
                     .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$").value("회원가입 되었습니다."))
+                    .andExpect(jsonPath("$.message").value("회원가입 되었습니다."))
                     .andExpect(cookie().exists("jwt"));
             }
 
@@ -349,7 +351,7 @@ class AuthControllerTest {
                     )
                     .andDo(print())
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$").value("이미 존재하는 유저입니다."))
+                    .andExpect(jsonPath("$.message").value("이미 존재하는 유저입니다."))
                     .andExpect(cookie().doesNotExist("jwt"));
             }
         }
@@ -376,7 +378,7 @@ class AuthControllerTest {
                     )
                     .andDo(print())
                     .andExpect(status().isUnauthorized())
-                    .andExpect(jsonPath("$").value("이메일 인증이 인증되지 않은 유저입니다."))
+                    .andExpect(jsonPath("$.message").value("이메일 인증이 인증되지 않은 유저입니다."))
                     .andExpect(cookie().doesNotExist("jwt"));
             }
 
@@ -406,7 +408,7 @@ class AuthControllerTest {
                     )
                     .andDo(print())
                     .andExpect(status().isUnauthorized())
-                    .andExpect(jsonPath("$").value("이메일 인증이 인증되지 않은 유저입니다."))
+                    .andExpect(jsonPath("$.message").value("이메일 인증이 인증되지 않은 유저입니다."))
                     .andExpect(cookie().doesNotExist("jwt"));
             }
         }
@@ -440,7 +442,7 @@ class AuthControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value("로그인에 성공했습니다."))
+                .andExpect(jsonPath("$.message").value("로그인에 성공했습니다."))
                 .andExpect(cookie().exists("jwt"));
         }
 
@@ -469,7 +471,7 @@ class AuthControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").value("아이디 혹은 비밀번호가 올바르지 않습니다."))
+                .andExpect(jsonPath("$.message").value("아이디 혹은 비밀번호가 올바르지 않습니다."))
                 .andExpect(cookie().doesNotExist("jwt"));
         }
 
@@ -498,7 +500,7 @@ class AuthControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").value("아이디 혹은 비밀번호가 올바르지 않습니다."))
+                .andExpect(jsonPath("$.message").value("아이디 혹은 비밀번호가 올바르지 않습니다."))
                 .andExpect(cookie().doesNotExist("jwt"));
         }
     }

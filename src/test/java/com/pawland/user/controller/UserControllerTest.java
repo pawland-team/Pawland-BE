@@ -18,8 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -50,7 +49,7 @@ class UserControllerTest {
     @Test
     void getUserInfo1() throws Exception {
         // expected
-        mockMvc.perform(get("/api/users/my-info")
+        mockMvc.perform(get("/api/user/my-info")
                 .contentType(APPLICATION_JSON)
             )
             .andDo(print())
@@ -78,7 +77,7 @@ class UserControllerTest {
             String json = objectMapper.writeValueAsString(request);
 
             // expected
-            mockMvc.perform(patch("/api/users/my-info")
+            mockMvc.perform(put("/api/user/my-info")
                     .contentType(APPLICATION_JSON)
                     .content(json)
                 )
@@ -90,7 +89,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.userDesc").value(""));
         }
 
-        @DisplayName("닉네임 누락이 누락되거나 빈 값이면 에러 메시지를 출력한다.")
+        @DisplayName("닉네임이 누락되거나 빈 값이면 에러 메시지를 출력한다.")
         @Test
         void updateUserInfo2() throws Exception {
             UserInfoUpdateRequest request = UserInfoUpdateRequest.builder()
@@ -102,13 +101,13 @@ class UserControllerTest {
             String json = objectMapper.writeValueAsString(request);
 
             // expected
-            mockMvc.perform(patch("/api/users/my-info")
+            mockMvc.perform(put("/api/user/my-info")
                     .contentType(APPLICATION_JSON)
                     .content(json)
                 )
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").value("닉네임을 입력해주세요."));
+                .andExpect(jsonPath("$.message").value("닉네임을 입력해주세요."));
         }
     }
 }
