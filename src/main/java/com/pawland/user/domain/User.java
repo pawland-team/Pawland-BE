@@ -1,10 +1,8 @@
 package com.pawland.user.domain;
 
 import com.pawland.order.domain.Order;
-import com.pawland.post.domain.FavoritePost;
 import com.pawland.post.domain.Post;
 import com.pawland.product.domain.Product;
-import com.pawland.product.domain.WishItem;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
@@ -49,14 +47,8 @@ public class User {
     @OneToMany(mappedBy = "seller")
     private List<Product> productList = new ArrayList<>();    // 등록한 상품
 
-    @OneToMany(mappedBy = "user")
-    private List<WishItem> WishItemList = new ArrayList<>(); // 찜한 상품
-
     @OneToMany(mappedBy = "author")
     private List<Post> postList = new ArrayList<>();    // 내가 쓴 글
-
-    @OneToMany(mappedBy = "user")
-    private List<FavoritePost> favoritePostList = new ArrayList<>();    // 추천 누른 글
 
     @Builder
     public User(String email, String password, String introduce, UserType type, String nickname, String image) {
@@ -66,10 +58,5 @@ public class User {
         this.type = type;
         this.nickname = nickname;
         this.image = image;
-    }
-
-    @Deprecated
-    public String getName() {
-        return nickname;
     }
 }

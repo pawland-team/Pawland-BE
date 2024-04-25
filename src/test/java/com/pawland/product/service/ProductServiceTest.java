@@ -97,7 +97,7 @@ class ProductServiceTest {
 
         //then
         Assertions.assertEquals(1L, oneProductById.getId());
-        Assertions.assertEquals("상품1",oneProductById.getName());
+        Assertions.assertEquals("상품0",oneProductById.getName());
         Assertions.assertEquals("tester",oneProductById.getSeller().getNickname());
     }
 

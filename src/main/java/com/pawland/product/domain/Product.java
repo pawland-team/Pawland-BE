@@ -15,6 +15,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "product")
 public class Product extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +24,7 @@ public class Product extends BaseTimeEntity {
     private Category category;
     @Enumerated(EnumType.STRING)
     private Species species;
+    @Column(name = "`condition`")
     @Enumerated(EnumType.STRING)
     private Condition condition;
 

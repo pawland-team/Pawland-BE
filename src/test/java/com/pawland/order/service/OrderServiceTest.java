@@ -7,8 +7,8 @@ import com.pawland.product.service.ProductService;
 import com.pawland.user.domain.User;
 import com.pawland.user.domain.UserType;
 import com.pawland.user.repository.UserRepository;
-import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ class OrderServiceTest {
 
     private final List<User> list = new ArrayList<>();
 
-    @PostConstruct
+    @BeforeEach
     void init() {
         User tester = User.builder().email("test@test.com")
                 .password("123123")
