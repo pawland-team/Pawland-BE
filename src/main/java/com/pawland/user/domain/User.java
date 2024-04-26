@@ -18,8 +18,9 @@ import java.util.List;
 
 import static com.pawland.user.domain.LoginType.NORMAL;
 
-@Entity(name = "users")
+@Entity
 @Getter
+@Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
 
