@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,9 +17,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtUtils {
@@ -32,18 +35,21 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(byteJwtKey);
     }
 
-    public String generateAccessToken(String name, Date dateTime) {
+    public String generateJwtCookie(String name, Date dateTime) {
         SecretKey secretKey = getSecretKey();
-        return Jwts.builder()
+        String jwt = Jwts.builder()
             .subject(name)
             .issuedAt(dateTime)
             .expiration(new Date(dateTime.getTime() + 24L * 60 * 60 * 1000)) // 하루짜리 jwt
             .signWith(secretKey)
             .compact();
+
+        return createCookie(jwt).toString();
     }
 
     public String getJwtFromCookie(Cookie[] cookies) {
         if (cookies == null){
+            log.error("[쿠키가 없음]");
             throw new BadCredentialsException("JWT가 없습니다."); // TODO: 예외 메시지 Enum 만들기
         }
         return Arrays.stream(cookies)
@@ -68,6 +74,7 @@ public class JwtUtils {
 
     private void validateJwt(String jwt) {
         if (jwt == null || jwt.isBlank()) {
+            log.error("[JWT가 없음]");
             throw new BadCredentialsException("JWT가 없습니다.");
         }
         try {
@@ -76,7 +83,19 @@ public class JwtUtils {
                 .build()
                 .parseSignedClaims(jwt);
         } catch (JwtException e) {
+            log.error("[만료된 JWT]");
             throw new BadCredentialsException("올바르지 않은 JWT 토큰 정보입니다.");
         }
+    }
+
+    private ResponseCookie createCookie(String jwt) {
+        return ResponseCookie.from(JWT_NAME, jwt)
+            .domain(appConfig.getBackDomain())
+            .path("/")
+            .secure(true)
+            .httpOnly(true)
+            .maxAge(Duration.ofDays(30))
+            .sameSite("None")
+            .build();
     }
 }

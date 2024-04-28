@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.UnsupportedEncodingException;
-import java.time.Duration;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -76,19 +75,11 @@ public class AuthController {
         })
     @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiMessageResponse> signup(@Valid @RequestBody SignupRequest request) {
-        String jwt = authFacade.signup(request);
-
-        ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
-            .domain("localhost")   // todo 서버 환경에 따라 설정파일로 분리해서 관리
-            .path("/")
-            .secure(false)
-            .maxAge(Duration.ofDays(30))
-            .sameSite("Strict")
-            .build();
+        String jwtCookie = authFacade.signup(request);
 
         return ResponseEntity
             .status(CREATED)
-            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+            .header(HttpHeaders.SET_COOKIE, jwtCookie)
             .body(new ApiMessageResponse("회원가입 되었습니다."));
     }
 

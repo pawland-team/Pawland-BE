@@ -47,7 +47,7 @@ public class AuthFacade {
             .build();
         userService.register(user);
 
-        return jwtUtils.generateAccessToken(request.getEmail(), new Date());
+        return jwtUtils.generateJwtCookie(request.getEmail(), new Date());
     }
 
 }
