@@ -2,7 +2,6 @@ package com.pawland.auth.facade;
 
 import com.pawland.auth.dto.request.SignupRequest;
 import com.pawland.auth.dto.request.VerifyCodeRequest;
-import com.pawland.global.config.AppConfig;
 import com.pawland.global.config.security.JwtUtils;
 import com.pawland.mail.service.MailVerificationService;
 import com.pawland.user.domain.User;

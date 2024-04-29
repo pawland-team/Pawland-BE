@@ -12,6 +12,5 @@ public class AppConfig {
     private final String jwtKey;
     private final String backUrl;
     private final String frontUrl;
-    private final String defaultImage;
     private final String backDomain;
 }

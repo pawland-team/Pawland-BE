@@ -1,6 +1,5 @@
 package com.pawland.user.service;
 
-import com.pawland.global.config.AppConfig;
 import com.pawland.global.exception.AlreadyExistsUserException;
 import com.pawland.user.domain.User;
 import com.pawland.user.dto.request.UserInfoUpdateRequest;
@@ -8,7 +7,6 @@ import com.pawland.user.dto.response.UserInfoResponse;
 import com.pawland.user.dto.response.UserInfoUpdateResponse;
 import com.pawland.user.exception.UserException;
 import com.pawland.user.repository.UserRepository;
-import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,9 +20,6 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 class UserServiceTest {
-
-    @Autowired
-    private AppConfig appConfig;
 
     @Autowired
     private UserService userService;
@@ -124,7 +119,6 @@ class UserServiceTest {
                 .password("asd123123")
                 .nickname("나는짱")
                 .introduce("나아는짱")
-                .profileImage(appConfig.getDefaultImage())
                 .build();
             userRepository.save(user);
 
@@ -140,7 +134,7 @@ class UserServiceTest {
             assertThat(result.getNickname()).isEqualTo(user.getNickname());
             assertThat(result.getUserDesc()).isEqualTo(user.getIntroduce());
             assertThat(result.getStars()).isEqualTo(tempStars);
-            assertThat(result.getProfileImage()).isNotBlank();
+            assertThat(result.getProfileImage()).isEqualTo(user.getProfileImage());
         }
 
         @DisplayName("DB에 저장되지 않은 유저 조회 시도 시 실패한다.")

@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class UserTest {
 
-    @DisplayName("빌더 사용 시 로그인 타입, 프로필 이미지, 소개글을 입력하지 않으면 엔티티 기본 값으로 저장한다.")
+    @DisplayName("빌더 사용 시 로그인 타입, 프로필 이미지, 소개글을 입력하지 않으면 기본 설정 값으로 저장한다.")
     @Test
     void userBuilder() {
         // given
