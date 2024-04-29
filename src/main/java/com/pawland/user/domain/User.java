@@ -43,13 +43,13 @@ public class User extends BaseTimeEntity {
     @NotNull
     private String profileImage = Profile.getImageUrl();
 
-    @OneToMany(mappedBy = "buyer")
+    @OneToMany(mappedBy = "buyer", orphanRemoval = true)
     private List<Order> orderList = new ArrayList<>();    // 주문 내역
 
-    @OneToMany(mappedBy = "seller")
+    @OneToMany(mappedBy = "seller", orphanRemoval = true)
     private List<Product> productList = new ArrayList<>();    // 등록한 상품
 
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "author", orphanRemoval = true)
     private List<Post> postList = new ArrayList<>();    // 내가 쓴 글
 
     @Builder
