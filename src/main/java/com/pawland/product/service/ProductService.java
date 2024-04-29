@@ -1,18 +1,22 @@
 package com.pawland.product.service;
 
-import com.pawland.product.domain.Category;
 import com.pawland.product.domain.Product;
 import com.pawland.product.dto.request.CreateProductRequest;
 import com.pawland.product.dto.request.UpdateProductRequest;
 import com.pawland.product.dto.response.ProductResponse;
 import com.pawland.product.exception.ProductException;
 import com.pawland.product.respository.ProductJpaRepository;
+import com.pawland.product.respository.ProductRepository;
 import com.pawland.user.domain.User;
 import com.pawland.user.exception.UserException;
 import com.pawland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,18 +25,20 @@ public class ProductService {
 
     private final UserRepository userRepository;
     private final ProductJpaRepository productJpaRepository;
+    private final ProductRepository productRepository;
 
     public ProductResponse createProduct(Long userId, CreateProductRequest createProductRequest) {
 
         User user = getUserById(userId);
 
         Product product = Product.builder()
-                .category(Category.getInstance(createProductRequest.getCategory()))
+                .category(createProductRequest.getCategory())
+                .species(createProductRequest.getSpecies())
+                .condition(createProductRequest.getCondition())
                 .name(createProductRequest.getName())
                 .price(createProductRequest.getPrice())
                 .content(createProductRequest.getContent())
                 .region(createProductRequest.getRegion())
-                .view(0)
                 .seller(user)
                 .build();
 
@@ -82,5 +88,10 @@ public class ProductService {
 
     private boolean canUpdateOrDelete(Long userId, Product product) {
         return product.getSeller().getId().equals(userId);
+    }
+
+    public List<ProductResponse> getProducts(int page) {
+        Pageable pageable =PageRequest.of(page - 1, 8);
+        return productRepository.getAllProducts(pageable).stream().map(ProductResponse::of).toList();
     }
 }

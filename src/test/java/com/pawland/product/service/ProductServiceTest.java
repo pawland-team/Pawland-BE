@@ -4,19 +4,18 @@ import com.pawland.product.dto.request.CreateProductRequest;
 import com.pawland.product.dto.request.UpdateProductRequest;
 import com.pawland.product.dto.response.ProductResponse;
 import com.pawland.product.exception.ProductException;
+import com.pawland.product.respository.ProductJpaRepository;
 import com.pawland.user.domain.User;
 import com.pawland.user.domain.LoginType;
 import com.pawland.user.repository.UserRepository;
-import jakarta.annotation.PostConstruct;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+import java.util.List;
+
 @SpringBootTest
 class ProductServiceTest {
 
@@ -26,7 +25,13 @@ class ProductServiceTest {
     @Autowired
     private UserRepository userRepository;
 
-    @PostConstruct
+    @Autowired
+    private ProductJpaRepository productJpaRepository;
+
+    @Autowired
+    private EntityManager entityManager;
+
+    @BeforeEach
     void init() {
         User tester = User.builder()
             .email("test@test.com")
@@ -37,36 +42,51 @@ class ProductServiceTest {
                 .build();
 
         userRepository.save(tester);
+
+        createProduct(1L,10);
     }
 
-    private void createProduct(Long userId) {
-        CreateProductRequest createProductRequest = new CreateProductRequest("상품1",
-                10000,
-                "상품입니다.",
-                "서울시 강서구",
-                "사료",
-                null);
+    private void createProduct(Long userId,int size) {
 
-        productService.createProduct(userId, createProductRequest);
+        for (int i = 0; i < size; i++) {
+            CreateProductRequest createProductRequest = new CreateProductRequest(
+                    "사료",
+                    "CAT",
+                    "NEW",
+                    "상품"+i,
+                    10000,
+                    "상품입니다.",
+                    "서울시 강서구",
+                    null,
+                    null);
+
+            productService.createProduct(userId, createProductRequest);
+        }
+
+
     }
 
     @DisplayName("상품 등록")
     @Test
     void createProductTest() {
         //given
-        CreateProductRequest createProductRequest = new CreateProductRequest("상품1",
+        CreateProductRequest createProductRequest = new CreateProductRequest(
+                "사료",
+                "CAT",
+                "NEW",
+                "상품",
                 10000,
                 "상품입니다.",
                 "서울시 강서구",
-                "사료",
+                null,
                 null);
 
         //when
         ProductResponse product = productService.createProduct(1L, createProductRequest);
 
         //then
-        Assertions.assertEquals(1L, product.getId());
         Assertions.assertEquals("tester",product.getSeller().getNickname());
+        Assertions.assertEquals("상품", product.getName());
     }
 
 
@@ -74,13 +94,10 @@ class ProductServiceTest {
     @Test
     void getOneProductById() {
         //given
-        createProduct(1L);
-
         //when
-        ProductResponse oneProductById = productService.getOneProductById(1L);
+        ProductResponse oneProductById = productService.getOneProductById(2L);
 
         //then
-        Assertions.assertEquals(1L, oneProductById.getId());
         Assertions.assertEquals("상품1",oneProductById.getName());
         Assertions.assertEquals("tester",oneProductById.getSeller().getNickname());
     }
@@ -89,7 +106,7 @@ class ProductServiceTest {
     @Test
     void updateProduct() {
         //given
-        createProduct(1L);
+        createProduct(1L,1);
 
         //when
         ProductResponse updatedProduct = productService.updateProduct(1L, 1L, UpdateProductRequest.builder().name("상품1수정").build());
@@ -103,13 +120,27 @@ class ProductServiceTest {
     @Transactional
     void deleteProduct() {
         //given
-        createProduct(1L);
+        createProduct(1L,1);
 
         //when
         productService.deleteProduct(1L, 1L);
 
         //then
-        Assertions.assertThrows(ProductException.class, () -> productService.getOneProductById(1L));
+        Assertions.assertThrows(ProductException.NotFoundProduct.class, () -> productService.getOneProductById(1L));
 
+    }
+
+    @DisplayName("상품 최신순 8개 조회")
+    @Test
+    @Transactional
+    void getProductsWithPaging() {
+        //given
+        createProduct(1L,10);
+
+        //when
+        List<ProductResponse> products = productService.getProducts(1);
+
+        //then
+        Assertions.assertEquals(8, products.size());
     }
 }

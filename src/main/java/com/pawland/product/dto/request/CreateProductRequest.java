@@ -12,6 +12,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateProductRequest {
+    private String category;
+    private String species;
+    private String condition;
     @NotBlank
     private String name;
     @NotBlank
@@ -20,7 +23,6 @@ public class CreateProductRequest {
     private String content;
     @NotBlank
     private String region;
-    @NotBlank
-    private String category;
+    private MultipartFile thumbnailImage;
     private List<MultipartFile> images;
 }
