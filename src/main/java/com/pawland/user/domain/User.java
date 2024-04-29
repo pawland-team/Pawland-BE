@@ -6,6 +6,7 @@ import com.pawland.post.domain.Post;
 import com.pawland.product.domain.Product;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -13,9 +14,9 @@ import java.util.List;
 
 import static com.pawland.user.domain.LoginType.NORMAL;
 
-@Entity(name = "users")
+@Entity
 @Getter
-@Table
+@Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
 
@@ -32,11 +33,13 @@ public class User extends BaseTimeEntity {
     @NotBlank(message = "닉네임을 입력해주세요.")
     private String nickname;
 
+    @NotNull
     private String introduce = "";
 
     @Enumerated(EnumType.STRING)
     private LoginType type = NORMAL;
 
+    @NotNull
     private String profileImage = "";
 
     @OneToMany(mappedBy = "buyer")
@@ -58,7 +61,7 @@ public class User extends BaseTimeEntity {
         this.introduce = isBlank(introduce) ? this.introduce : introduce;
     }
 
-    public void update(User user) {
+    public void updateProfile(User user) {
         this.nickname = user.getNickname();
         this.profileImage = isBlank(user.getProfileImage()) ? profileImage : user.getProfileImage();
         this.introduce = isBlank(user.getIntroduce()) ? introduce : user.getIntroduce();

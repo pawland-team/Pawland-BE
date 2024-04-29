@@ -39,11 +39,10 @@ class UserTest {
         UserInfoUpdateRequest request = UserInfoUpdateRequest.builder()
             .nickname("나아아는짱")
             .profileImage("1234567")
-            .introduce("")
             .build();
 
         // when
-        user.update(request.toUser());
+        user.updateProfile(request.toUser());
 
         // then
         assertThat(user.getNickname()).isEqualTo("나아아는짱");
@@ -68,7 +67,7 @@ class UserTest {
             .build();
 
         // when
-        user.update(invalidUsage);
+        user.updateProfile(invalidUsage);
 
         // then
         assertThat(user.getPassword()).isEqualTo("asd213123");
