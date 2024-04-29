@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @SecurityScheme(
-    name = "cookie",
+    name = "jwt-cookie",
     type = SecuritySchemeType.APIKEY,
     in = SecuritySchemeIn.HEADER
 )
