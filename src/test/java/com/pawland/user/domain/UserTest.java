@@ -4,6 +4,7 @@ import com.pawland.user.dto.request.UserInfoUpdateRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static com.pawland.global.domain.DefaultImage.Profile;
 import static com.pawland.user.domain.LoginType.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +23,7 @@ class UserTest {
 
         // expected
         assertThat(result.getType()).isEqualTo(NORMAL);
-        assertThat(result.getProfileImage()).isEqualTo("");
+        assertThat(result.getProfileImage()).isEqualTo(Profile.getImageUrl());
         assertThat(result.getIntroduce()).isEqualTo("");
     }
 

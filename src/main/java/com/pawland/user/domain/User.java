@@ -12,6 +12,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.pawland.global.domain.DefaultImage.Profile;
 import static com.pawland.user.domain.LoginType.NORMAL;
 
 @Entity
@@ -40,7 +41,7 @@ public class User extends BaseTimeEntity {
     private LoginType type = NORMAL;
 
     @NotNull
-    private String profileImage = "";
+    private String profileImage = Profile.getImageUrl();
 
     @OneToMany(mappedBy = "buyer")
     private List<Order> orderList = new ArrayList<>();    // 주문 내역
