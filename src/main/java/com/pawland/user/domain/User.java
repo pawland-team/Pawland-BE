@@ -15,9 +15,9 @@ import java.util.List;
 
 import static com.pawland.user.domain.UserType.NORMAL;
 
-@Entity
+@Entity(name = "users")
 @Getter
-@Table(name = "users")
+@Table
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
@@ -39,7 +39,7 @@ public class User {
     @Enumerated(EnumType.STRING)    // 회원 유형(구글, 카카오, 일반)
     private UserType type = NORMAL;
 
-    private String image;    // 이미지
+    private String profile_image;    // 이미지
 
     @OneToMany(mappedBy = "buyer")
     private List<Order> orderList = new ArrayList<>();    // 주문 내역
@@ -51,12 +51,12 @@ public class User {
     private List<Post> postList = new ArrayList<>();    // 내가 쓴 글
 
     @Builder
-    public User(String email, String password, String introduce, UserType type, String nickname, String image) {
+    public User(String email, String password, String introduce, UserType type, String nickname, String profile_image) {
         this.email = email;
         this.password = password;
         this.introduce = introduce;
         this.type = type;
         this.nickname = nickname;
-        this.image = image;
+        this.profile_image = profile_image;
     }
 }

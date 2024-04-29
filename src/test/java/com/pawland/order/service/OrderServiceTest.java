@@ -3,6 +3,7 @@ package com.pawland.order.service;
 import com.pawland.order.domain.OrderStatus;
 import com.pawland.order.dto.response.OrderResponse;
 import com.pawland.product.dto.request.CreateProductRequest;
+import com.pawland.product.dto.response.ProductResponse;
 import com.pawland.product.service.ProductService;
 import com.pawland.user.domain.User;
 import com.pawland.user.domain.UserType;
@@ -13,17 +14,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Transactional
 class OrderServiceTest {
-
     @Autowired
     UserRepository userRepository;
 
@@ -33,7 +30,7 @@ class OrderServiceTest {
     @Autowired
     ProductService productService;
 
-    private final List<User> list = new ArrayList<>();
+    private List<User> list = new ArrayList<>();
 
     @BeforeEach
     void init() {
@@ -59,20 +56,24 @@ class OrderServiceTest {
 
         userRepository.save(tester2);
 
+
+        list.add(tester2);
+
+    }
+
+    private ProductResponse createProduct(Long userId) {
         CreateProductRequest createProductRequest = new CreateProductRequest(
                 "사료",
                 "CAT",
                 "NEW",
-                "상품1",
+                "상품",
                 10000,
                 "상품입니다.",
                 "서울시 강서구",
                 null,
                 null);
 
-        list.add(tester2);
-
-        productService.createProduct(1L, createProductRequest);
+        return productService.createProduct(userId, createProductRequest);
     }
 
     @DisplayName("주문 생성 성공")
@@ -82,117 +83,133 @@ class OrderServiceTest {
         User seller = list.get(0);
         User buyer = list.get(1);
 
+        ProductResponse product = createProduct(seller.getId());
+
         //when
-        OrderResponse orderResponse = orderService.createOrder(buyer.getId(), 1L);
+        OrderResponse orderResponse = orderService.createOrder(buyer.getId(), product.getId());
 
         //then
-        Assertions.assertEquals(1L,orderResponse.getId());
-        Assertions.assertEquals(seller.getNickname(),orderResponse.getSeller().getNickname());
-        Assertions.assertEquals(buyer.getNickname(),orderResponse.getBuyer().getNickname());
-        Assertions.assertEquals("상품1",orderResponse.getProduct().getName());
+        Assertions.assertEquals(seller.getNickname(), orderResponse.getSeller().getNickname());
+        Assertions.assertEquals(buyer.getNickname(), orderResponse.getBuyer().getNickname());
+        Assertions.assertEquals("상품", orderResponse.getProduct().getName());
     }
 
     @DisplayName("주문 단일 조회")
     @Test
+    @Transactional
     void getOneOrderById() {
         //given
         User seller = list.get(0);
         User buyer = list.get(1);
-        orderService.createOrder(buyer.getId(), 1L);
+        ProductResponse product = createProduct(seller.getId());
+
+        OrderResponse order = orderService.createOrder(buyer.getId(), product.getId());
 
         //when
-        OrderResponse oneOrderById = orderService.getOneOrderById(1L);
+        OrderResponse oneOrderById = orderService.getOneOrderById(order.getId());
 
         //then
-        Assertions.assertEquals(1L,oneOrderById.getId());
-        Assertions.assertEquals(seller.getNickname(),oneOrderById.getSeller().getNickname());
-        Assertions.assertEquals(buyer.getNickname(),oneOrderById.getBuyer().getNickname());
-        Assertions.assertEquals("상품1",oneOrderById.getProduct().getName());
+        Assertions.assertEquals(seller.getNickname(), oneOrderById.getSeller().getNickname());
+        Assertions.assertEquals(buyer.getNickname(), oneOrderById.getBuyer().getNickname());
+        Assertions.assertEquals("상품", oneOrderById.getProduct().getName());
     }
 
     @DisplayName("판매자 거래 완료")
     @Test
+    @Transactional
     void doneOrderBySeller() {
         //given
         User seller = list.get(0);
         User buyer = list.get(1);
-        orderService.createOrder(buyer.getId(), 1L);
+        ProductResponse product = createProduct(seller.getId());
+        OrderResponse order = orderService.createOrder(buyer.getId(), product.getId());
 
         //when
-        orderService.doneOrder(seller.getId(), 1L);
-        OrderResponse oneOrderById = orderService.getOneOrderById(1L);
+        orderService.doneOrder(seller.getId(), order.getId());
+        OrderResponse oneOrderById = orderService.getOneOrderById(order.getId());
 
         //then
         Assertions.assertTrue(oneOrderById.isSellerCheck());
         Assertions.assertFalse(oneOrderById.isBuyerCheck());
-        Assertions.assertEquals(OrderStatus.PROCEEDING,oneOrderById.getOrderStatus());
+        Assertions.assertEquals(OrderStatus.PROCEEDING, oneOrderById.getOrderStatus());
     }
 
     @DisplayName("구매자 거래 완료")
     @Test
+    @Transactional
     void doneOrderByBuyer() {
         //given
+        User seller = list.get(0);
         User buyer = list.get(1);
-        orderService.createOrder(buyer.getId(), 1L);
+        ProductResponse product = createProduct(seller.getId());
+        OrderResponse order = orderService.createOrder(buyer.getId(), product.getId());
 
         //when
-        orderService.doneOrder(buyer.getId(), 1L);
-        OrderResponse oneOrderById = orderService.getOneOrderById(1L);
+        orderService.doneOrder(buyer.getId(), order.getId());
+        OrderResponse oneOrderById = orderService.getOneOrderById(order.getId());
 
         //then
         Assertions.assertTrue(oneOrderById.isBuyerCheck());
         Assertions.assertFalse(oneOrderById.isSellerCheck());
-        Assertions.assertEquals(OrderStatus.PROCEEDING,oneOrderById.getOrderStatus());
+        Assertions.assertEquals(OrderStatus.PROCEEDING, oneOrderById.getOrderStatus());
     }
 
     @DisplayName("판매자 구매자 모두 거래 완료")
     @Test
+    @Transactional
     void doneOrderBoth() {
         //given
         User seller = list.get(0);
         User buyer = list.get(1);
-        orderService.createOrder(buyer.getId(), 1L);
+        ProductResponse product = createProduct(seller.getId());
+        OrderResponse order = orderService.createOrder(buyer.getId(), product.getId());
 
         //when
-        orderService.doneOrder(seller.getId(), 1L);
-        orderService.doneOrder(buyer.getId(), 1L);
-        OrderResponse oneOrderById = orderService.getOneOrderById(1L);
+        orderService.doneOrder(seller.getId(), order.getId());
+        orderService.doneOrder(buyer.getId(), order.getId());
+        OrderResponse oneOrderById = orderService.getOneOrderById(order.getId());
 
         //then
         Assertions.assertTrue(oneOrderById.isBuyerCheck());
         Assertions.assertTrue(oneOrderById.isSellerCheck());
-        Assertions.assertEquals(OrderStatus.DONE,oneOrderById.getOrderStatus());
+        Assertions.assertEquals(OrderStatus.DONE, oneOrderById.getOrderStatus());
     }
 
     @DisplayName("판매자의 주문 취소")
     @Test
+    @Transactional
     void cancelOrderBySeller() {
         //given
         User seller = list.get(0);
         User buyer = list.get(1);
-        orderService.createOrder(buyer.getId(), 1L);
+        ProductResponse product = createProduct(seller.getId());
+        OrderResponse order = orderService.createOrder(buyer.getId(), product.getId());
 
         //when
-        orderService.cancelOrder(seller.getId(), 1L);
-        OrderResponse oneOrderById = orderService.getOneOrderById(1L);
+        orderService.cancelOrder(seller.getId(), order.getId());
+        OrderResponse oneOrderById = orderService.getOneOrderById(order.getId());
 
         //then
-        Assertions.assertEquals(OrderStatus.CANCEL,oneOrderById.getOrderStatus());
+        Assertions.assertEquals(OrderStatus.CANCEL, oneOrderById.getOrderStatus());
     }
 
     @DisplayName("구매자의 주문 취소")
     @Test
+    @Transactional
     void cancelOrderByBuyer() {
         //given
+        User seller = list.get(0);
         User buyer = list.get(1);
-        orderService.createOrder(buyer.getId(), 1L);
+
+        ProductResponse product = createProduct(seller.getId());
+        OrderResponse order = orderService.createOrder(buyer.getId(), product.getId());
 
         //when
-        orderService.cancelOrder(buyer.getId(), 1L);
-        OrderResponse oneOrderById = orderService.getOneOrderById(1L);
+        orderService.cancelOrder(buyer.getId(), order.getId());
+        OrderResponse oneOrderById = orderService.getOneOrderById(order.getId());
 
         //then
-        Assertions.assertEquals(OrderStatus.CANCEL,oneOrderById.getOrderStatus());
+        Assertions.assertEquals(OrderStatus.CANCEL, oneOrderById.getOrderStatus());
     }
 
 }
