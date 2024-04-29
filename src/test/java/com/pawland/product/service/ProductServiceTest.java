@@ -6,7 +6,7 @@ import com.pawland.product.dto.response.ProductResponse;
 import com.pawland.product.exception.ProductException;
 import com.pawland.product.respository.ProductJpaRepository;
 import com.pawland.user.domain.User;
-import com.pawland.user.domain.UserType;
+import com.pawland.user.domain.LoginType;
 import com.pawland.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
@@ -38,7 +38,7 @@ class ProductServiceTest {
                 .password("123123")
                 .nickname("tester")
                 .introduce("tester입니다.")
-                .type(UserType.GOOGLE)
+                .type(LoginType.GOOGLE)
                 .build();
 
         userRepository.save(tester);
