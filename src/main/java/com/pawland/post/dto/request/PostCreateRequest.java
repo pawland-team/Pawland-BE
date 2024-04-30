@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostWriteRequest {
+public class PostCreateRequest {
 
     @NotBlank(message = "제목을 입력해주세요.")
     private String title;
@@ -23,7 +23,7 @@ public class PostWriteRequest {
     private String region;
 
     @Builder
-    public PostWriteRequest(String title, String content, String thumbnail, String region) {
+    public PostCreateRequest(String title, String content, String thumbnail, String region) {
         this.title = title;
         this.content = content;
         this.thumbnail = thumbnail;

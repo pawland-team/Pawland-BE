@@ -2,7 +2,7 @@ package com.pawland.post.controller;
 
 import com.pawland.global.config.security.domain.UserPrincipal;
 import com.pawland.global.dto.ApiMessageResponse;
-import com.pawland.post.dto.request.PostWriteRequest;
+import com.pawland.post.dto.request.PostCreateRequest;
 import com.pawland.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,7 +34,7 @@ public class PostController {
     @ApiResponse(responseCode = "400", description = "제목 누락 시")
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiMessageResponse> writePost(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                                        @Valid @RequestBody PostWriteRequest request) {
+                                                        @Valid @RequestBody PostCreateRequest request) {
         postService.uploadPost(userPrincipal.getUserId(), request);
         return ResponseEntity
             .status(CREATED)

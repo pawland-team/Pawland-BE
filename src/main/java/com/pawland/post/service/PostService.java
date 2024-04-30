@@ -1,6 +1,6 @@
 package com.pawland.post.service;
 
-import com.pawland.post.dto.request.PostWriteRequest;
+import com.pawland.post.dto.request.PostCreateRequest;
 import com.pawland.post.repository.PostRepository;
 import com.pawland.user.domain.User;
 import com.pawland.user.exception.UserException;
@@ -18,7 +18,7 @@ public class PostService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void uploadPost(Long userId, PostWriteRequest request) {
+    public void uploadPost(Long userId, PostCreateRequest request) {
         User user = userRepository.findById(userId)
             .orElseThrow(UserException.NotFoundUser::new);
 

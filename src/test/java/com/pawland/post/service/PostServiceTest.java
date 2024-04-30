@@ -2,7 +2,7 @@ package com.pawland.post.service;
 
 import com.pawland.post.domain.Post;
 import com.pawland.post.domain.Region;
-import com.pawland.post.dto.request.PostWriteRequest;
+import com.pawland.post.dto.request.PostCreateRequest;
 import com.pawland.post.repository.PostRepository;
 import com.pawland.user.domain.User;
 import com.pawland.user.repository.UserRepository;
@@ -55,7 +55,7 @@ class PostServiceTest {
                     .build();
                 userRepository.save(user);
 
-                PostWriteRequest request = PostWriteRequest.builder()
+                PostCreateRequest request = PostCreateRequest.builder()
                     .title("제목")
                     .content("내용")
                     .thumbnail("이미지.png")
@@ -87,7 +87,7 @@ class PostServiceTest {
                     .build();
                 userRepository.save(user);
 
-                PostWriteRequest request = PostWriteRequest.builder()
+                PostCreateRequest request = PostCreateRequest.builder()
                     .title("제목")
                     .build();
 
@@ -116,7 +116,7 @@ class PostServiceTest {
                     .build();
                 userRepository.save(user);
 
-                PostWriteRequest request = PostWriteRequest.builder()
+                PostCreateRequest request = PostCreateRequest.builder()
                     .title("제목")
                     .region("나는짱")
                     .build();
@@ -139,7 +139,7 @@ class PostServiceTest {
                 .build();
             userRepository.save(user);
 
-            PostWriteRequest request = PostWriteRequest.builder()
+            PostCreateRequest request = PostCreateRequest.builder()
                 .thumbnail("이미지.png")
                 .region("충남")
                 .build();

@@ -3,7 +3,7 @@ package com.pawland.post.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pawland.global.config.TestSecurityConfig;
 import com.pawland.global.utils.PawLandMockUser;
-import com.pawland.post.dto.request.PostWriteRequest;
+import com.pawland.post.dto.request.PostCreateRequest;
 import com.pawland.post.repository.PostRepository;
 import com.pawland.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -56,7 +56,7 @@ class PostControllerTest {
         @Test
         void writePost1() throws Exception {
             // given
-            PostWriteRequest request = PostWriteRequest.builder()
+            PostCreateRequest request = PostCreateRequest.builder()
                 .title("제목")
                 .content("내용")
                 .build();
@@ -78,7 +78,7 @@ class PostControllerTest {
         @Test
         void writePost2() throws Exception {
             // given
-            PostWriteRequest request = PostWriteRequest.builder()
+            PostCreateRequest request = PostCreateRequest.builder()
                 .title("제목")
                 .build();
 
@@ -99,7 +99,7 @@ class PostControllerTest {
         @Test
         void writePost3() throws Exception {
             // given
-            PostWriteRequest request = PostWriteRequest.builder()
+            PostCreateRequest request = PostCreateRequest.builder()
                 .content("내용")
                 .build();
 
@@ -120,7 +120,7 @@ class PostControllerTest {
         @Test
         void writePost4() throws Exception {
             // given
-            PostWriteRequest request = PostWriteRequest.builder()
+            PostCreateRequest request = PostCreateRequest.builder()
                 .title("제목")
                 .region("나는짱")
                 .build();
