@@ -3,7 +3,7 @@ package com.pawland.post.dto.request;
 import com.pawland.post.domain.Post;
 import com.pawland.post.domain.Region;
 import com.pawland.user.domain.User;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,10 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostWriteRequest {
 
-    @NotNull
+    @NotBlank(message = "제목을 입력해주세요.")
     private String title;
 
-    @NotNull
     private String content;
 
     private String thumbnail;

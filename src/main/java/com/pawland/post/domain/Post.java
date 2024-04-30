@@ -25,7 +25,7 @@ public class Post extends BaseTimeEntity {
     private String title;
 
     @NotNull
-    private String content;
+    private String content = "";
 
     private String thumbnail = DEFAULT_POST_IMAGE.value();
 
@@ -40,7 +40,7 @@ public class Post extends BaseTimeEntity {
     public Post(User author, String title, String content, String thumbnail, Region region) {
         this.author = author;
         this.title = title;
-        this.content = content;
+        this.content = isBlank(content) ? this.content : content;
         this.thumbnail = isBlank(thumbnail) ? this.thumbnail : thumbnail;
         this.region = isBlank(region) ? this.region : region;
     }
