@@ -1,6 +1,7 @@
 package com.pawland.global.config.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pawland.global.dto.ApiMessageResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,6 +29,6 @@ public class Http403Handler implements AccessDeniedHandler {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(UTF_8.name());
         response.setStatus(SC_FORBIDDEN);
-        objectMapper.writeValue(response.getWriter(), "권한이 없습니다.");
+        objectMapper.writeValue(response.getWriter(), new ApiMessageResponse("권한이 없습니다."));
     }
 }

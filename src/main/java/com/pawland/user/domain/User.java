@@ -6,16 +6,18 @@ import com.pawland.post.domain.Post;
 import com.pawland.product.domain.Product;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.pawland.global.domain.DefaultImage.Profile;
 import static com.pawland.user.domain.LoginType.NORMAL;
 
-@Entity(name = "users")
+@Entity
 @Getter
-@Table
+@Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity {
 
@@ -32,20 +34,22 @@ public class User extends BaseTimeEntity {
     @NotBlank(message = "닉네임을 입력해주세요.")
     private String nickname;
 
+    @NotNull
     private String introduce = "";
 
     @Enumerated(EnumType.STRING)
     private LoginType type = NORMAL;
 
-    private String profileImage = "";
+    @NotNull
+    private String profileImage = Profile.getImageUrl();
 
-    @OneToMany(mappedBy = "buyer")
+    @OneToMany(mappedBy = "buyer", orphanRemoval = true)
     private List<Order> orderList = new ArrayList<>();    // 주문 내역
 
-    @OneToMany(mappedBy = "seller")
+    @OneToMany(mappedBy = "seller", orphanRemoval = true)
     private List<Product> productList = new ArrayList<>();    // 등록한 상품
 
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "author", orphanRemoval = true)
     private List<Post> postList = new ArrayList<>();    // 내가 쓴 글
 
     @Builder
@@ -58,7 +62,7 @@ public class User extends BaseTimeEntity {
         this.introduce = isBlank(introduce) ? this.introduce : introduce;
     }
 
-    public void update(User user) {
+    public void updateProfile(User user) {
         this.nickname = user.getNickname();
         this.profileImage = isBlank(user.getProfileImage()) ? profileImage : user.getProfileImage();
         this.introduce = isBlank(user.getIntroduce()) ? introduce : user.getIntroduce();

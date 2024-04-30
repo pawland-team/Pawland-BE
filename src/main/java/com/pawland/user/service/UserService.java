@@ -48,7 +48,7 @@ public class UserService {
         User user = userRepository.findByEmail(email)
             .orElseThrow(UserException.NotFoundUser::new);
 
-        user.update(request.toUser());
+        user.updateProfile(request.toUser());
 
         return UserInfoUpdateResponse.builder()
             .id(user.getId())

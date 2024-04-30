@@ -27,7 +27,7 @@ public class ProductController {
     private final ProductService productService;
 
     @Operation(summary = "상품 등록")
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody @Valid CreateProductRequest createProductRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(userPrincipal.getUserId(), createProductRequest));
     }
@@ -51,7 +51,7 @@ public class ProductController {
     }
 
     @Operation(summary = "상품 페이징 조회")
-    @GetMapping("/")
+    @GetMapping
     public List<ProductResponse> getProducts(@RequestParam(defaultValue = "1") int page) {
         return productService.getProducts(page);
     }
