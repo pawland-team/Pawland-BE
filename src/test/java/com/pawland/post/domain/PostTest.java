@@ -1,11 +1,11 @@
 package com.pawland.post.domain;
 
-import com.pawland.global.domain.DefaultImage;
 import com.pawland.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static com.pawland.global.domain.DefaultImage.DEFAULT_POST_IMAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -31,7 +31,7 @@ class PostTest {
                 .build();
 
             // expected
-            assertThat(result.getThumbnail()).isEqualTo(DefaultImage.POST.getImageUrl());
+            assertThat(result.getThumbnail()).isEqualTo(DEFAULT_POST_IMAGE.value());
             assertThat(result.getRegion()).isEqualTo(Region.SEOUL);
         }
 

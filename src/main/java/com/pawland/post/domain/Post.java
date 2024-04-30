@@ -1,7 +1,6 @@
 package com.pawland.post.domain;
 
 import com.pawland.global.domain.BaseTimeEntity;
-import com.pawland.global.domain.DefaultImage;
 import com.pawland.user.domain.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static com.pawland.global.domain.DefaultImage.DEFAULT_POST_IMAGE;
 import static com.pawland.post.domain.Region.SEOUL;
 
 @Entity
@@ -30,7 +30,7 @@ public class Post extends BaseTimeEntity {
     @NotNull
     private String content;
 
-    private String thumbnail = DefaultImage.POST.getImageUrl();
+    private String thumbnail = DEFAULT_POST_IMAGE.value();
 
     private Region region = SEOUL;
 
