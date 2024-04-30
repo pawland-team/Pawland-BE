@@ -35,7 +35,7 @@ class PostTest {
             assertThat(result.getRegion()).isEqualTo(Region.SEOUL);
         }
 
-        @DisplayName("썸네일, 지역을 설정하면 입력값대로 저장한다.")
+        @DisplayName("썸네일, 지역을 설정하면 입력 값대로 저장한다.")
         @Test
         void postBuilder2() {
             // given
