@@ -41,7 +41,7 @@ class PostServiceTest {
     @DisplayName("게시글 작성 시")
     @Nested
     class uploadPost {
-        @DisplayName("필수 값 입력 시")
+        @DisplayName("필수 값(제목) 입력 시")
         @Nested
         class uploadPostWithEssential {
             @DisplayName("입력 값대로 저장된다.")
@@ -75,7 +75,7 @@ class PostServiceTest {
                 assertThat(result.getRegion()).isEqualTo(Region.CHUNGNAM);
             }
 
-            @DisplayName("썸네일과 지역을 입력하지 않으면 기본 값으로 저장된다.")
+            @DisplayName("내용, 썸네일, 지역을 입력하지 않으면 기본 값으로 저장된다.")
             @Test
             void uploadPost2() {
                 // given
@@ -88,7 +88,6 @@ class PostServiceTest {
 
                 PostWriteRequest request = PostWriteRequest.builder()
                     .title("제목")
-                    .content("내용")
                     .build();
 
                 // when
@@ -99,7 +98,7 @@ class PostServiceTest {
                 // then
                 assertThat(postList.size()).isEqualTo(1);
                 assertThat(result.getTitle()).isEqualTo("제목");
-                assertThat(result.getContent()).isEqualTo("내용");
+                assertThat(result.getContent()).isEqualTo("");
                 assertThat(result.getThumbnail()).isEqualTo(DEFAULT_POST_IMAGE.value());
                 assertThat(result.getRegion()).isEqualTo(Region.SEOUL);
             }
@@ -117,7 +116,6 @@ class PostServiceTest {
 
                 PostWriteRequest request = PostWriteRequest.builder()
                     .title("제목")
-                    .content("내용")
                     .region("나는짱")
                     .build();
 
@@ -128,7 +126,7 @@ class PostServiceTest {
             }
         }
 
-        @DisplayName("필수 값 누락 시 예외가 발생한다.")
+        @DisplayName("필수 값(제목) 누락 시 예외가 발생한다.")
         @Test
         void uploadPost1() {
             // given

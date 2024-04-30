@@ -4,10 +4,13 @@ import com.pawland.global.config.security.domain.UserPrincipal;
 import com.pawland.global.dto.ApiMessageResponse;
 import com.pawland.post.dto.request.PostWriteRequest;
 import com.pawland.post.service.PostService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +29,10 @@ public class PostController {
 
     private final PostService postService;
 
-    @PostMapping
+    @Operation(summary = "게시글 등록", description = "게시글을 등록합니다.")
+    @ApiResponse(responseCode = "201", description = "게시글 등록 성공")
+    @ApiResponse(responseCode = "400", description = "제목 누락 시")
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiMessageResponse> writePost(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                         @Valid @RequestBody PostWriteRequest request) {
         postService.uploadPost(userPrincipal.getUserId(), request);

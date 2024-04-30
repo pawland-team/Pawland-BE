@@ -73,10 +73,31 @@ class PostControllerTest {
                 .andExpect(jsonPath("$.message").value("게시글이 등록되었습니다."));
         }
 
-        @DisplayName("필수 값(제목) 누락 시 게시글 작성에 실패한다.")
+        @DisplayName("필수 값(제목) 이외의 값은 누락해도 게시글이 작성에 성공한다.")
         @PawLandMockUser
         @Test
         void writePost2() throws Exception {
+            // given
+            PostWriteRequest request = PostWriteRequest.builder()
+                .title("제목")
+                .build();
+
+            String json = objectMapper.writeValueAsString(request);
+
+            // expected
+            mockMvc.perform(post("/api/post")
+                    .contentType(APPLICATION_JSON)
+                    .content(json)
+                )
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.message").value("게시글이 등록되었습니다."));
+        }
+
+        @DisplayName("필수 값(제목) 누락 시 게시글 작성에 실패한다.")
+        @PawLandMockUser
+        @Test
+        void writePost3() throws Exception {
             // given
             PostWriteRequest request = PostWriteRequest.builder()
                 .content("내용")
@@ -94,13 +115,14 @@ class PostControllerTest {
                 .andExpect(jsonPath("$.message").value("제목을 입력해주세요."));
         }
 
-        @DisplayName("내용 누락 시 게시글 작성에 성공한다.")
+        @DisplayName("설정된 지역 이외의 값 입력 시 게시글 작성에 실패한다.")
         @PawLandMockUser
         @Test
-        void writePost3() throws Exception {
+        void writePost4() throws Exception {
             // given
             PostWriteRequest request = PostWriteRequest.builder()
                 .title("제목")
+                .region("나는짱")
                 .build();
 
             String json = objectMapper.writeValueAsString(request);
@@ -111,8 +133,8 @@ class PostControllerTest {
                     .content(json)
                 )
                 .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.message").value("게시글이 등록되었습니다."));
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("지역 값을 확인해주세요."));
         }
     }
 }

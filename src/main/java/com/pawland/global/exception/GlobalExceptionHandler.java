@@ -39,6 +39,18 @@ public class GlobalExceptionHandler {
             .body(new ApiMessageResponse(errorMessages[0]));
     }
 
+    // TODO: Enum 관련 커스텀 예외 추가 시 제거 예정
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "400", description = "입력 값이 올바르지 않습니다.")
+    public ResponseEntity<ApiMessageResponse> invalidRequestHandler(IllegalArgumentException e) {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ApiMessageResponse(e.getMessage()));
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(MailSendException.class)
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)

@@ -29,9 +29,10 @@ public class Post extends BaseTimeEntity {
 
     private String thumbnail = DEFAULT_POST_IMAGE.value();
 
+    @Enumerated(EnumType.STRING)
     private Region region = SEOUL;
 
-    private Long views;
+    private Long views = 0L;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User author;
