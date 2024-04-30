@@ -1,4 +1,4 @@
-package com.pawland.user.dto;
+package com.pawland.user.dto.response;
 
 import com.pawland.user.domain.User;
 import lombok.Data;

@@ -2,6 +2,7 @@ package com.pawland.auth.facade;
 
 import com.pawland.auth.dto.request.SignupRequest;
 import com.pawland.auth.dto.request.VerifyCodeRequest;
+import com.pawland.global.config.AppConfig;
 import com.pawland.global.config.security.JwtUtils;
 import com.pawland.mail.service.MailVerificationService;
 import com.pawland.user.domain.User;
@@ -18,6 +19,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class AuthFacade {
 
+    private final AppConfig appConfig;
     private final UserService userService;
     private final MailVerificationService mailVerificationService;
     private final PasswordEncoder passwordEncoder;
@@ -41,6 +43,7 @@ public class AuthFacade {
             .email(request.getEmail())
             .password(passwordEncoder.encode(request.getPassword()))
             .nickname(request.getNickname())
+            .profileImage(appConfig.getDefaultImage())
             .build();
         userService.register(user);
 
