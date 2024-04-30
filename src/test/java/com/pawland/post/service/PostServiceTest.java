@@ -73,6 +73,7 @@ class PostServiceTest {
                 assertThat(result.getContent()).isEqualTo("내용");
                 assertThat(result.getThumbnail()).isEqualTo("이미지.png");
                 assertThat(result.getRegion()).isEqualTo(Region.CHUNGNAM);
+                assertThat(result.getViews()).isEqualTo(0L);
             }
 
             @DisplayName("내용, 썸네일, 지역을 입력하지 않으면 기본 값으로 저장된다.")
@@ -101,6 +102,7 @@ class PostServiceTest {
                 assertThat(result.getContent()).isEqualTo("");
                 assertThat(result.getThumbnail()).isEqualTo(DEFAULT_POST_IMAGE.value());
                 assertThat(result.getRegion()).isEqualTo(Region.SEOUL);
+                assertThat(result.getViews()).isEqualTo(0L);
             }
 
             @DisplayName("설정 지역 외의 지역 입력 시 예외가 발생한다.")
