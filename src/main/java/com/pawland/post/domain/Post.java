@@ -21,9 +21,6 @@ public class Post extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User author;
-
     @NotNull
     private String title;
 
@@ -35,6 +32,9 @@ public class Post extends BaseTimeEntity {
     private Region region = SEOUL;
 
     private Long views;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User author;
 
     @Builder
     public Post(User author, String title, String content, String thumbnail, Region region) {
