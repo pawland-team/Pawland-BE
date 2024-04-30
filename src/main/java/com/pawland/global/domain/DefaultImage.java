@@ -7,7 +7,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum DefaultImage {
 
-    Profile("https://midcon-bucket.s3.ap-northeast-2.amazonaws.com/myKey4");
+    Profile("https://midcon-bucket.s3.ap-northeast-2.amazonaws.com/myKey4"),
+    POST("https://midcon-bucket.s3.ap-northeast-2.amazonaws.com/myKey4");
 
     private final String imageUrl;
 }
