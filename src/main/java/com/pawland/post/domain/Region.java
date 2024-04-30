@@ -33,6 +33,9 @@ public enum Region {
     }
 
     public static Region fromString(String input) {
+        if (input == null || input.isBlank()) {
+            return Region.SEOUL;
+        }
         return Arrays.stream(Region.values()).
             filter(region -> region.value().equals(input))
             .findFirst()
