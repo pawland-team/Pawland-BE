@@ -3,6 +3,7 @@ package com.pawland.post.domain;
 import com.pawland.global.domain.BaseTimeEntity;
 import com.pawland.user.domain.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -21,7 +22,7 @@ public class Post extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @NotBlank
     private String title;
 
     @NotNull
@@ -46,11 +47,13 @@ public class Post extends BaseTimeEntity {
         this.region = isBlank(region) ? this.region : region;
     }
 
-    private boolean isBlank(Region region) {
-        return region == null;
-    }
-
-    private boolean isBlank(String value) {
-        return value == null || value.isBlank();
+    private boolean isBlank(Object value) {
+        if (value == null) {
+            return true;
+        }
+        if (value instanceof String) {
+            return ((String) value).isBlank();
+        }
+        return false;
     }
 }
