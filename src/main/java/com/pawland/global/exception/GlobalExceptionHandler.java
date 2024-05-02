@@ -1,5 +1,6 @@
 package com.pawland.global.exception;
 
+import com.pawland.global.dto.ApiMessageResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,36 +17,48 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PawLandException.class)
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity PawLandExceptionHandler(PawLandException e) {
+    public ResponseEntity<ApiMessageResponse> PawLandExceptionHandler(PawLandException e) {
 
         return ResponseEntity
             .status(e.getStatusCode())
             .contentType(MediaType.APPLICATION_JSON)
-            .body(e.getMessage());
+            .body(new ApiMessageResponse(e.getMessage()));
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponse(responseCode = "400", description = "입력 값이 올바르지 않습니다.")
-    public ResponseEntity invalidRequestHandler(MethodArgumentNotValidException e) {
+    public ResponseEntity<ApiMessageResponse> invalidRequestHandler(MethodArgumentNotValidException e) {
         String[] errorMessages = e.getFieldErrors().stream()
             .map(fieldError -> fieldError.getDefaultMessage())
             .toArray(String[]::new);
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(errorMessages);
+            .body(new ApiMessageResponse(errorMessages[0]));
+    }
+
+    // TODO: Enum 관련 커스텀 예외 추가 시 제거 예정
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "400", description = "입력 값이 올바르지 않습니다.")
+    public ResponseEntity<ApiMessageResponse> invalidRequestHandler(IllegalArgumentException e) {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ApiMessageResponse(e.getMessage()));
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(MailSendException.class)
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponse(responseCode = "500",description = "메시지 전송 오류")
-    public ResponseEntity mailSendExceptionHandler(MailSendException e) {
+    public ResponseEntity<ApiMessageResponse> mailSendExceptionHandler(MailSendException e) {
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(e.getMessage());
+            .body(new ApiMessageResponse(e.getMessage()));
     }
 }

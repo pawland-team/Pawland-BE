@@ -3,7 +3,7 @@ package com.pawland.order.dto.response;
 import com.pawland.order.domain.Order;
 import com.pawland.order.domain.OrderStatus;
 import com.pawland.product.dto.response.ProductResponse;
-import com.pawland.user.dto.UserResponse;
+import com.pawland.user.dto.response.UserResponse;
 import lombok.Data;
 
 @Data

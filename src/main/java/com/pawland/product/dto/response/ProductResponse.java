@@ -1,7 +1,7 @@
 package com.pawland.product.dto.response;
 
 import com.pawland.product.domain.*;
-import com.pawland.user.dto.UserResponse;
+import com.pawland.user.dto.response.UserResponse;
 import lombok.Data;
 
 import java.util.List;
