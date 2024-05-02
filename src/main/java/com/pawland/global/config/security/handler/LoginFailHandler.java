@@ -1,6 +1,7 @@
 package com.pawland.global.config.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pawland.global.dto.ApiMessageResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,6 +29,6 @@ public class LoginFailHandler implements AuthenticationFailureHandler {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(UTF_8.name());
         response.setStatus(SC_BAD_REQUEST);
-        objectMapper.writeValue(response.getWriter(), "아이디 혹은 비밀번호가 올바르지 않습니다.");
+        objectMapper.writeValue(response.getWriter(), new ApiMessageResponse("아이디 혹은 비밀번호가 올바르지 않습니다."));
     }
 }

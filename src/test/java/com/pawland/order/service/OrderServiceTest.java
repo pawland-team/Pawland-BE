@@ -5,8 +5,8 @@ import com.pawland.order.dto.response.OrderResponse;
 import com.pawland.product.dto.request.CreateProductRequest;
 import com.pawland.product.dto.response.ProductResponse;
 import com.pawland.product.service.ProductService;
+import com.pawland.user.domain.LoginType;
 import com.pawland.user.domain.User;
-import com.pawland.user.domain.UserType;
 import com.pawland.user.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +39,7 @@ class OrderServiceTest {
                 .nickname("010-1111-1111")
                 .nickname("tester")
                 .introduce("tester입니다.")
-                .type(UserType.GOOGLE)
+                .type(LoginType.GOOGLE)
                 .build();
 
         userRepository.save(tester);
@@ -51,7 +51,7 @@ class OrderServiceTest {
                 .nickname("010-1111-2222")
                 .nickname("tester2")
                 .introduce("tester2입니다.")
-                .type(UserType.GOOGLE)
+                .type(LoginType.GOOGLE)
                 .build();
 
         userRepository.save(tester2);

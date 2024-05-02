@@ -10,5 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class AppConfig {
 
     private final String jwtKey;
+    private final String backUrl;
     private final String frontUrl;
+    private final String backDomain;
 }

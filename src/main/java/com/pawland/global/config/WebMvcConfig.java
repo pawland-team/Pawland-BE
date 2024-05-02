@@ -14,7 +14,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-            .allowedOrigins(appConfig.getFrontUrl())
+            .allowedOrigins(appConfig.getFrontUrl(), appConfig.getBackUrl())
             .allowCredentials(true);
     }
 }
