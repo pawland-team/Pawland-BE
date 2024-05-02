@@ -1,5 +1,6 @@
 package com.pawland.comment.domain;
 
+import com.pawland.comment.dto.request.UpdateCommentRequest;
 import com.pawland.global.domain.BaseTimeEntity;
 import com.pawland.post.domain.Post;
 import com.pawland.user.domain.User;
@@ -49,5 +50,9 @@ public class Comment extends BaseTimeEntity {
     public void addReply(Comment comment) {
         this.reply.add(comment);
         comment.parent = this;
+    }
+
+    public void update(UpdateCommentRequest updateCommentRequest) {
+        this.content = updateCommentRequest.getContent();
     }
 }

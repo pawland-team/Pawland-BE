@@ -4,12 +4,13 @@ import com.pawland.product.dto.request.CreateProductRequest;
 import com.pawland.product.dto.request.UpdateProductRequest;
 import com.pawland.product.dto.response.ProductResponse;
 import com.pawland.product.exception.ProductException;
-import com.pawland.product.respository.ProductJpaRepository;
-import com.pawland.user.domain.User;
 import com.pawland.user.domain.LoginType;
+import com.pawland.user.domain.User;
 import com.pawland.user.repository.UserRepository;
-import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,12 +25,6 @@ class ProductServiceTest {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private ProductJpaRepository productJpaRepository;
-
-    @Autowired
-    private EntityManager entityManager;
 
     @BeforeEach
     void init() {
