@@ -154,7 +154,6 @@ class ProductServiceTest {
                     null));
         }
 
-
         //when
         Page<ProductResponse> products = productService.getProducts(1);
 
