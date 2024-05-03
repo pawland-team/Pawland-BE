@@ -4,9 +4,11 @@ import lombok.Data;
 
 @Data
 public class CreateCommentRequest {
+    private Long postId;
     private String content;
 
-    public CreateCommentRequest(String content) {
+    public CreateCommentRequest(Long postId, String content) {
+        this.postId = postId;
         this.content = content;
     }
 }

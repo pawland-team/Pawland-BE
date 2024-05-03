@@ -50,7 +50,7 @@ class CommentServiceTest {
         PostResponse post = createPost(user);
 
         //when
-        CommentResponse comment = commentService.createComment(user.getId(), post.getId(), new CreateCommentRequest("댓글입니다."));
+        CommentResponse comment = commentService.createComment(user.getId(),new CreateCommentRequest(post.getId(),"댓글입니다."));
         Post findPost = postRepository.findById(post.getId()).orElseThrow(PostException.NotFoundException::new);
 
         //then

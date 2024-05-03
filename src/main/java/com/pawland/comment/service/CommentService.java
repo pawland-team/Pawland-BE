@@ -24,9 +24,9 @@ public class CommentService {
     private final PostRepository postRepository;
 
     @Transactional
-    public CommentResponse createComment(Long userId, Long postId, CreateCommentRequest createCommentRequest) {
+    public CommentResponse createComment(Long userId, CreateCommentRequest createCommentRequest) {
         User author = getUserById(userId);
-        Post post = getPostById(postId);
+        Post post = getPostById(createCommentRequest.getPostId());
 
         Comment comment = Comment.builder()
                 .author(author)

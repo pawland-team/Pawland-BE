@@ -11,12 +11,11 @@ import com.pawland.user.domain.User;
 import com.pawland.user.exception.UserException;
 import com.pawland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -90,8 +89,10 @@ public class ProductService {
         return product.getSeller().getId().equals(userId);
     }
 
-    public List<ProductResponse> getProducts(int page) {
+    public Page<ProductResponse> getProducts(int page) {
         Pageable pageable =PageRequest.of(page - 1, 8);
-        return productRepository.getAllProducts(pageable).stream().map(ProductResponse::of).toList();
+        Page<Product> allProducts = productRepository.getAllProducts(pageable);
+
+        return allProducts.map(ProductResponse::of);
     }
 }
