@@ -93,6 +93,6 @@ public class ProductService {
         Pageable pageable =PageRequest.of(page - 1, 8);
         Page<Product> allProducts = productRepository.getAllProducts(pageable);
 
-        return allProducts.map(product -> ProductResponse.of(product));
+        return allProducts.map(ProductResponse::of);
     }
 }

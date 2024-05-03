@@ -141,7 +141,7 @@ class ProductServiceTest {
         User user = createUser();
 
         for (int i = 0; i < 10; i++) {
-            ProductResponse product = productService.createProduct(user.getId(), new CreateProductRequest(
+            productService.createProduct(user.getId(), new CreateProductRequest(
                     "사료",
                     "CAT",
                     "NEW",
