@@ -131,7 +131,6 @@ class ProductServiceTest {
 
         //then
         Assertions.assertThrows(ProductException.NotFoundProduct.class, () -> productService.getOneProductById(product.getId()));
-
     }
 
     @DisplayName("상품 최신순 8개 조회")
