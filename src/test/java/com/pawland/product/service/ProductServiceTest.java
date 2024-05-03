@@ -12,9 +12,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @SpringBootTest
 class ProductServiceTest {
@@ -38,6 +37,7 @@ class ProductServiceTest {
 
     @DisplayName("상품 등록")
     @Test
+    @Transactional
     void createProductTest() {
         //given
         User user = createUser();
@@ -63,6 +63,7 @@ class ProductServiceTest {
 
     @DisplayName("상품 단일 조회")
     @Test
+    @Transactional
     void getOneProductById() {
         //given
         User user = createUser();
@@ -86,6 +87,7 @@ class ProductServiceTest {
 
     @DisplayName("상품 수정")
     @Test
+    @Transactional
     void updateProduct() {
         //given
         User user = createUser();
@@ -154,9 +156,9 @@ class ProductServiceTest {
 
 
         //when
-        List<ProductResponse> products = productService.getProducts(1);
+        Page<ProductResponse> products = productService.getProducts(1);
 
         //then
-        Assertions.assertEquals(8, products.size());
+        Assertions.assertEquals(8, products.getContent().size());
     }
 }

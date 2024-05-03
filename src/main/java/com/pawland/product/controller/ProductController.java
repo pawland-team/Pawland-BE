@@ -10,12 +10,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,7 +51,7 @@ public class ProductController {
 
     @Operation(summary = "상품 페이징 조회")
     @GetMapping
-    public List<ProductResponse> getProducts(@RequestParam(defaultValue = "1") int page) {
+    public Page<ProductResponse> getProducts(@RequestParam(defaultValue = "1") int page) {
         return productService.getProducts(page);
     }
 }
