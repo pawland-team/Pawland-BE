@@ -1,6 +1,7 @@
 package com.pawland.comment.service;
 
 import com.pawland.comment.domain.Comment;
+import com.pawland.comment.domain.RecommendComment;
 import com.pawland.comment.dto.request.CreateCommentRequest;
 import com.pawland.comment.dto.request.UpdateCommentRequest;
 import com.pawland.comment.dto.response.CommentResponse;
@@ -55,7 +56,28 @@ public class CommentService {
         return CommentResponse.of(commentById);
     }
 
+    @Transactional
+    public void deleteComment(Long userId, Long commentId) {
+        User userById = getUserById(userId);
+        Comment commentById = getCommentById(commentId);
 
+        if (!userById.getId().equals(commentById.getAuthor().getId())) {
+            throw new CommentException.AccessDeniedException();
+        }
+
+        commentById.getPost().getComments().remove(commentById);
+        commentJpaRepository.delete(commentById);
+    }
+
+    @Transactional
+    public CommentResponse recommendComment(Long userId, Long commentId) {
+        User userById = getUserById(userId);
+        Comment commentById = getCommentById(commentId);
+
+        commentById.recommendComment(new RecommendComment(commentById, userById));
+
+        return CommentResponse.of(commentById);
+    }
 
     private User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(UserException.NotFoundUser::new);

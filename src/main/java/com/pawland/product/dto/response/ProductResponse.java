@@ -2,11 +2,13 @@ package com.pawland.product.dto.response;
 
 import com.pawland.product.domain.*;
 import com.pawland.user.dto.response.UserResponse;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@Schema(name = "상품 응답")
 public class ProductResponse {
     private Long id;
     private UserResponse seller;
