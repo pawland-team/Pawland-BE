@@ -1,5 +1,6 @@
 package com.pawland.product.dto.response;
 
+import com.pawland.post.domain.Region;
 import com.pawland.product.domain.*;
 import com.pawland.user.dto.response.UserResponse;
 import lombok.Data;
@@ -16,7 +17,7 @@ public class ProductResponse {
     private String name;
     private int price;
     private String content;
-    private String region;
+    private Region region;
     private int view;
     private Status status;
     private String thumbnailUrl;

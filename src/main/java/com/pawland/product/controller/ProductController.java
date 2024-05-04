@@ -2,6 +2,7 @@ package com.pawland.product.controller;
 
 import com.pawland.global.config.security.domain.UserPrincipal;
 import com.pawland.product.dto.request.CreateProductRequest;
+import com.pawland.product.dto.request.SearchProductRequest;
 import com.pawland.product.dto.request.UpdateProductRequest;
 import com.pawland.product.dto.response.ProductResponse;
 import com.pawland.product.service.ProductService;
@@ -51,7 +52,8 @@ public class ProductController {
 
     @Operation(summary = "상품 페이징 조회")
     @GetMapping
-    public Page<ProductResponse> getProducts(@RequestParam(defaultValue = "1") int page) {
-        return productService.getProducts(page);
+    public Page<ProductResponse> getProducts(@RequestBody SearchProductRequest searchProductRequest) {
+        return productService.getProducts(searchProductRequest);
     }
+
 }

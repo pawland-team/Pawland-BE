@@ -1,6 +1,7 @@
 package com.pawland.product.service;
 
 import com.pawland.product.dto.request.CreateProductRequest;
+import com.pawland.product.dto.request.SearchProductRequest;
 import com.pawland.product.dto.request.UpdateProductRequest;
 import com.pawland.product.dto.response.ProductResponse;
 import com.pawland.product.exception.ProductException;
@@ -48,7 +49,7 @@ class ProductServiceTest {
                 "상품",
                 10000,
                 "상품입니다.",
-                "서울시 강서구",
+                "서울",
                 null,
                 null);
 
@@ -74,7 +75,7 @@ class ProductServiceTest {
                 "상품",
                 10000,
                 "상품입니다.",
-                "서울시 강서구",
+                "서울",
                 null,
                 null));
         //when
@@ -98,7 +99,7 @@ class ProductServiceTest {
                 "상품",
                 10000,
                 "상품입니다.",
-                "서울시 강서구",
+                "서울",
                 null,
                 null));
 
@@ -122,7 +123,7 @@ class ProductServiceTest {
                 "상품",
                 10000,
                 "상품입니다.",
-                "서울시 강서구",
+                "서울",
                 null,
                 null));
 
@@ -148,15 +149,74 @@ class ProductServiceTest {
                     "상품",
                     10000,
                     "상품입니다.",
-                    "서울시 강서구",
+                    "서울",
                     null,
                     null));
         }
 
         //when
-        Page<ProductResponse> products = productService.getProducts(1);
+        Page<ProductResponse> products = productService.getProducts(SearchProductRequest.builder().page(1).size(8).build());
 
         //then
         Assertions.assertEquals(8, products.getContent().size());
+    }
+
+    @DisplayName("가격이 같은 상품 조회")
+    @Test
+    @Transactional
+    void getEqualPriceProduct() {
+        //given
+        User user = createUser();
+
+        for (int i = 0; i < 10; i++) {
+            productService.createProduct(user.getId(), new CreateProductRequest(
+                    "사료",
+                    "CAT",
+                    "NEW",
+                    "상품",
+                    10000+i,
+                    "상품입니다.",
+                    "서울",
+                    null,
+                    null));
+        }
+
+        //when
+        Page<ProductResponse> products = productService.getProducts(SearchProductRequest.builder().price(10000).page(1).size(8).build());
+
+        //then
+        Assertions.assertEquals(1, products.getContent().size());
+    }
+
+    @DisplayName("지역으로 상품 조회")
+    @Test
+    @Transactional
+    void getEqualRegionProduct() {
+        //given
+        User user = createUser();
+
+        String[] region = {"서울", "서울", "인천"};
+
+        for (int i = 0; i < 3; i++) {
+            ProductResponse product = productService.createProduct(user.getId(), new CreateProductRequest(
+                    "사료",
+                    "CAT",
+                    "NEW",
+                    "상품",
+                    10000,
+                    "상품입니다.",
+                    region[i],
+                    null,
+                    null));
+
+            System.out.println("product = " + product);
+        }
+
+        //when
+        Page<ProductResponse> products = productService.getProducts(SearchProductRequest.builder().region("서울").page(1).size(8).build());
+
+        //then
+        Assertions.assertEquals(2,products.getContent().size());
+
     }
 }
