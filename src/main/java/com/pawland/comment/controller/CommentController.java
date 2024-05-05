@@ -28,4 +28,14 @@ public class CommentController {
     public CommentResponse updateComment(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long commentId, @RequestBody UpdateCommentRequest updateCommentRequest) {
         return commentService.updateComment(userPrincipal.getUserId(), commentId, updateCommentRequest);
     }
+
+    @DeleteMapping("/{commentId}")
+    public void deleteComment(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long commentId) {
+        commentService.deleteComment(userPrincipal.getUserId(),commentId);
+    }
+
+    @PostMapping("/{commentId}")
+    public void recommendComment(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long commentId) {
+        commentService.recommendComment(userPrincipal.getUserId(),commentId);
+    }
 }

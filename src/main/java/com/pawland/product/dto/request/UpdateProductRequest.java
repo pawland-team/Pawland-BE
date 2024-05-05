@@ -1,5 +1,6 @@
 package com.pawland.product.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Schema(name = "상품 수정 요청")
 public class UpdateProductRequest {
     private String category;
     private String species;

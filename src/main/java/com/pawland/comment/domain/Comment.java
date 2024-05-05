@@ -11,7 +11,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -31,6 +33,9 @@ public class Comment extends BaseTimeEntity {
 
     @ManyToOne
     private Comment parent;
+
+    @OneToMany(mappedBy = "comment", orphanRemoval = true)
+    private Set<RecommendComment> recommendComments = new HashSet<>();
 
     @OneToMany(mappedBy = "parent",orphanRemoval = true)
     private List<Comment> reply;
@@ -54,5 +59,15 @@ public class Comment extends BaseTimeEntity {
 
     public void update(UpdateCommentRequest updateCommentRequest) {
         this.content = updateCommentRequest.getContent();
+    }
+
+    public void recommendComment(RecommendComment recommendComment) {
+        recommendComment.setComment(this);
+        this.recommendComments.add(recommendComment);
+    }
+
+    public void deleteRecommendComment(RecommendComment recommendComment) {
+        recommendComment.setComment(null);
+        this.recommendComments.remove(recommendComment);
     }
 }

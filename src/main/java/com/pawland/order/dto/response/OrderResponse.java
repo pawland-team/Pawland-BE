@@ -4,9 +4,11 @@ import com.pawland.order.domain.Order;
 import com.pawland.order.domain.OrderStatus;
 import com.pawland.product.dto.response.ProductResponse;
 import com.pawland.user.dto.response.UserResponse;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
+@Schema(name = "주문 응답")
 public class OrderResponse {
     private Long id;
     private UserResponse seller;
