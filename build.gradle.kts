@@ -28,6 +28,10 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 
+	// 소셜 로그인
+	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+	implementation ("org.springframework.boot:spring-boot-starter-webflux")
+
 	// AWS SDK
 	implementation(platform("software.amazon.awssdk:bom:2.25.35"))
 	implementation("software.amazon.awssdk:s3")
