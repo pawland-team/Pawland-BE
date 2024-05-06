@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pawland.global.config.TestSecurityConfig;
 import com.pawland.global.utils.PawLandMockUser;
 import com.pawland.post.dto.request.PostCreateRequest;
-import com.pawland.post.repository.PostRepository;
+import com.pawland.post.repository.PostJpaRepository;
 import com.pawland.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,12 +40,12 @@ class PostControllerTest {
     private UserRepository userRepository;
 
     @Autowired
-    private PostRepository postRepository;
+    private PostJpaRepository postJpaRepository;
 
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
-        postRepository.deleteAllInBatch();
+        postJpaRepository.deleteAllInBatch();
     }
 
     @DisplayName("게시글 작성 시")

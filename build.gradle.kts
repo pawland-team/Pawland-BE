@@ -28,6 +28,10 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 
+	// AWS SDK
+	implementation(platform("software.amazon.awssdk:bom:2.25.35"))
+	implementation("software.amazon.awssdk:s3")
+
 	// swagger
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4")
 

@@ -1,5 +1,6 @@
 package com.pawland.post.domain;
 
+import com.pawland.comment.domain.Comment;
 import com.pawland.global.domain.BaseTimeEntity;
 import com.pawland.user.domain.User;
 import jakarta.persistence.*;
@@ -9,6 +10,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.pawland.global.domain.DefaultImage.DEFAULT_POST_IMAGE;
 import static com.pawland.post.domain.Region.SEOUL;
@@ -38,6 +42,9 @@ public class Post extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User author;
 
+    @OneToMany(mappedBy = "post")
+    private List<Comment> comments = new ArrayList<>();
+
     @Builder
     public Post(User author, String title, String content, String thumbnail, Region region) {
         this.author = author;
@@ -55,5 +62,10 @@ public class Post extends BaseTimeEntity {
             return ((String) value).isBlank();
         }
         return false;
+    }
+
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+        comment.setPost(this);
     }
 }

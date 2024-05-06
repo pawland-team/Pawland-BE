@@ -1,12 +1,15 @@
 package com.pawland.product.dto.response;
 
+import com.pawland.post.domain.Region;
 import com.pawland.product.domain.*;
 import com.pawland.user.dto.response.UserResponse;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@Schema(name = "상품 응답")
 public class ProductResponse {
     private Long id;
     private UserResponse seller;
@@ -16,7 +19,7 @@ public class ProductResponse {
     private String name;
     private int price;
     private String content;
-    private String region;
+    private Region region;
     private int view;
     private Status status;
     private String thumbnailUrl;
