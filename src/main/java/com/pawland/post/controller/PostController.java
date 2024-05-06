@@ -3,6 +3,8 @@ package com.pawland.post.controller;
 import com.pawland.global.config.security.domain.UserPrincipal;
 import com.pawland.global.dto.ApiMessageResponse;
 import com.pawland.post.dto.request.PostCreateRequest;
+import com.pawland.post.dto.request.PostSearchRequest;
+import com.pawland.post.dto.response.PostResponse;
 import com.pawland.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -10,13 +12,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -39,5 +39,12 @@ public class PostController {
         return ResponseEntity
             .status(CREATED)
             .body(new ApiMessageResponse("게시글이 등록되었습니다."));
+    }
+
+    @Operation(summary = "게시글 조회", description = "게시글을 조회 합니다")
+    @ApiResponse(responseCode = "201", description = "게시글 조회 성공")
+    @GetMapping
+    public ResponseEntity<Page<PostResponse>> getPosts(@RequestBody PostSearchRequest postSearchRequest) {
+        return ResponseEntity.ok(postService.getPosts(postSearchRequest));
     }
 }

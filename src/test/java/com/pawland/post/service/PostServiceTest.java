@@ -3,7 +3,7 @@ package com.pawland.post.service;
 import com.pawland.post.domain.Post;
 import com.pawland.post.domain.Region;
 import com.pawland.post.dto.request.PostCreateRequest;
-import com.pawland.post.repository.PostRepository;
+import com.pawland.post.repository.PostJpaRepository;
 import com.pawland.user.domain.User;
 import com.pawland.user.repository.UserRepository;
 import jakarta.validation.ConstraintViolationException;
@@ -27,7 +27,7 @@ class PostServiceTest {
     private PostService postService;
 
     @Autowired
-    private PostRepository postRepository;
+    private PostJpaRepository postJpaRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -35,7 +35,7 @@ class PostServiceTest {
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
-        postRepository.deleteAllInBatch();
+        postJpaRepository.deleteAllInBatch();
     }
 
     @DisplayName("게시글 작성 시")
@@ -64,7 +64,7 @@ class PostServiceTest {
 
                 // when
                 postService.uploadPost(user.getId(), request);
-                List<Post> postList = postRepository.findAll();
+                List<Post> postList = postJpaRepository.findAll();
                 Post result = postList.get(0);
 
                 // then
@@ -93,7 +93,7 @@ class PostServiceTest {
 
                 // when
                 postService.uploadPost(user.getId(), request);
-                List<Post> postList = postRepository.findAll();
+                List<Post> postList = postJpaRepository.findAll();
                 Post result = postList.get(0);
 
                 // then

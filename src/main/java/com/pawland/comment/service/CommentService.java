@@ -9,7 +9,7 @@ import com.pawland.comment.exception.CommentException;
 import com.pawland.comment.respository.CommentJpaRepository;
 import com.pawland.post.domain.Post;
 import com.pawland.post.exception.PostException;
-import com.pawland.post.repository.PostRepository;
+import com.pawland.post.repository.PostJpaRepository;
 import com.pawland.user.domain.User;
 import com.pawland.user.exception.UserException;
 import com.pawland.user.repository.UserRepository;
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
     private final CommentJpaRepository commentJpaRepository;
     private final UserRepository userRepository;
-    private final PostRepository postRepository;
+    private final PostJpaRepository postJpaRepository;
 
     @Transactional
     public CommentResponse createComment(Long userId, CreateCommentRequest createCommentRequest) {
@@ -84,7 +84,7 @@ public class CommentService {
     }
 
     private Post getPostById(Long postId) {
-        return postRepository.findById(postId).orElseThrow(PostException.NotFoundException::new);
+        return postJpaRepository.findById(postId).orElseThrow(PostException.NotFoundException::new);
     }
 
     private Comment getCommentById(Long commentId) {
