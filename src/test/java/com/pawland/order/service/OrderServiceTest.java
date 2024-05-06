@@ -69,7 +69,7 @@ class OrderServiceTest {
                 "상품",
                 10000,
                 "상품입니다.",
-                "서울시 강서구",
+                "서울",
                 null,
                 null);
 

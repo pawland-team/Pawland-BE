@@ -2,6 +2,7 @@ package com.pawland.product.service;
 
 import com.pawland.product.domain.Product;
 import com.pawland.product.dto.request.CreateProductRequest;
+import com.pawland.product.dto.request.SearchProductRequest;
 import com.pawland.product.dto.request.UpdateProductRequest;
 import com.pawland.product.dto.response.ProductResponse;
 import com.pawland.product.exception.ProductException;
@@ -62,8 +63,6 @@ public class ProductService {
         } else {
             throw new ProductException.AccessDeniedException();
         }
-
-
     }
 
     public boolean deleteProduct(Long userId, Long productId) {
@@ -77,6 +76,13 @@ public class ProductService {
         }
     }
 
+    public Page<ProductResponse> getProducts(SearchProductRequest searchProductRequest) {
+        Pageable pageable = PageRequest.of(searchProductRequest.getPage() - 1, searchProductRequest.getSize());
+        Page<Product> allProducts = productRepository.getAllProducts(searchProductRequest,pageable);
+
+        return allProducts.map(ProductResponse::of);
+    }
+
     private Product getProductById(Long productId) {
         return productJpaRepository.findById(productId).orElseThrow(ProductException.NotFoundProduct::new);
     }
@@ -87,12 +93,5 @@ public class ProductService {
 
     private boolean canUpdateOrDelete(Long userId, Product product) {
         return product.getSeller().getId().equals(userId);
-    }
-
-    public Page<ProductResponse> getProducts(int page) {
-        Pageable pageable =PageRequest.of(page - 1, 8);
-        Page<Product> allProducts = productRepository.getAllProducts(pageable);
-
-        return allProducts.map(ProductResponse::of);
     }
 }

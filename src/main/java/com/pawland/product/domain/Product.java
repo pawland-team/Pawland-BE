@@ -1,6 +1,7 @@
 package com.pawland.product.domain;
 
 import com.pawland.global.domain.BaseTimeEntity;
+import com.pawland.post.domain.Region;
 import com.pawland.product.dto.request.UpdateProductRequest;
 import com.pawland.user.domain.User;
 import jakarta.persistence.*;
@@ -34,7 +35,8 @@ public class Product extends BaseTimeEntity {
 
     private String content;
 
-    private String region;
+    @Enumerated(EnumType.STRING)
+    private Region region;
 
     private int view;
     @ManyToOne
@@ -56,7 +58,7 @@ public class Product extends BaseTimeEntity {
         this.name = name;
         this.price = price;
         this.content = content;
-        this.region = region;
+        this.region = Region.fromString(region);
         this.view = 0;
         this.seller = seller;
         this.status = Status.SELLING;
@@ -85,7 +87,7 @@ public class Product extends BaseTimeEntity {
             this.content = updateProductRequest.getContent();
         }
         if (updateProductRequest.getRegion() != null) {
-            this.region = updateProductRequest.getRegion();
+            this.region = Region.fromString(updateProductRequest.getRegion());
         }
     }
 
