@@ -1,10 +1,7 @@
 package com.pawland.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pawland.auth.dto.request.SendVerificationCodeRequest;
-import com.pawland.auth.dto.request.EmailDupCheckRequest;
-import com.pawland.auth.dto.request.SignupRequest;
-import com.pawland.auth.dto.request.VerifyCodeRequest;
+import com.pawland.auth.dto.request.*;
 import com.pawland.auth.dto.response.OAuthAttributes;
 import com.pawland.auth.service.AuthService;
 import com.pawland.global.config.security.domain.LoginRequest;
@@ -73,7 +70,52 @@ class AuthControllerTest {
         });
     }
 
-    @DisplayName("이메일로 중복 확인 요청 시")
+    @DisplayName("닉네임 중복 확인 요청 시")
+    @Nested
+    class nicknameDupCheck {
+        @DisplayName("가입되지 않은 닉네임으로 중복 확인 시 성공 메시지를 반환한다.")
+        @Test
+        void emailDupCheck1() throws Exception {
+            // given
+            NicknameDupCheckRequest request = new NicknameDupCheckRequest("나는짱");
+            String json = objectMapper.writeValueAsString(request);
+
+            // expected
+            mockMvc.perform(post("/api/auth/nickname-dupcheck")
+                    .contentType(APPLICATION_JSON)
+                    .content(json)
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("사용할 수 있는 닉네임입니다."));
+        }
+
+        @DisplayName("이미 가입된 닉네임으로 중복 확인 시 오류 메시지를 반환한다.")
+        @Test
+        void emailDupCheck2() throws Exception {
+            // given
+            User user = User.builder()
+                .email("midcon@nav.com")
+                .password("asd123123")
+                .nickname("나는짱")
+                .build();
+            userRepository.save(user);
+
+            NicknameDupCheckRequest request = new NicknameDupCheckRequest("나는짱");
+            String json = objectMapper.writeValueAsString(request);
+
+            // expected
+            mockMvc.perform(post("/api/auth/nickname-dupcheck")
+                    .contentType(APPLICATION_JSON)
+                    .content(json)
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("이미 존재하는 유저입니다."));
+        }
+    }
+
+    @DisplayName("이메일 중복 확인 요청 시")
     @Nested
     class emailDupCheck {
         @DisplayName("가입되지 않은 이메일로 중복 확인 시 성공 메시지를 반환한다.")

@@ -25,6 +25,10 @@ public class AuthFacade {
     private final JwtUtils jwtUtils;
     private final AuthService authService;
 
+    public void checkNicknameDuplicate(String nickname) {
+        userService.checkNicknameDuplicate(nickname);
+    }
+
     public void checkEmailDuplicate(String email) {
         userService.checkEmailDuplicate(email);
     }
