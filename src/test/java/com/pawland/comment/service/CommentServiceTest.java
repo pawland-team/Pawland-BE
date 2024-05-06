@@ -8,7 +8,7 @@ import com.pawland.post.domain.Post;
 import com.pawland.post.dto.request.PostCreateRequest;
 import com.pawland.post.dto.response.PostResponse;
 import com.pawland.post.exception.PostException;
-import com.pawland.post.repository.PostRepository;
+import com.pawland.post.repository.PostJpaRepository;
 import com.pawland.post.service.PostService;
 import com.pawland.user.domain.LoginType;
 import com.pawland.user.domain.User;
@@ -36,7 +36,7 @@ class CommentServiceTest {
     private PostService postService;
 
     @Autowired
-    private PostRepository postRepository;
+    private PostJpaRepository postJpaRepository;
 
     @Autowired
     private CommentJpaRepository commentJpaRepository;
@@ -58,7 +58,7 @@ class CommentServiceTest {
 
         //when
         CommentResponse comment = commentService.createComment(user.getId(),new CreateCommentRequest(post.getId(),"댓글입니다."));
-        Post findPost = postRepository.findById(post.getId()).orElseThrow(PostException.NotFoundException::new);
+        Post findPost = postJpaRepository.findById(post.getId()).orElseThrow(PostException.NotFoundException::new);
 
         //then
         Assertions.assertEquals(user.getNickname(), comment.getAuthor().getNickname());
