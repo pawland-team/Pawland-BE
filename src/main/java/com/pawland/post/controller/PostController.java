@@ -43,8 +43,8 @@ public class PostController {
 
     @Operation(summary = "게시글 조회", description = "게시글을 조회 합니다")
     @ApiResponse(responseCode = "201", description = "게시글 조회 성공")
-    @GetMapping
-    public ResponseEntity<Page<PostResponse>> getPosts(@RequestBody PostSearchRequest postSearchRequest) {
-        return ResponseEntity.ok(postService.getPosts(postSearchRequest));
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Page<PostResponse>> getPosts(@RequestParam(required = true,defaultValue = "1") int page,@RequestParam(required = false) String content,@RequestParam(required = false) String region) {
+        return ResponseEntity.ok(postService.getPosts(PostSearchRequest.builder().page(page).content(content).region(region).build()));
     }
 }

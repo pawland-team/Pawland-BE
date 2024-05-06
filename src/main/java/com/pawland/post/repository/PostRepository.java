@@ -32,8 +32,8 @@ public class PostRepository {
                         eqRegion(postSearchRequest.getRegion())
                 )
                 .orderBy(post.createdDate.desc())
-                .offset(postSearchRequest.getPage() - 1)
-                .limit(6)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
         return new PageImpl<>(posts,pageable,posts.size());
