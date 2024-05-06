@@ -2,6 +2,8 @@ package com.pawland.auth.service;
 
 import com.pawland.auth.dto.response.OAuthAttributes;
 import com.pawland.auth.dto.response.OauthTokenResponse;
+import com.pawland.user.domain.User;
+import com.pawland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -9,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -23,11 +26,18 @@ import java.util.Map;
 public class AuthService {
 
     private final ClientRegistrationRepository clientRegistrationRepository;
+    private final UserRepository userRepository;
 
-    public OAuthAttributes getUserInfoByOauth2(String code, String provider) {
+    @Transactional
+    public User oauth2Login(String code, String provider) {
         ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(provider);
         OauthTokenResponse tokenResponse = requestAccessToken(code, registration);
-        return getUerProfile(tokenResponse.getAccessToken(), registration);
+        OAuthAttributes uerProfile = getUerProfile(tokenResponse.getAccessToken(), registration);
+
+        User oauth2User = userRepository.findByEmail(uerProfile.getEmail())
+            .map(user -> user.updateOauth2Profile(uerProfile.toUser()))
+            .orElse(uerProfile.toUser());
+        return userRepository.save(oauth2User);
     }
 
     private OauthTokenResponse requestAccessToken(String code, ClientRegistration registration) {
