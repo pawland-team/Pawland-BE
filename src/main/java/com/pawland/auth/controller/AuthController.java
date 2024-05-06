@@ -16,10 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 
@@ -92,5 +89,20 @@ public class AuthController {
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiMessageResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(new ApiMessageResponse(""));
+    }
+
+    @Operation(summary = "소셜 로그인", description = "소셜 로그인 성공 시 쿠키를 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "로그인에 성공",
+        headers = {
+            @Header(name = "Set-Cookie", description = "인증 쿠키")
+        })
+    @ApiResponse(responseCode = "400", description = "잘못된 아이디 혹은 비밀번호")
+    @GetMapping("/oauth2/{provider}")
+    public ResponseEntity<ApiMessageResponse> oauth2Login(@PathVariable String provider, @RequestParam String code) {
+        String jwtCookie = authFacade.oauth2Login(code, provider);
+        return ResponseEntity
+            .status(CREATED)
+            .header(HttpHeaders.SET_COOKIE, jwtCookie)
+            .body(new ApiMessageResponse("소셜 로그인에 성공했습니다."));
     }
 }

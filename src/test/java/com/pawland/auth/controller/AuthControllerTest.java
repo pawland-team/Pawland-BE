@@ -5,7 +5,11 @@ import com.pawland.auth.dto.request.SendVerificationCodeRequest;
 import com.pawland.auth.dto.request.EmailDupCheckRequest;
 import com.pawland.auth.dto.request.SignupRequest;
 import com.pawland.auth.dto.request.VerifyCodeRequest;
+import com.pawland.auth.dto.response.OAuthAttributes;
+import com.pawland.auth.service.AuthService;
 import com.pawland.global.config.security.domain.LoginRequest;
+import com.pawland.global.domain.DefaultImage;
+import com.pawland.user.domain.LoginType;
 import com.pawland.user.domain.User;
 import com.pawland.user.repository.UserRepository;
 import jakarta.mail.Session;
@@ -30,6 +34,7 @@ import java.time.Duration;
 import static org.hamcrest.Matchers.oneOf;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -52,6 +57,9 @@ class AuthControllerTest {
 
     @MockBean
     private JavaMailSender mailSender;
+
+    @MockBean
+    private AuthService authService;
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
@@ -414,7 +422,7 @@ class AuthControllerTest {
         }
     }
 
-    @DisplayName("로그인 시")
+    @DisplayName("일반 로그인 시")
     @Nested
     class login {
         @DisplayName("등록된 유저와 이메일, 비밀번호가 일치하면 로그인에 성공한다.")
@@ -501,6 +509,55 @@ class AuthControllerTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("아이디 혹은 비밀번호가 올바르지 않습니다."))
+                .andExpect(cookie().doesNotExist("jwt"));
+        }
+    }
+
+    @DisplayName("소셜 로그인 시")
+    @Nested
+    class oauth2Login {
+        @DisplayName("provider가 카카오/구글/네이버 일 시 성공한다.")
+        @Test
+        void oauth2Login1() throws Exception {
+            // given
+            String email = "midcon@nav.com";
+            User oauth2User = OAuthAttributes.builder()
+                .email(email + "/" + LoginType.KAKAO.value())
+                .nickname("임시 닉네임")
+                .profileImage(DefaultImage.DEFAULT_PROFILE_IMAGE.value())
+                .provider(LoginType.KAKAO.value())
+                .build()
+                .toUser();
+            userRepository.save(oauth2User);
+
+            String provider = "kakao";
+            String code = "code";
+            when(authService.oauth2Login(code, provider))
+                .thenReturn(oauth2User);
+
+            // expected
+            mockMvc.perform(get("/api/auth/oauth2/" + provider + "?code=" + code))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.message").value("소셜 로그인에 성공했습니다."))
+                .andExpect(cookie().exists("jwt"));
+        }
+
+        @DisplayName("provider가 카카오/구글/네이버 이외의 값이면 실패한다.")
+        @Test
+        void oauth2Login2() throws Exception {
+            // given
+            String provider = "invalidProvider";
+            String code = "code";
+
+            when(authService.oauth2Login(code, provider))
+                .thenThrow(new IllegalArgumentException("허용되지 않은 접근입니다."));
+
+            // expected
+            mockMvc.perform(get("/api/auth/oauth2/" + provider + "?code=" + code))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("허용되지 않은 접근입니다."))
                 .andExpect(cookie().doesNotExist("jwt"));
         }
     }

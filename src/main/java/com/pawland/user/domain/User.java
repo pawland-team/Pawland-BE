@@ -68,6 +68,11 @@ public class User extends BaseTimeEntity {
         this.introduce = isBlank(user.getIntroduce()) ? introduce : user.getIntroduce();
     }
 
+    public User updateOauth2Profile(User user) {
+        this.profileImage = user.profileImage;
+        return this;
+    }
+
     private boolean isBlank(String value) {
         return value == null || value.isBlank();
     }
