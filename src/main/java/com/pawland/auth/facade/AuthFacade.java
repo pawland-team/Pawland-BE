@@ -2,6 +2,7 @@ package com.pawland.auth.facade;
 
 import com.pawland.auth.dto.request.SignupRequest;
 import com.pawland.auth.dto.request.VerifyCodeRequest;
+import com.pawland.auth.service.AuthService;
 import com.pawland.global.config.security.JwtUtils;
 import com.pawland.mail.service.MailVerificationService;
 import com.pawland.user.domain.User;
@@ -22,6 +23,7 @@ public class AuthFacade {
     private final MailVerificationService mailVerificationService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final AuthService authService;
 
     public void checkEmailDuplicate(String email) {
         userService.checkEmailDuplicate(email);
@@ -43,8 +45,11 @@ public class AuthFacade {
             .nickname(request.getNickname())
             .build();
         userService.register(user);
-
         return jwtUtils.generateJwtCookie(request.getEmail(), new Date());
     }
 
+    public String oauth2Login(String code, String provider) {
+        User user = authService.oauth2Login(code, provider);
+        return jwtUtils.generateJwtCookie(user.getEmail(), new Date());
+    }
 }
