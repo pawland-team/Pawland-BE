@@ -578,7 +578,9 @@ class AuthControllerTest {
                 .thenReturn(oauth2User);
 
             // expected
-            mockMvc.perform(get("/api/auth/oauth2/" + provider + "?code=" + code))
+            mockMvc.perform(get("/api/auth/oauth2/{provider}", provider)
+                    .param("code", code)
+                )
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("소셜 로그인에 성공했습니다."))
@@ -596,7 +598,9 @@ class AuthControllerTest {
                 .thenThrow(new IllegalArgumentException("허용되지 않은 접근입니다."));
 
             // expected
-            mockMvc.perform(get("/api/auth/oauth2/" + provider + "?code=" + code))
+            mockMvc.perform(get("/api/auth/oauth2/{provider}", provider)
+                    .param("code", code)
+                )
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("허용되지 않은 접근입니다."))
