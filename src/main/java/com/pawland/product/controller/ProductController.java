@@ -63,7 +63,12 @@ public class ProductController {
     @ApiResponse(responseCode = "200", description = "상품 페이징 조회 성공")
     @ApiResponse(responseCode = "500", description = "상품 페이징 조회 실패")
     @GetMapping
-    public Page<ProductResponse> getProducts(@RequestParam(required = false) String region, @RequestParam(required = false) String species, @RequestParam(required = false) String category, @RequestParam(required = false) int price, @RequestParam(required = true) int page, @RequestParam(required = true) int size) {
+    public Page<ProductResponse> getProducts(@RequestParam(required = false) String region,
+                                             @RequestParam(required = false) String species,
+                                             @RequestParam(required = false) String category,
+                                             @RequestParam(required = false) int price,
+                                             @RequestParam(required = true) int page,
+                                             @RequestParam(required = true) int size) {
         return productService.getProducts(SearchProductRequest.builder().region(region).species(species).category(category).price(price).page(page).size(size).build());
     }
 
