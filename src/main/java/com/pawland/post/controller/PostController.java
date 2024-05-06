@@ -44,7 +44,16 @@ public class PostController {
     @Operation(summary = "게시글 조회", description = "게시글을 조회 합니다")
     @ApiResponse(responseCode = "201", description = "게시글 조회 성공")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<PostResponse>> getPosts(@RequestParam(required = true,defaultValue = "1") int page,@RequestParam(required = false) String content,@RequestParam(required = false) String region) {
-        return ResponseEntity.ok(postService.getPosts(PostSearchRequest.builder().page(page).content(content).region(region).build()));
+    public ResponseEntity<Page<PostResponse>> getPosts(@RequestParam(required = true,defaultValue = "1") int page,
+                                                       @RequestParam(required = false) String content,
+                                                       @RequestParam(required = false) String region,
+                                                       @RequestParam(required = false) String orderBy) {
+        return ResponseEntity.ok(postService.getPosts(PostSearchRequest.builder().page(page).content(content).region(region).orderBy(orderBy).build()));
+    }
+
+    @Operation(summary = "내가 쓴글 조회", description = "글쓴이가 자신인 글을 조회 합니다.")
+    @GetMapping("/my-post")
+    public ResponseEntity<Page<PostResponse>> getMyPosts(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(required = false) String orderBy) {
+        return ResponseEntity.ok(postService.getMyPosts(userPrincipal.getUserId(),PostSearchRequest.builder().orderBy(orderBy).build()));
     }
 }

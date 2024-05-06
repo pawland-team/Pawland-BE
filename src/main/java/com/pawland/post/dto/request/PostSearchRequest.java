@@ -15,5 +15,5 @@ public class PostSearchRequest {
     private int page;
     private String content;
     private String region;
-
+    private String orderBy;
 }

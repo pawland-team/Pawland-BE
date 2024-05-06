@@ -45,6 +45,9 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
+    //todo 임시로 Long 타입.
+    private Long recommend = 0L;
+
     @Builder
     public Post(User author, String title, String content, String thumbnail, Region region) {
         this.author = author;
