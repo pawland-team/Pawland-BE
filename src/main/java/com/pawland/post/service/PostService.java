@@ -42,4 +42,11 @@ public class PostService {
 
         return posts.map(PostResponse::of);
     }
+
+    public Page<PostResponse> getMyPosts(Long userId, PostSearchRequest postSearchRequest) {
+        Pageable pageable = PageRequest.of(postSearchRequest.getPage() - 1, 6);
+        Page<Post> myPosts = postRepository.getMyPosts(userId, pageable, postSearchRequest);
+
+        return myPosts.map(PostResponse::of);
+    }
 }

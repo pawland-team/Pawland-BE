@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.pawland.post.domain.QPost.post;
 
@@ -31,12 +32,32 @@ public class PostRepository {
                         eqContent(postSearchRequest.getContent()),
                         eqRegion(postSearchRequest.getRegion())
                 )
-                .orderBy(post.createdDate.desc())
-                .offset(postSearchRequest.getPage() - 1)
-                .limit(6)
+                .orderBy(Objects.equals(postSearchRequest.getOrderBy(), "new") ? post.createdDate.desc() : null,
+                        Objects.equals(postSearchRequest.getOrderBy(), "view") ? post.views.desc() : null,
+                        Objects.equals(postSearchRequest.getOrderBy(), "recommend") ? post.recommend.desc() : null,
+                        Objects.equals(postSearchRequest.getOrderBy(),"comment") ? post.comments.size().desc() : null
+                        )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
         return new PageImpl<>(posts,pageable,posts.size());
+    }
+
+    public Page<Post> getMyPosts(Long userId,Pageable pageable,PostSearchRequest postSearchRequest) {
+        List<Post> myPosts = jpaQueryFactory.selectFrom(post)
+                .leftJoin(post.author, QUser.user)
+                .fetchJoin()
+                .where(post.author.id.eq(userId))
+                .orderBy(Objects.equals(postSearchRequest.getOrderBy(), "new") ? post.createdDate.desc() : null,
+                        Objects.equals(postSearchRequest.getOrderBy(), "view") ? post.views.desc() : null,
+                        Objects.equals(postSearchRequest.getOrderBy(), "recommend") ? post.recommend.desc() : null,
+                        Objects.equals(postSearchRequest.getOrderBy(),"comment") ? post.comments.size().desc() : null)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(myPosts,pageable,myPosts.size());
     }
 
     private BooleanExpression eqContent(String content) {
