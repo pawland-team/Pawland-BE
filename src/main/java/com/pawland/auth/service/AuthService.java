@@ -18,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -28,16 +29,19 @@ public class AuthService {
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final UserRepository userRepository;
 
-    @Transactional
     public User oauth2Login(String code, String provider) {
+        validateProvider(provider);
         ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(provider);
         OauthTokenResponse tokenResponse = requestAccessToken(code, registration);
-        OAuthAttributes uerProfile = getUerProfile(tokenResponse.getAccessToken(), registration);
+        User uerProfile = getUerProfile(tokenResponse.getAccessToken(), registration);
+        return updateOrSave(uerProfile);
+    }
 
-        User oauth2User = userRepository.findByEmail(uerProfile.getEmail())
-            .map(user -> user.updateOauth2Profile(uerProfile.toUser()))
-            .orElse(uerProfile.toUser());
-        return userRepository.save(oauth2User);
+    private void validateProvider(String provider) {
+        List<String> validProvider = List.of("kakao", "naver", "google");
+        if (!validProvider.contains(provider)) {
+            throw new IllegalArgumentException("허용되지 않은 접근입니다.");
+        }
     }
 
     private OauthTokenResponse requestAccessToken(String code, ClientRegistration registration) {
@@ -64,10 +68,10 @@ public class AuthService {
         return formData;
     }
 
-    private OAuthAttributes getUerProfile(String accessToken, ClientRegistration registration) {
+    private User getUerProfile(String accessToken, ClientRegistration registration) {
         Map<String, Object> userAttributes = requestUserAttributes(registration, accessToken);
         String clientName = registration.getClientName();
-        return OAuthAttributes.of(clientName, userAttributes);
+        return OAuthAttributes.of(clientName, userAttributes).toUser();
     }
 
     private Map<String, Object> requestUserAttributes(ClientRegistration registration, String accessToken) {
@@ -78,5 +82,13 @@ public class AuthService {
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
             .block();
+    }
+
+    @Transactional
+    private User updateOrSave(User uerProfile) {
+        User oauth2User = userRepository.findByEmail(uerProfile.getEmail())
+            .map(user -> user.updateOauth2Profile(uerProfile))
+            .orElse(uerProfile);
+        return userRepository.save(oauth2User);
     }
 }
