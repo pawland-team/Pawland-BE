@@ -17,15 +17,15 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthService {
 
+    private static final String TEMP_NICKNAME_PREFIX = "임시닉네임";
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final UserRepository userRepository;
 
@@ -70,8 +70,8 @@ public class AuthService {
 
     private User getUerProfile(String accessToken, ClientRegistration registration) {
         Map<String, Object> userAttributes = requestUserAttributes(registration, accessToken);
-        String clientName = registration.getClientName();
-        return OAuthAttributes.of(clientName, userAttributes).toUser();
+        userAttributes.put("temp_nickname", createNonDuplicateNickname());
+        return OAuthAttributes.of(registration.getClientName(), userAttributes).toUser();
     }
 
     private Map<String, Object> requestUserAttributes(ClientRegistration registration, String accessToken) {
@@ -82,6 +82,24 @@ public class AuthService {
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
             .block();
+    }
+
+    private String createNonDuplicateNickname() {
+        String tempNickname = createRandomNickname();
+        while (isDuplicateNickname(tempNickname)) {
+            tempNickname = createRandomNickname();
+        }
+        return tempNickname;
+    }
+
+    private String createRandomNickname() {
+        Random random = new Random();
+        int randomNumber = random.nextInt(999999) + 1;
+        return TEMP_NICKNAME_PREFIX + String.format("%06d", randomNumber);
+    }
+
+    private boolean isDuplicateNickname(String nickname) {
+        return userRepository.findByNickname(nickname).isPresent();
     }
 
     @Transactional
