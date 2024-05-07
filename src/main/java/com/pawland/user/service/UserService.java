@@ -22,6 +22,13 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    public void checkNicknameDuplicate(String nickname) {
+        Optional<User> foundUser = userRepository.findByNickname(nickname);
+        if (foundUser.isPresent()) {
+            throw new AlreadyExistsUserException();
+        }
+    }
+
     public void checkEmailDuplicate(String email) {
         Optional<User> foundUser = userRepository.findByEmail(email);
         if (foundUser.isPresent()) {
@@ -31,6 +38,7 @@ public class UserService {
 
     @Transactional
     public void register(User user) {
+        checkNicknameDuplicate(user.getNickname());
         checkEmailDuplicate(user.getEmail());
         userRepository.save(user);
     }

@@ -12,7 +12,6 @@ import java.util.Map;
 @ToString
 public class OAuthAttributes {
 
-    private static final String TEMP_NICKNAME = "임시 닉네임";
     private String nickname;
     private String email;
     private String profileImage;
@@ -53,7 +52,7 @@ public class OAuthAttributes {
         Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> profile = (Map<String, Object>) account.get("profile");
         return OAuthAttributes.builder()
-            .nickname(TEMP_NICKNAME)
+            .nickname((String) attributes.get("temp_nickname"))
             .email(account.get("email") + "/" + providerName)
             .profileImage((String) profile.get("profile_image_url"))
             .provider(providerName)
@@ -62,7 +61,7 @@ public class OAuthAttributes {
 
     private static OAuthAttributes ofGoogle(String providerName, Map<String, Object> attributes) {
         return OAuthAttributes.builder()
-            .nickname(TEMP_NICKNAME)
+            .nickname((String) attributes.get("temp_nickname"))
             .email(attributes.get("email") + "/" + providerName)
             .profileImage((String) attributes.get("picture"))
             .provider(providerName)
@@ -72,7 +71,7 @@ public class OAuthAttributes {
     private static OAuthAttributes ofNaver(String providerName, Map<String, Object> attributes) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
         return OAuthAttributes.builder()
-            .nickname(TEMP_NICKNAME)
+            .nickname((String) attributes.get("temp_nickname"))
             .email(response.get("email") + "/" + providerName)
             .profileImage((String) response.get("profile_image"))
             .provider(providerName)

@@ -32,32 +32,68 @@ class UserServiceTest {
         userRepository.deleteAll();
     }
 
-    @DisplayName("이메일 중복 확인 시 중복된 이메일이 없으면 성공한다.")
-    @Test
-    void checkEmailDuplicate1() {
-        // given
-        String email = "midcon@nav.com";
+    @DisplayName("이메일 중복 확인 시")
+    @Nested
+    class checkNicknameDuplicate {
+        @DisplayName("중복된 이메일이 없으면 성공한다.")
+        @Test
+        void checkNicknameDuplicate1() {
+            // given
+            String nickname = "나는짱";
 
-        // expected
-        assertThatCode(() -> userService.checkEmailDuplicate(email))
-            .doesNotThrowAnyException();
+            // expected
+            assertThatCode(() -> userService.checkNicknameDuplicate(nickname))
+                .doesNotThrowAnyException();
+        }
+
+        @DisplayName("중복된 이메일이 있으면 실패한다.")
+        @Test
+        void checkNicknameDuplicate2() {
+            // given
+            User user = User.builder()
+                .email("mid@nav.com")
+                .password("asd123123")
+                .nickname("나는짱")
+                .build();
+            userRepository.save(user);
+
+            // expected
+            assertThatThrownBy(() -> userService.checkNicknameDuplicate("나는짱"))
+                .isInstanceOf(AlreadyExistsUserException.class)
+                .hasMessageContaining("이미 존재하는 유저입니다.");
+        }
     }
 
-    @DisplayName("이메일 중복 확인 시 중복된 이메일이 있으면 실패한다.")
-    @Test
-    void checkEmailDuplicate2() {
-        // given
-        User user = User.builder()
-            .email("mid@nav.com")
-            .password("asd123123")
-            .nickname("나는짱")
-            .build();
-        userRepository.save(user);
+    @DisplayName("이메일 중복 확인 시")
+    @Nested
+    class checkEmailDuplicate {
+        @DisplayName("중복된 이메일이 없으면 성공한다.")
+        @Test
+        void checkEmailDuplicate1() {
+            // given
+            String email = "midcon@nav.com";
 
-        // expected
-        assertThatThrownBy(() -> userService.checkEmailDuplicate("mid@nav.com"))
-            .isInstanceOf(AlreadyExistsUserException.class)
-            .hasMessageContaining("이미 존재하는 유저입니다.");
+            // expected
+            assertThatCode(() -> userService.checkEmailDuplicate(email))
+                .doesNotThrowAnyException();
+        }
+
+        @DisplayName("중복된 이메일이 있으면 실패한다.")
+        @Test
+        void checkEmailDuplicate2() {
+            // given
+            User user = User.builder()
+                .email("mid@nav.com")
+                .password("asd123123")
+                .nickname("나는짱")
+                .build();
+            userRepository.save(user);
+
+            // expected
+            assertThatThrownBy(() -> userService.checkEmailDuplicate("mid@nav.com"))
+                .isInstanceOf(AlreadyExistsUserException.class)
+                .hasMessageContaining("이미 존재하는 유저입니다.");
+        }
     }
 
     @DisplayName("유저 등록 시")
@@ -102,6 +138,29 @@ class UserServiceTest {
 
             // expected
             assertThatThrownBy(() -> userService.register(duplicateEmailUser))
+                .isInstanceOf(AlreadyExistsUserException.class)
+                .hasMessageContaining("이미 존재하는 유저입니다.");
+        }
+
+        @DisplayName("정상적인 정보 입력 시 중복 닉네임이 존재하면 실패한다.")
+        @Test
+        void register3() {
+            // given
+            User user = User.builder()
+                .email("mid@naver.com")
+                .password("asd123123")
+                .nickname("나는짱")
+                .build();
+            userService.register(user);
+
+            User duplicateNicknameUser = User.builder()
+                .email("mid1@naver.com")
+                .password("asd123123")
+                .nickname("나는짱")
+                .build();
+
+            // expected
+            assertThatThrownBy(() -> userService.register(duplicateNicknameUser))
                 .isInstanceOf(AlreadyExistsUserException.class)
                 .hasMessageContaining("이미 존재하는 유저입니다.");
         }

@@ -1,10 +1,7 @@
 package com.pawland.auth.controller;
 
-import com.pawland.auth.dto.request.EmailDupCheckRequest;
-import com.pawland.auth.dto.request.VerifyCodeRequest;
-import com.pawland.auth.dto.request.SendVerificationCodeRequest;
+import com.pawland.auth.dto.request.*;
 import com.pawland.auth.facade.AuthFacade;
-import com.pawland.auth.dto.request.SignupRequest;
 import com.pawland.global.config.security.domain.LoginRequest;
 import com.pawland.global.dto.ApiMessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +28,17 @@ import static org.springframework.http.HttpStatus.OK;
 public class AuthController {
 
     private final AuthFacade authFacade;
+
+    @Operation(summary = "닉네임 중복 확인", description = "요청한 닉네임이 이미 가입된 닉네임인지 확인합니다.")
+    @ApiResponse(responseCode = "200", description = "사용할 수 있는 닉네임")
+    @ApiResponse(responseCode = "400", description = "사용중인 닉네임")
+    @PostMapping(value = "/nickname-dupcheck", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiMessageResponse> nicknameDupCheck(@Valid @RequestBody NicknameDupCheckRequest request) {
+        authFacade.checkNicknameDuplicate(request.getNickname());
+        return ResponseEntity
+            .status(OK)
+            .body(new ApiMessageResponse("사용할 수 있는 닉네임입니다."));
+    }
 
     @Operation(summary = "이메일 중복 확인", description = "요청한 이메일이 이미 가입된 이메일인지 확인합니다.")
     @ApiResponse(responseCode = "200", description = "사용할 수 있는 이메일")
