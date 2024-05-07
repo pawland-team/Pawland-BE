@@ -1,6 +1,7 @@
 package com.pawland.product.service;
 
 import com.pawland.product.domain.Product;
+import com.pawland.product.domain.WishProduct;
 import com.pawland.product.dto.request.CreateProductRequest;
 import com.pawland.product.dto.request.SearchProductRequest;
 import com.pawland.product.dto.request.UpdateProductRequest;
@@ -8,6 +9,8 @@ import com.pawland.product.dto.response.ProductResponse;
 import com.pawland.product.exception.ProductException;
 import com.pawland.product.respository.ProductJpaRepository;
 import com.pawland.product.respository.ProductRepository;
+import com.pawland.product.respository.WishProductJpaRepository;
+import com.pawland.product.respository.WishProductRepository;
 import com.pawland.user.domain.User;
 import com.pawland.user.exception.UserException;
 import com.pawland.user.repository.UserRepository;
@@ -26,6 +29,8 @@ public class ProductService {
     private final UserRepository userRepository;
     private final ProductJpaRepository productJpaRepository;
     private final ProductRepository productRepository;
+    private final WishProductJpaRepository wishProductJpaRepository;
+    private final WishProductRepository wishProductRepository;
 
     public ProductResponse createProduct(Long userId, CreateProductRequest createProductRequest) {
 
@@ -65,6 +70,7 @@ public class ProductService {
         }
     }
 
+    @Transactional
     public boolean deleteProduct(Long userId, Long productId) {
         Product product = getProductById(productId);
 
@@ -76,11 +82,39 @@ public class ProductService {
         }
     }
 
+    @Transactional
     public Page<ProductResponse> getProducts(SearchProductRequest searchProductRequest) {
         Pageable pageable = PageRequest.of(searchProductRequest.getPage() - 1, searchProductRequest.getSize());
         Page<Product> allProducts = productRepository.getAllProducts(searchProductRequest,pageable);
 
         return allProducts.map(ProductResponse::of);
+    }
+
+    @Transactional
+    public boolean wishProduct(Long userId, Long productId) {
+        Product productById = getProductById(productId);
+        User userById = getUserById(userId);
+
+        WishProduct wishProduct = new WishProduct(productById, userById);
+
+        wishProductJpaRepository.save(wishProduct);
+
+        productById.addWishProduct(wishProduct);
+        userById.addWishProduct(wishProduct);
+
+        return true;
+    }
+
+    @Transactional
+    public boolean cancelWishProduct(Long userId, Long productId) {
+        WishProduct wishProductByUserIdAndProductId = wishProductRepository.findWishProductByUserIdAndProductId(userId, productId);
+
+        wishProductByUserIdAndProductId.getProduct().deleteWishProduct(wishProductByUserIdAndProductId);
+        wishProductByUserIdAndProductId.getUser().deleteWishProduct(wishProductByUserIdAndProductId);
+
+        wishProductJpaRepository.delete(wishProductByUserIdAndProductId);
+
+        return true;
     }
 
     private Product getProductById(Long productId) {

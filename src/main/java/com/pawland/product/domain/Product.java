@@ -11,7 +11,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -47,8 +49,11 @@ public class Product extends BaseTimeEntity {
 
     private String thumbnailImageUrl;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> imageUrls = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product")
+    private Set<WishProduct> wishProducts = new HashSet<>();
 
     @Builder
     public Product(String category,String species,String condition,String name, int price, String content, String region,User seller) {
@@ -91,5 +96,14 @@ public class Product extends BaseTimeEntity {
         }
     }
 
+    public void addWishProduct(WishProduct wishProduct) {
+        this.wishProducts.add(wishProduct);
+        wishProduct.setProduct(this);
+    }
+
+    public void deleteWishProduct(WishProduct wishProduct) {
+        this.wishProducts.remove(wishProduct);
+        wishProduct.setProduct(null);
+    }
 
 }

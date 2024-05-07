@@ -59,17 +59,31 @@ public class ProductController {
         return ResponseEntity.ok(productService.deleteProduct(userPrincipal.getUserId(), productId));
     }
 
-    @Operation(summary = "상품 페이징 조회")
+    @Operation(summary = "상품 페이징 조회 및 검색")
     @ApiResponse(responseCode = "200", description = "상품 페이징 조회 성공")
     @ApiResponse(responseCode = "500", description = "상품 페이징 조회 실패")
     @GetMapping
     public Page<ProductResponse> getProducts(@RequestParam(required = false) String region,
                                              @RequestParam(required = false) String species,
                                              @RequestParam(required = false) String category,
-                                             @RequestParam(required = false) int price,
+                                             @RequestParam(required = false) String isFree,
+                                             @RequestParam(required = false) String orderBy,
                                              @RequestParam(required = true) int page,
-                                             @RequestParam(required = true) int size) {
-        return productService.getProducts(SearchProductRequest.builder().region(region).species(species).category(category).price(price).page(page).size(size).build());
+                                             @RequestParam(required = true) int size
+    ) {
+        return productService.getProducts(SearchProductRequest.builder().region(region).species(species).category(category).isFree(isFree).orderBy(orderBy).page(page).size(size).build());
     }
 
+
+    @Operation(summary = "상품 찜하기")
+    @PostMapping("/wish/{productId}")
+    public ResponseEntity<Boolean> wishProduct(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long productId) {
+        return ResponseEntity.ok(productService.wishProduct(userPrincipal.getUserId(), productId));
+    }
+
+    @Operation(summary = "상품 찜 취소")
+    @PostMapping("/wish/cancel/{productId}")
+    public void wishCancelProduct(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long productId) {
+        productService.cancelWishProduct(userPrincipal.getUserId(),productId);
+    }
 }

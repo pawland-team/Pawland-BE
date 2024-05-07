@@ -7,6 +7,8 @@ import com.pawland.product.domain.Species;
 import com.pawland.product.domain.Status;
 import com.pawland.product.dto.request.SearchProductRequest;
 import com.pawland.user.domain.QUser;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +18,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.pawland.product.domain.QProduct.product;
 
@@ -34,9 +38,9 @@ public class ProductRepository {
                         eqRegion(searchProductRequest.getRegion()),
                         eqSpecies(searchProductRequest.getSpecies()),
                         eqCategory(searchProductRequest.getCategory()),
-                        eqPrice(searchProductRequest.getPrice())
+                        eqPrice(searchProductRequest.getIsFree())
                 )
-                .orderBy(product.createdDate.desc())
+                .orderBy(createOrderSpecifier(searchProductRequest))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -56,11 +60,30 @@ public class ProductRepository {
         return !StringUtils.hasText(category) ? null : product.category.eq(Category.getInstance(category));
     }
 
-    private BooleanExpression eqPrice(int price) {
-        if (price <= 0) {
+    private BooleanExpression eqPrice(String price) {
+        if (price == null) {
             return null;
-        } else {
-            return product.price.eq(price);
         }
+        if (price.equals("free")) {
+            return product.price.eq(0);
+        }
+        return null;
+    }
+    private OrderSpecifier[] createOrderSpecifier(SearchProductRequest searchProductRequest) {
+        List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
+
+        if (Objects.isNull(searchProductRequest.getOrderBy())) {
+            orderSpecifiers.add(new OrderSpecifier(Order.DESC, product.createdDate));
+        } else if (searchProductRequest.getOrderBy().equals("높은가격순")){
+            orderSpecifiers.add(new OrderSpecifier(Order.DESC, product.price));
+        }else if (searchProductRequest.getOrderBy().equals("낮은가격순")){
+            orderSpecifiers.add(new OrderSpecifier(Order.ASC, product.price));
+        }else if (searchProductRequest.getOrderBy().equals("조회순")){
+            orderSpecifiers.add(new OrderSpecifier(Order.DESC, product.view));
+        }else if (searchProductRequest.getOrderBy().equals("인기순")){
+            orderSpecifiers.add(new OrderSpecifier(Order.DESC, product.wishProducts.size()));
+        }
+
+        return orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]);
     }
 }
