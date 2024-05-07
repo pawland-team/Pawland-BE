@@ -3,14 +3,20 @@ package com.pawland.user.domain;
 import com.pawland.global.domain.BaseTimeEntity;
 import com.pawland.order.domain.Order;
 import com.pawland.post.domain.Post;
+import com.pawland.post.domain.PostRecommend;
 import com.pawland.product.domain.Product;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.pawland.global.domain.DefaultImage.DEFAULT_PROFILE_IMAGE;
 import static com.pawland.user.domain.LoginType.NORMAL;
@@ -52,6 +58,9 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "author", orphanRemoval = true)
     private List<Post> postList = new ArrayList<>();    // 내가 쓴 글
 
+    @OneToMany(mappedBy = "user",orphanRemoval = true)
+    private Set<PostRecommend> recommendPosts = new HashSet<>();
+
     @Builder
     public User(String email, String password, String introduce, LoginType type, String nickname, String profileImage) {
         this.email = email;
@@ -75,5 +84,13 @@ public class User extends BaseTimeEntity {
 
     private boolean isBlank(String value) {
         return value == null || value.isBlank();
+    }
+
+    public void addRecommend(PostRecommend postRecommend) {
+        this.recommendPosts.add(postRecommend);
+    }
+
+    public void deleteRecommend(PostRecommend postRecommend) {
+        this.recommendPosts.remove(postRecommend);
     }
 }
