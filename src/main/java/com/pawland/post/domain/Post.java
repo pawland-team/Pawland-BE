@@ -12,7 +12,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.pawland.global.domain.DefaultImage.DEFAULT_POST_IMAGE;
 import static com.pawland.post.domain.Region.SEOUL;
@@ -45,8 +47,8 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
-    //todo 임시로 Long 타입.
-    private Long recommend = 0L;
+    @OneToMany(mappedBy = "post")
+    Set<PostRecommend> recommends = new HashSet<>();
 
     @Builder
     public Post(User author, String title, String content, String thumbnail, Region region) {
@@ -70,5 +72,13 @@ public class Post extends BaseTimeEntity {
     public void addComment(Comment comment) {
         this.comments.add(comment);
         comment.setPost(this);
+    }
+
+    public void addRecommend(PostRecommend postRecommend) {
+        this.recommends.add(postRecommend);
+    }
+
+    public void deleteRecommend(PostRecommend postRecommend) {
+        this.recommends.remove(postRecommend);
     }
 }
