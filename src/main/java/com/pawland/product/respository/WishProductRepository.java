@@ -9,12 +9,14 @@ import org.springframework.stereotype.Repository;
 
 import static com.pawland.product.domain.QWishProduct.wishProduct;
 
+
 @Repository
 @RequiredArgsConstructor
 public class WishProductRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     public WishProduct findWishProductByUserIdAndProductId(Long userId, Long productId) {
+
         return jpaQueryFactory.selectFrom(wishProduct)
                 .leftJoin(wishProduct.product, QProduct.product)
                 .fetchJoin()
