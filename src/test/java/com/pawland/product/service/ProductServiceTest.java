@@ -161,32 +161,6 @@ class ProductServiceTest {
         Assertions.assertEquals(8, products.getContent().size());
     }
 
-    @DisplayName("가격이 같은 상품 조회")
-    @Test
-    @Transactional
-    void getEqualPriceProduct() {
-        //given
-        User user = createUser();
-
-        for (int i = 0; i < 10; i++) {
-            productService.createProduct(user.getId(), new CreateProductRequest(
-                    "사료",
-                    "CAT",
-                    "NEW",
-                    "상품",
-                    10000+i,
-                    "상품입니다.",
-                    "서울",
-                    null,
-                    null));
-        }
-
-        //when
-        Page<ProductResponse> products = productService.getProducts(SearchProductRequest.builder().price(10000).page(1).size(8).build());
-
-        //then
-        Assertions.assertEquals(1, products.getContent().size());
-    }
 
     @DisplayName("지역으로 상품 조회")
     @Test

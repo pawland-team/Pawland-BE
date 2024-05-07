@@ -5,6 +5,7 @@ import com.pawland.order.domain.Order;
 import com.pawland.post.domain.Post;
 import com.pawland.post.domain.PostRecommend;
 import com.pawland.product.domain.Product;
+import com.pawland.product.domain.WishProduct;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -58,8 +59,11 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "author", orphanRemoval = true)
     private List<Post> postList = new ArrayList<>();    // 내가 쓴 글
 
-    @OneToMany(mappedBy = "user",orphanRemoval = true)
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
     private Set<PostRecommend> recommendPosts = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private Set<WishProduct> wishProductSet = new HashSet<>();
 
     @Builder
     public User(String email, String password, String introduce, LoginType type, String nickname, String profileImage) {
@@ -92,5 +96,15 @@ public class User extends BaseTimeEntity {
 
     public void deleteRecommend(PostRecommend postRecommend) {
         this.recommendPosts.remove(postRecommend);
+    }
+
+    public void addWishProduct(WishProduct wishProduct) {
+        this.wishProductSet.add(wishProduct);
+        wishProduct.setUser(this);
+    }
+
+    public void deleteWishProduct(WishProduct wishProduct) {
+        this.wishProductSet.remove(wishProduct);
+        wishProduct.setUser(null);
     }
 }

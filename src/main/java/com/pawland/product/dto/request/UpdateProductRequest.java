@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,6 +21,6 @@ public class UpdateProductRequest {
     private int price;
     private String content;
     private String region;
-    private MultipartFile thumbnailImage;
-    private List<MultipartFile> images;
+    private String thumbnailImage;
+    private List<String> images;
 }

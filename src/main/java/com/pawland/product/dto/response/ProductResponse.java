@@ -6,6 +6,8 @@ import com.pawland.user.dto.response.UserResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -23,7 +25,9 @@ public class ProductResponse {
     private int view;
     private Status status;
     private String thumbnailUrl;
-    private List<String> imageUrls;
+    private List<String> imageUrls = new ArrayList<>();
+    private boolean isWished;
+    private LocalDateTime createAt;
 
     public ProductResponse(Product product) {
         this.id = product.getId();
@@ -39,6 +43,8 @@ public class ProductResponse {
         this.status = product.getStatus();
         this.thumbnailUrl = product.getThumbnailImageUrl();
         this.imageUrls = product.getImageUrls();
+        this.isWished = product.getWishProducts().stream().map(WishProduct::getUser).toList().contains(product.getSeller());
+        this.createAt = product.getCreatedDate();
     }
 
     public static ProductResponse of(Product product) {
