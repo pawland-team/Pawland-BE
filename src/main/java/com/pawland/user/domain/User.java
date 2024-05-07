@@ -59,10 +59,10 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "author", orphanRemoval = true)
     private List<Post> postList = new ArrayList<>();    // 내가 쓴 글
 
-    @OneToMany(mappedBy = "user",orphanRemoval = true)
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
     private Set<PostRecommend> recommendPosts = new HashSet<>();
 
-    @OneToMany(mappedBy = "user",orphanRemoval = true)
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
     private Set<WishProduct> wishProductSet = new HashSet<>();
 
     @Builder
@@ -97,6 +97,7 @@ public class User extends BaseTimeEntity {
     public void deleteRecommend(PostRecommend postRecommend) {
         this.recommendPosts.remove(postRecommend);
     }
+
     public void addWishProduct(WishProduct wishProduct) {
         this.wishProductSet.add(wishProduct);
         wishProduct.setUser(this);

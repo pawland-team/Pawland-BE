@@ -84,6 +84,6 @@ public class ProductController {
     @Operation(summary = "상품 찜 취소")
     @PostMapping("/wish/cancel/{productId}")
     public void wishCancelProduct(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long productId) {
-        productService.cancelWishProduct(userPrincipal.getUserId(),productId);
+        productService.cancelWishProduct(userPrincipal.getUserId(), productId);
     }
 }
