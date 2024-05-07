@@ -6,6 +6,7 @@ import com.pawland.auth.dto.response.OAuthAttributes;
 import com.pawland.auth.service.AuthService;
 import com.pawland.global.config.security.domain.LoginRequest;
 import com.pawland.global.domain.DefaultImage;
+import com.pawland.mail.repository.MailRepository;
 import com.pawland.user.domain.LoginType;
 import com.pawland.user.domain.User;
 import com.pawland.user.repository.UserRepository;
@@ -17,9 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.MediaType;
 import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -59,15 +57,12 @@ class AuthControllerTest {
     private AuthService authService;
 
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private MailRepository mailRepository;
 
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
-        redisTemplate.execute((RedisCallback<Object>) connection -> {
-            connection.serverCommands().flushDb();
-            return null;
-        });
+        mailRepository.deleteAll();
     }
 
     @DisplayName("닉네임 중복 확인 요청 시")
@@ -220,8 +215,7 @@ class AuthControllerTest {
             // given
             String email = "test@example.com";
             String verificationCode = "123456";
-            ValueOperations<String, String> values = redisTemplate.opsForValue();
-            values.set(email, verificationCode, Duration.ofMinutes(3));
+            mailRepository.save(email, verificationCode, Duration.ofMinutes(3));
 
             VerifyCodeRequest request = VerifyCodeRequest.builder()
                 .email(email)
@@ -248,8 +242,7 @@ class AuthControllerTest {
             String email = "test@example.com";
             String verificationCode = "123456";
             String WrongCode = "111111";
-            ValueOperations<String, String> values = redisTemplate.opsForValue();
-            values.set(email, verificationCode, Duration.ofMinutes(3));
+            mailRepository.save(email, verificationCode, Duration.ofMinutes(3));
 
             VerifyCodeRequest request = VerifyCodeRequest.builder()
                 .email(email)
@@ -276,8 +269,7 @@ class AuthControllerTest {
             String email = "test@example.com";
             String notRequestedEmail = "midcon@nav.com";
             String verificationCode = "123456";
-            ValueOperations<String, String> values = redisTemplate.opsForValue();
-            values.set(email, verificationCode, Duration.ofMinutes(3));
+            mailRepository.save(email, verificationCode, Duration.ofMinutes(3));
 
             VerifyCodeRequest request = VerifyCodeRequest.builder()
                 .email(notRequestedEmail)
@@ -357,8 +349,7 @@ class AuthControllerTest {
                     .password("1234")
                     .nickname("나는짱")
                     .build();
-                ValueOperations<String, String> values = redisTemplate.opsForValue();
-                values.set("midcon@nav.com", "ok");
+                mailRepository.save("midcon@nav.com", "ok", Duration.ofMinutes(5));
 
                 String json = objectMapper.writeValueAsString(request);
 
@@ -383,8 +374,7 @@ class AuthControllerTest {
                     .nickname("나는짱")
                     .build();
                 userRepository.save(user);
-                ValueOperations<String, String> values = redisTemplate.opsForValue();
-                values.set("midcon@nav.com", "ok");
+                mailRepository.save("midcon@nav.com", "ok",Duration.ofMinutes(5));
 
                 SignupRequest request = SignupRequest.builder()
                     .email("midcon@nav.com")

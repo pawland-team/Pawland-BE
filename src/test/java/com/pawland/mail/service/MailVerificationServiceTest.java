@@ -3,17 +3,17 @@ package com.pawland.mail.service;
 import com.pawland.global.config.MailConfig;
 import com.pawland.global.exception.InvalidCodeException;
 import com.pawland.global.exception.InvalidUserException;
+import com.pawland.mail.repository.MailRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -35,22 +35,16 @@ class MailVerificationServiceTest {
     private JavaMailSender mailSender;
 
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
-
-    @Autowired
     private MailVerificationService mailVerificationService;
 
-    private RedisTemplate<String, String> mockRedisTemplate;
+    @Autowired
+    private MailRepository mailRepository;
 
+    @Mock
+    private MailRepository mockMailRepository;
+
+    @InjectMocks
     private MailVerificationService mockMailService;
-
-    @BeforeEach
-    void setUp() {
-        mockRedisTemplate = mock(RedisTemplate.class);
-        ValueOperations<String, String> mockValues = mock(ValueOperations.class);
-        when(mockRedisTemplate.opsForValue()).thenReturn(mockValues);
-        mockMailService = new MailVerificationService(mailConfig, mailSender, mockRedisTemplate);
-    }
 
     @DisplayName("이메일 전송 성공 Mock 테스트")
     @Test
@@ -95,7 +89,7 @@ class MailVerificationServiceTest {
 
         // when
         mailVerificationService.sendVerificationCode(toEmail);
-        String result = redisTemplate.opsForValue().get(toEmail);
+        String result = mailRepository.findByEmail(toEmail);
 
         // then
         assertThat(result).isNotNull();
@@ -108,12 +102,11 @@ class MailVerificationServiceTest {
         // given
         String email = "test@example.com";
         String verificationCode = "123456";
-        ValueOperations<String, String> values = redisTemplate.opsForValue();
-        values.set(email, verificationCode, Duration.ofMinutes(3));
+        mailRepository.save(email, verificationCode, Duration.ofMinutes(3));
 
         // when
         mailVerificationService.verifyCode(email, verificationCode);
-        String result = values.get(email);
+        String result = mailRepository.findByEmail(email);
 
         // then
         assertThat(result).isNotNull();
@@ -127,8 +120,7 @@ class MailVerificationServiceTest {
         String email = "test@example.com";
         String verificationCode = "123456";
         String WrongCode = "111111";
-        ValueOperations<String, String> values = redisTemplate.opsForValue();
-        values.set(email, verificationCode, Duration.ofMinutes(3));
+        mailRepository.save(email, verificationCode, Duration.ofMinutes(3));
 
         // expected
         assertThatThrownBy(() -> mailVerificationService.verifyCode(email, WrongCode))
@@ -143,8 +135,7 @@ class MailVerificationServiceTest {
         String email = "test@example.com";
         String notRequestedEmail = "midcon@nav.com";
         String verificationCode = "123456";
-        ValueOperations<String, String> values = redisTemplate.opsForValue();
-        values.set(email, verificationCode, Duration.ofMinutes(3));
+        mailRepository.save(email, verificationCode, Duration.ofMinutes(3));
 
         // expected
         assertThatThrownBy(() -> mailVerificationService.verifyCode(notRequestedEmail, verificationCode))
@@ -158,15 +149,14 @@ class MailVerificationServiceTest {
         // given
         String verifiedEmail = "test@example.com";
         String authSuccessStatus = "ok";
-        ValueOperations<String, String> values = mockRedisTemplate.opsForValue();
-        when(values.get(verifiedEmail)).thenReturn(authSuccessStatus);
+        when(mockMailRepository.findByEmail(verifiedEmail)).thenReturn(authSuccessStatus);
 
         // when
         mockMailService.checkEmailVerification(verifiedEmail);
 
         // then
-        verify(values).get(verifiedEmail);
-        verify(values, times(1)).get(verifiedEmail);
+        verify(mockMailRepository).findByEmail(verifiedEmail);
+        verify(mockMailRepository, times(1)).findByEmail(verifiedEmail);
     }
 
     @DisplayName("이메일을 인증하지 않은 유저가 회원가입 요청 시 실패한다.")
@@ -175,8 +165,7 @@ class MailVerificationServiceTest {
         // given
         String authWaitingEmail = "test@example.com";
         String authWaitingStatus = "123456";
-        ValueOperations<String, String> values = mockRedisTemplate.opsForValue();
-        when(values.get(authWaitingEmail)).thenReturn(authWaitingStatus);
+        when(mockMailRepository.findByEmail(authWaitingEmail)).thenReturn(authWaitingStatus);
 
         // expected
         assertThatThrownBy(() ->  mockMailService.checkEmailVerification(authWaitingEmail))
@@ -190,8 +179,7 @@ class MailVerificationServiceTest {
         // given
         String authNotProcessingEmail = "test@example.com";
         String authNotProcessingStatus = null;
-        ValueOperations<String, String> values = mockRedisTemplate.opsForValue();
-        when(values.get(authNotProcessingEmail)).thenReturn(authNotProcessingStatus);
+        when(mockMailRepository.findByEmail(authNotProcessingEmail)).thenReturn(authNotProcessingStatus);
 
         // expected
         assertThatThrownBy(() ->  mockMailService.checkEmailVerification(authNotProcessingEmail))
