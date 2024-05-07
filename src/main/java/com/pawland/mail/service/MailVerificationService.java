@@ -3,7 +3,7 @@ package com.pawland.mail.service;
 import com.pawland.global.config.MailConfig;
 import com.pawland.global.exception.InvalidCodeException;
 import com.pawland.global.exception.InvalidUserException;
-import com.pawland.mail.repository.VerifyCodeRepository;
+import com.pawland.mail.repository.MailRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +26,12 @@ public class MailVerificationService {
 
     private final MailConfig mailConfig;
     private final JavaMailSender mailSender;
-    private final VerifyCodeRepository verifyCodeRepository;
+    private final MailRepository mailRepository;
 
     @Transactional
     public void sendVerificationCode(String toEmail) throws MessagingException, UnsupportedEncodingException {
         String verificationCode = generateVerificationCode();
-        verifyCodeRepository.save(toEmail, verificationCode, Duration.ofMinutes(3));
+        mailRepository.save(toEmail, verificationCode, Duration.ofMinutes(3));
 
         MimeMessage message = createMessage(toEmail, verificationCode);
         try {
@@ -44,10 +44,10 @@ public class MailVerificationService {
 
     @Transactional
     public void verifyCode(String email, String code) {
-        String savedVerificationCode = verifyCodeRepository.findByEmail(email);
+        String savedVerificationCode = mailRepository.findByEmail(email);
         boolean isMatched = code.equals(savedVerificationCode);
         if (isMatched) {
-            verifyCodeRepository.save(email, "ok", Duration.ofMinutes(5));
+            mailRepository.save(email, "ok", Duration.ofMinutes(5));
         } else {
             log.error("[메일 인증 실패]");
             throw new InvalidCodeException();
@@ -55,7 +55,7 @@ public class MailVerificationService {
     }
 
     public void checkEmailVerification(String email) {
-        String savedCode = verifyCodeRepository.findByEmail(email);
+        String savedCode = mailRepository.findByEmail(email);
         boolean isVerifiedEmail = savedCode != null && savedCode.equals("ok");
         if (!isVerifiedEmail) {
             log.error("[이메일 인증이 안된 유저]");

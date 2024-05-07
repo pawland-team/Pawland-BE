@@ -10,7 +10,7 @@ import java.time.Duration;
 
 @Repository
 @RequiredArgsConstructor
-public class VerifyCodeRepository {
+public class MailRepository {
 
     private final RedisTemplate<String, String> redisTemplate;
 
