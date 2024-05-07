@@ -4,6 +4,8 @@ import com.pawland.post.domain.Post;
 import com.pawland.post.domain.Region;
 import com.pawland.post.dto.request.PostSearchRequest;
 import com.pawland.user.domain.QUser;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,13 +33,8 @@ public class PostRepository {
                 .fetchJoin()
                 .where(eqTitle(postSearchRequest.getContent()),
                         eqContent(postSearchRequest.getContent()),
-                        eqRegion(postSearchRequest.getRegion())
-                )
-                .orderBy(Objects.equals(postSearchRequest.getOrderBy(), "new") ? post.createdDate.desc() : null,
-                        Objects.equals(postSearchRequest.getOrderBy(), "view") ? post.views.desc() : null,
-                        Objects.equals(postSearchRequest.getOrderBy(), "recommend") ? post.recommend.desc() : null,
-                        Objects.equals(postSearchRequest.getOrderBy(),"comment") ? post.comments.size().desc() : null
-                        )
+                        eqRegion(postSearchRequest.getRegion()))
+                .orderBy(createOrderSpecifier(postSearchRequest))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -49,10 +47,7 @@ public class PostRepository {
                 .leftJoin(post.author, QUser.user)
                 .fetchJoin()
                 .where(post.author.id.eq(userId))
-                .orderBy(Objects.equals(postSearchRequest.getOrderBy(), "new") ? post.createdDate.desc() : null,
-                        Objects.equals(postSearchRequest.getOrderBy(), "view") ? post.views.desc() : null,
-                        Objects.equals(postSearchRequest.getOrderBy(), "recommend") ? post.recommend.desc() : null,
-                        Objects.equals(postSearchRequest.getOrderBy(),"comment") ? post.comments.size().desc() : null)
+                .orderBy(createOrderSpecifier(postSearchRequest))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -70,5 +65,21 @@ public class PostRepository {
 
     private BooleanExpression eqRegion(String region) {
         return !StringUtils.hasText(region) ? null : post.region.eq(Region.fromString(region));
+    }
+
+    private OrderSpecifier[] createOrderSpecifier(PostSearchRequest postSearchRequest) {
+        List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
+
+        if (Objects.isNull(postSearchRequest.getOrderBy())) {
+            orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.createdDate));
+        } else if (postSearchRequest.getOrderBy().equals("view")){
+            orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.views));
+        }else if (postSearchRequest.getOrderBy().equals("recommend")){
+            orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.recommends.size()));
+        }else if (postSearchRequest.getOrderBy().equals("comment")){
+            orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.comments.size()));
+        }
+
+    return orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]);
     }
 }

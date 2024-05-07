@@ -3,6 +3,7 @@ package com.pawland.user.domain;
 import com.pawland.global.domain.BaseTimeEntity;
 import com.pawland.order.domain.Order;
 import com.pawland.post.domain.Post;
+import com.pawland.post.domain.PostRecommend;
 import com.pawland.product.domain.Product;
 import com.pawland.product.domain.WishProduct;
 import jakarta.persistence.*;
@@ -61,6 +62,7 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user",orphanRemoval = true)
     private Set<WishProduct> wishProductSet = new HashSet<>();
 
+    private Set<PostRecommend> recommendPosts = new HashSet<>();
 
     @Builder
     public User(String email, String password, String introduce, LoginType type, String nickname, String profileImage) {
@@ -97,4 +99,11 @@ public class User extends BaseTimeEntity {
         wishProduct.setUser(null);
     }
 
+    public void addRecommend(PostRecommend postRecommend) {
+        this.recommendPosts.add(postRecommend);
+    }
+
+    public void deleteRecommend(PostRecommend postRecommend) {
+        this.recommendPosts.remove(postRecommend);
+    }
 }
