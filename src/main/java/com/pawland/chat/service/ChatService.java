@@ -1,6 +1,7 @@
 package com.pawland.chat.service;
 
 import com.pawland.chat.dto.request.ChatRoomCreateRequest;
+import com.pawland.chat.dto.response.ChatRoomInfoResponse;
 import com.pawland.chat.repository.ChatRoomRepository;
 import com.pawland.product.exception.ProductException;
 import com.pawland.product.respository.ProductJpaRepository;
@@ -10,8 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ChatService {
 
     private final ChatRoomRepository chatRoomRepository;
@@ -22,6 +26,10 @@ public class ChatService {
     public void createChatRoom(Long userId, ChatRoomCreateRequest request) {
         validateChatRoomCreateRequest(request);
         chatRoomRepository.save(request.toChatRoomWithMyId(userId));
+    }
+
+    public List<ChatRoomInfoResponse> getChatRoomList(Long userId) {
+        return chatRoomRepository.getMyChatRoomList(userId);
     }
 
     private void validateChatRoomCreateRequest(ChatRoomCreateRequest request) {

@@ -48,39 +48,38 @@ class ChatRoomRepositoryTest {
             User seller1 = createUser("판매자1", "midcon2@naver.com", "asd123123");
             User seller2 = createUser("판매자2", "midcon3@naver.com", "asd123123");
             User buyer1 = createUser("구매자1", "midcon4@naver.com", "asd123123");
-            userRepository.saveAll(List.of(myAccount, seller1, seller2, buyer1));
+            User buyer2 = createUser("구매자2", "midcon5@naver.com", "asd123123");
+            userRepository.saveAll(List.of(myAccount, seller1, seller2, buyer1, buyer2));
 
             Product product1 = createProduct("나는짱물건1", 1000, "장난감", "DOG", "NEW");
             Product product2 = createProduct("나는짱물건2", 2000, "장난감", "DOG", "NEW");
             Product product3 = createProduct("나는짱물건3", 3000, "장난감", "DOG", "NEW");
+            Product product4 = createProduct("나는짱물건4", 4000, "장난감", "DOG", "NEW");
             product3.confirmPurchase(1L);
-            productJpaRepository.saveAll(List.of(product1, product2, product3));
+            productJpaRepository.saveAll(List.of(product1, product2, product3, product4));
 
-            ChatRoom chatRoom1 = createChatRoom(myAccount.getId(), seller1.getId(), product1.getId());
-            ChatRoom chatRoom2 = createChatRoom(myAccount.getId(), seller2.getId(), product2.getId());
-            ChatRoom chatRoom3 = createChatRoom(buyer1.getId(), myAccount.getId(), product3.getId());
-            chatRoomRepository.saveAll(List.of(chatRoom1, chatRoom2, chatRoom3));
+            ChatRoom myChatRoom1 = createChatRoom(myAccount.getId(), seller1.getId(), product1.getId());
+            ChatRoom myChatRoom2 = createChatRoom(myAccount.getId(), seller2.getId(), product2.getId());
+            ChatRoom myChatRoom3 = createChatRoom(buyer1.getId(), myAccount.getId(), product3.getId());
+            ChatRoom notMyChatRoom1 = createChatRoom(buyer1.getId(), seller2.getId(), product4.getId());
+            ChatRoom notMyChatRoom2 = createChatRoom(buyer2.getId(), seller2.getId(), product4.getId());
+            chatRoomRepository.saveAll(List.of(myChatRoom1, myChatRoom2, myChatRoom3, notMyChatRoom1, notMyChatRoom2));
 
             // when
-            List<ChatRoomInfoResponse> chatRoomList = chatRoomRepository.getMyChatRoomList(myAccount.getId());
+            List<ChatRoomInfoResponse> result = chatRoomRepository.getMyChatRoomList(myAccount.getId());
 
             // then
-            assertThat(chatRoomList).hasSize(3);
-            assertThat(chatRoomList).extracting("opponentUser")
+            assertThat(result).hasSize(3);
+            assertThat(result).extracting("opponentUser")
                 .extracting("nickname")
                 .containsExactlyInAnyOrder("판매자1", "판매자2", "구매자1");
-            assertThat(chatRoomList).extracting("productInfo")
+            assertThat(result).extracting("productInfo")
                 .extracting("price", "productName", "saleState", "purchaser")
                 .containsExactlyInAnyOrder(
                     tuple(1000,"나는짱물건1", SELLING, null),
                     tuple(2000,"나는짱물건2", SELLING, null),
                     tuple(3000,"나는짱물건3", SELLING, 1L)
                 );
-
-            List<ChatRoom> all = chatRoomRepository.findAll();
-            System.out.println("[size] " + all.size());
-            System.out.println("[size] " + all.get(0).getId());
-
         }
 
         @DisplayName("내가 참여하고 있는 채팅방이 없을 시 빈 리스트를 반환한다.")
@@ -97,18 +96,15 @@ class ChatRoomRepositoryTest {
             Product product2 = createProduct("나는짱물건2", 2000, "장난감", "DOG", "NEW");
             productJpaRepository.saveAll(List.of(product1, product2));
 
-            ChatRoom chatRoom1 = createChatRoom(buyer1.getId(), seller1.getId(), product1.getId());
-            ChatRoom chatRoom2 = createChatRoom(buyer2.getId(), seller2.getId(), product2.getId());
-            chatRoomRepository.saveAll(List.of(chatRoom1, chatRoom2));
+            ChatRoom notMyChatRoom1 = createChatRoom(buyer1.getId(), seller1.getId(), product1.getId());
+            ChatRoom notMyChatRoom2 = createChatRoom(buyer2.getId(), seller2.getId(), product2.getId());
+            chatRoomRepository.saveAll(List.of(notMyChatRoom1, notMyChatRoom2));
 
             // when
-            List<ChatRoomInfoResponse> chatRoomList = chatRoomRepository.getMyChatRoomList(myAccount.getId());
+            List<ChatRoomInfoResponse> result = chatRoomRepository.getMyChatRoomList(myAccount.getId());
 
             // then
-            assertThat(chatRoomList).hasSize(0);
-            List<ChatRoom> all = chatRoomRepository.findAll();
-            System.out.println("[size] " + all.size());
-            System.out.println("[size] " + all.get(0).getId());
+            assertThat(result).hasSize(0);
         }
     }
 
