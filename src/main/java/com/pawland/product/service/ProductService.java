@@ -45,6 +45,8 @@ public class ProductService {
                 .content(createProductRequest.getContent())
                 .region(createProductRequest.getRegion())
                 .seller(user)
+                .thumbnailImageUrl(createProductRequest.getThumbnailImage())
+                .imageUrls(createProductRequest.getImages())
                 .build();
 
         productJpaRepository.save(product);

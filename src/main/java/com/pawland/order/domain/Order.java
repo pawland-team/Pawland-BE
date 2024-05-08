@@ -2,6 +2,7 @@ package com.pawland.order.domain;
 
 import com.pawland.global.domain.BaseTimeEntity;
 import com.pawland.product.domain.Product;
+import com.pawland.review.domain.OrderReview;
 import com.pawland.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -34,6 +35,9 @@ public class Order extends BaseTimeEntity {
 
     private boolean buyerCheck;
 
+    @OneToOne(mappedBy = "order")
+    private OrderReview orderReview;
+
     public Order(User seller, User buyer, Product product) {
         this.seller = seller;
         this.buyer = buyer;
@@ -59,5 +63,10 @@ public class Order extends BaseTimeEntity {
         if (sellerCheck && buyerCheck) {
             changeStatus(OrderStatus.DONE);
         }
+    }
+
+    public void addOrderReview(OrderReview orderReview) {
+        this.orderReview = orderReview;
+        orderReview.setOrder(this);
     }
 }

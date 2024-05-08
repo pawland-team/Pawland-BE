@@ -20,7 +20,8 @@ public enum Category {
     HOME_DECOR("홈 장식"),
     CARRIERS_AND_CAGES("캐리어 및 케이지"),
     PARTY_SUPPLIES("파티용품"),
-    PORTABLE_ITEMS("휴대용 용품");
+    PORTABLE_ITEMS("휴대용 용품"),
+    ETC("그외");
 
     private final String name;
 

@@ -5,6 +5,7 @@ import com.pawland.post.domain.Post;
 import com.pawland.user.dto.response.UserResponse;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -17,8 +18,9 @@ public class PostResponse {
     private Long views;
     private UserResponse author;
     private List<CommentResponse> comments;
+    private LocalDateTime createdAt;
 
-    private PostResponse(Long id, String title, String content, String thumbnail, String region, Long views, UserResponse author, List<CommentResponse> comments) {
+    private PostResponse(Long id, String title, String content, String thumbnail, String region, Long views, UserResponse author, List<CommentResponse> comments,LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -27,6 +29,7 @@ public class PostResponse {
         this.views = views;
         this.author = author;
         this.comments = comments;
+        this.createdAt = createdAt;
     }
 
     public static PostResponse of(Post post) {
@@ -38,7 +41,8 @@ public class PostResponse {
                 post.getRegion().name(),
                 post.getViews(),
                 UserResponse.of(post.getAuthor()),
-                post.getComments().stream().map(CommentResponse::of).toList()
+                post.getComments().stream().map(CommentResponse::of).toList(),
+                post.getCreatedDate()
         );
     }
 

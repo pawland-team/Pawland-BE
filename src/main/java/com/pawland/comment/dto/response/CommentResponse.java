@@ -5,6 +5,7 @@ import com.pawland.user.dto.response.UserResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -15,13 +16,15 @@ public class CommentResponse {
     private String content;
     private List<CommentResponse> replies;
     private Long recommendCount;
+    private LocalDateTime createdAt;
 
-    private CommentResponse(Long id, UserResponse author, String content, List<CommentResponse> replies,Long recommendCount) {
+    private CommentResponse(Long id, UserResponse author, String content, List<CommentResponse> replies, Long recommendCount, LocalDateTime createdAt) {
         this.id = id;
         this.author = author;
         this.content = content;
         this.replies = replies;
         this.recommendCount = recommendCount;
+        this.createdAt = createdAt;
     }
 
     public static CommentResponse of(Comment comment) {
@@ -29,6 +32,7 @@ public class CommentResponse {
                 UserResponse.of(comment.getAuthor()),
                 comment.getContent(),
                 comment.getReply().stream().map(CommentResponse::of).toList(),
-                (long) comment.getRecommendComments().size());
+                (long) comment.getRecommendComments().size(),
+                comment.getCreatedDate());
     }
 }
