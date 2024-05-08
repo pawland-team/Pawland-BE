@@ -16,6 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 class ReviewServiceTest {
@@ -33,6 +34,7 @@ class ReviewServiceTest {
 
     @DisplayName("리뷰 작성 테스트")
     @Test
+    @Transactional
     void createReview() {
         //given
         User user = createUser1();
