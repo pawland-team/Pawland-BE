@@ -54,27 +54,11 @@ class ChatServiceTest {
             @Test
             void createChatRoom1() {
                 // given
-                User buyer = User.builder()
-                    .nickname("구매자")
-                    .email("midcon1@nav.com")
-                    .password("asd123123")
-                    .build();
-                userRepository.save(buyer);
+                User buyer = createUser("구매자1", "midcon4@naver.com", "asd123123");
+                User seller = createUser("판매자1", "midcon2@naver.com", "asd123123");
+                userRepository.saveAll(List.of(buyer ,seller));
 
-                User seller = User.builder()
-                    .nickname("판매자")
-                    .email("midcon2@nav.com")
-                    .password("asd123123")
-                    .build();
-                userRepository.save(seller);
-
-                Product product = Product.builder()
-                    .name("나는짱물건")
-                    .price(10000)
-                    .category("장난감")
-                    .species("DOG")
-                    .condition("NEW")
-                    .build();
+                Product product = createProduct("나는짱물건", 10000, "장난감", "DOG", "NEW");
                 productJpaRepository.save(product);
 
                 ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
@@ -98,27 +82,11 @@ class ChatServiceTest {
             @Test
             void createChatRoom2() {
                 // given
-                User buyer = User.builder()
-                    .nickname("구매자")
-                    .email("midcon1@nav.com")
-                    .password("asd123123")
-                    .build();
-                userRepository.save(buyer);
+                User buyer = createUser("구매자1", "midcon4@naver.com", "asd123123");
+                User seller = createUser("판매자1", "midcon2@naver.com", "asd123123");
+                userRepository.saveAll(List.of(buyer ,seller));
 
-                User seller = User.builder()
-                    .nickname("판매자")
-                    .email("midcon2@nav.com")
-                    .password("asd123123")
-                    .build();
-                userRepository.save(seller);
-
-                Product product = Product.builder()
-                    .name("나는짱물건")
-                    .price(10000)
-                    .category("장난감")
-                    .species("DOG")
-                    .condition("NEW")
-                    .build();
+                Product product = createProduct("나는짱물건", 10000, "장난감", "DOG", "NEW");
                 productJpaRepository.save(product);
 
                 ChatRoomCreateRequest requestWithoutSellerId = ChatRoomCreateRequest.builder()
@@ -147,27 +115,11 @@ class ChatServiceTest {
             @Test
             void createChatRoom1() {
                 // given
-                User buyer = User.builder()
-                    .nickname("구매자")
-                    .email("midcon1@nav.com")
-                    .password("asd123123")
-                    .build();
-                userRepository.save(buyer);
+                User buyer = createUser("구매자1", "midcon4@naver.com", "asd123123");
+                User seller = createUser("판매자1", "midcon2@naver.com", "asd123123");
+                userRepository.saveAll(List.of(buyer ,seller));
 
-                User seller = User.builder()
-                    .nickname("판매자")
-                    .email("midcon2@nav.com")
-                    .password("asd123123")
-                    .build();
-                userRepository.save(seller);
-
-                Product product = Product.builder()
-                    .name("나는짱물건")
-                    .price(10000)
-                    .category("장난감")
-                    .species("DOG")
-                    .condition("NEW")
-                    .build();
+                Product product = createProduct("나는짱물건", 10000, "장난감", "DOG", "NEW");
                 productJpaRepository.save(product);
 
                 ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
@@ -191,27 +143,11 @@ class ChatServiceTest {
             @Test
             void createChatRoom2() {
                 // given
-                User buyer = User.builder()
-                    .nickname("구매자")
-                    .email("midcon1@nav.com")
-                    .password("asd123123")
-                    .build();
-                userRepository.save(buyer);
+                User buyer = createUser("구매자1", "midcon4@naver.com", "asd123123");
+                User seller = createUser("판매자1", "midcon2@naver.com", "asd123123");
+                userRepository.saveAll(List.of(buyer ,seller));
 
-                User seller = User.builder()
-                    .nickname("판매자")
-                    .email("midcon2@nav.com")
-                    .password("asd123123")
-                    .build();
-                userRepository.save(seller);
-
-                Product product = Product.builder()
-                    .name("나는짱물건")
-                    .price(10000)
-                    .category("장난감")
-                    .species("DOG")
-                    .condition("NEW")
-                    .build();
+                Product product = createProduct("나는짱물건", 10000, "장난감", "DOG", "NEW");
                 productJpaRepository.save(product);
 
                 Long InvalidSellerId = 0L;
@@ -237,5 +173,32 @@ class ChatServiceTest {
                     .isInstanceOf(ProductException.NotFoundProduct.class);
             }
         }
+    }
+
+    private static User createUser(String nickname, String email, String password) {
+        return User.builder()
+            .nickname(nickname)
+            .email(email)
+            .password(password)
+            .build();
+    }
+
+    private Product createProduct(String name, int price, String category, String species, String condition) {
+        return Product.builder()
+            .name(name)
+            .price(price)
+            .category(category)
+            .species(species)
+            .condition(condition)
+            .build();
+    }
+
+    private static ChatRoom createChatRoom(Long buyerId, Long sellerId, Long productId) {
+        ChatRoom chatRoom = ChatRoom.builder()
+            .buyerId(buyerId)
+            .sellerId(sellerId)
+            .productId(productId)
+            .build();
+        return chatRoom;
     }
 }

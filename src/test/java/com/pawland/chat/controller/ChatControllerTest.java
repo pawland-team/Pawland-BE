@@ -1,6 +1,7 @@
 package com.pawland.chat.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pawland.chat.domain.ChatRoom;
 import com.pawland.chat.dto.request.ChatRoomCreateRequest;
 import com.pawland.chat.repository.ChatRoomRepository;
 import com.pawland.global.config.TestSecurityConfig;
@@ -64,20 +65,10 @@ class ChatControllerTest {
         @Test
         void createChatRoom1() throws Exception {
             // given
-            User seller = User.builder()
-                .nickname("판매자")
-                .email("midcon2@nav.com")
-                .password("asd123123")
-                .build();
+            User seller = createUser("판매자1", "midcon2@naver.com", "asd123123");
             userRepository.save(seller);
 
-            Product product = Product.builder()
-                .name("나는짱물건")
-                .price(10000)
-                .category("장난감")
-                .species("DOG")
-                .condition("NEW")
-                .build();
+            Product product = createProduct("나는짱물건", 10000, "장난감", "DOG", "NEW");
             productJpaRepository.save(product);
 
             ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
@@ -102,11 +93,7 @@ class ChatControllerTest {
         @Test
         void createChatRoom2() throws Exception {
             // given
-            User seller = User.builder()
-                .nickname("판매자")
-                .email("midcon2@nav.com")
-                .password("asd123123")
-                .build();
+            User seller = createUser("판매자1", "midcon2@naver.com", "asd123123");
             userRepository.save(seller);
 
             Long invalidProductId = 0L;
@@ -133,13 +120,7 @@ class ChatControllerTest {
         @Test
         void createChatRoom3() throws Exception {
             // given
-            Product product = Product.builder()
-                .name("나는짱물건")
-                .price(10000)
-                .category("장난감")
-                .species("DOG")
-                .condition("NEW")
-                .build();
+            Product product = createProduct("나는짱물건", 10000, "장난감", "DOG", "NEW");
             productJpaRepository.save(product);
 
             Long invalidSellerId = 0L;
@@ -160,5 +141,32 @@ class ChatControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(USER_NOT_FOUND.getMessage()));
         }
+    }
+
+    private static User createUser(String nickname, String email, String password) {
+        return User.builder()
+            .nickname(nickname)
+            .email(email)
+            .password(password)
+            .build();
+    }
+
+    private Product createProduct(String name, int price, String category, String species, String condition) {
+        return Product.builder()
+            .name(name)
+            .price(price)
+            .category(category)
+            .species(species)
+            .condition(condition)
+            .build();
+    }
+
+    private static ChatRoom createChatRoom(Long buyerId, Long sellerId, Long productId) {
+        ChatRoom chatRoom = ChatRoom.builder()
+            .buyerId(buyerId)
+            .sellerId(sellerId)
+            .productId(productId)
+            .build();
+        return chatRoom;
     }
 }
