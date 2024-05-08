@@ -1,6 +1,7 @@
 package com.pawland.chat.dto.request;
 
 import com.pawland.chat.domain.ChatRoom;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Schema(name = "채팅방 생성 요청")
 public class ChatRoomCreateRequest {
 
     @NotNull

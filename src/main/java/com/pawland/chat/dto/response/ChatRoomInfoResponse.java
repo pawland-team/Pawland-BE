@@ -1,9 +1,11 @@
 package com.pawland.chat.dto.response;
 
 import com.pawland.product.domain.Status;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 @Getter
+@Schema(name = "채팅방 목록 조회 시 개별 채팅방 정보")
 public class ChatRoomInfoResponse {
 
     private Long roomId;
@@ -17,6 +19,7 @@ public class ChatRoomInfoResponse {
     }
 
     @Getter
+    @Schema(name = "채팅 상대의 유저 정보")
     public static class UserInfo {
         private Long id;
         private String nickname;
@@ -30,6 +33,7 @@ public class ChatRoomInfoResponse {
     }
 
     @Getter
+    @Schema(name = "채팅방의 상품 정보")
     public static class ProductInfo {
         private Long id;
         private int price;
