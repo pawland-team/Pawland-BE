@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.TransactionSystemException;
 
+import java.util.List;
+
 import static com.pawland.user.exception.UserExceptionMessage.*;
 import static org.assertj.core.api.Assertions.*;
 
@@ -49,11 +51,7 @@ class UserServiceTest {
         @Test
         void checkNicknameDuplicate2() {
             // given
-            User user = User.builder()
-                .email("mid@nav.com")
-                .password("asd123123")
-                .nickname("나는짱")
-                .build();
+            User user = createUser("나는짱", "midcon@naver.com", "asd123123");
             userRepository.save(user);
 
             String duplicateNickname = "나는짱";
@@ -83,14 +81,10 @@ class UserServiceTest {
         @Test
         void checkEmailDuplicate2() {
             // given
-            User user = User.builder()
-                .email("midcon@nav.com")
-                .password("asd123123")
-                .nickname("나는짱")
-                .build();
+            User user = createUser("나는짱", "midcon@naver.com", "asd123123");
             userRepository.save(user);
 
-            String duplicateEmail = "midcon@nav.com";
+            String duplicateEmail = "midcon@naver.com";
 
             // expected
             assertThatThrownBy(() -> userService.checkEmailDuplicate(duplicateEmail))
@@ -106,15 +100,12 @@ class UserServiceTest {
         @Test
         void register1() {
             // given
-            User user = User.builder()
-                .email("mid@nav.com")
-                .password("asd123123")
-                .nickname("나는짱")
-                .build();
+            User user = createUser("나는짱", "midcon@naver.com", "asd123123");
+            String toFindEmail = "midcon@naver.com";
 
             // when
             userService.register(user);
-            User result = userRepository.findByEmail(user.getEmail())
+            User result = userRepository.findByEmail(toFindEmail)
                 .orElseThrow(IllegalArgumentException::new);
 
             // then
@@ -126,18 +117,10 @@ class UserServiceTest {
         @Test
         void register2() {
             // given
-            User user = User.builder()
-                .email("mid@nav.com")
-                .password("asd123123")
-                .nickname("나는짱")
-                .build();
-            userService.register(user);
+            User user = createUser("나는짱", "midcon@naver.com", "asd123123");
+            userRepository.save(user);
 
-            User duplicateEmailUser = User.builder()
-                .email("mid@nav.com")
-                .password("asd123123")
-                .nickname("나는짱123")
-                .build();
+            User duplicateEmailUser = createUser("나는짱123", "midcon@naver.com", "asd123123");
 
             // expected
             assertThatThrownBy(() -> userService.register(duplicateEmailUser))
@@ -149,18 +132,10 @@ class UserServiceTest {
         @Test
         void register3() {
             // given
-            User user = User.builder()
-                .email("mid@naver.com")
-                .password("asd123123")
-                .nickname("나는짱")
-                .build();
-            userService.register(user);
+            User user = createUser("나는짱", "midcon@naver.com", "asd123123");
+            userRepository.save(user);
 
-            User duplicateNicknameUser = User.builder()
-                .email("mid1@naver.com")
-                .password("asd123123")
-                .nickname("나는짱")
-                .build();
+            User duplicateNicknameUser = createUser("나는짱", "midcon123@naver.com", "asd123123");
 
             // expected
             assertThatThrownBy(() -> userService.register(duplicateNicknameUser))
@@ -176,19 +151,14 @@ class UserServiceTest {
         @Test
         void getUserInfo1() {
             // given
-            User user = User.builder()
-                .email("mid@nav.com")
-                .password("asd123123")
-                .nickname("나는짱")
-                .introduce("나아는짱")
-                .build();
+            User user = createUser("나는짱", "midcon@naver.com", "asd123123");
             userRepository.save(user);
 
-            String toGetEmail = "mid@nav.com";
+            String toFindEmail = "midcon@naver.com";
             double tempStars = 3.5;  // TODO 평점 조회 로직 구현시 수정 필요
 
             // when
-            UserInfoResponse result = userService.getUserInfo(toGetEmail);
+            UserInfoResponse result = userService.getUserInfo(toFindEmail);
 
             // then
             assertThat(result.getId()).isNotNull();
@@ -202,17 +172,13 @@ class UserServiceTest {
         @DisplayName("DB에 저장되지 않은 유저 조회 시도 시 실패한다.")
         @Test
         void getUserInfo2() {
-            User user = User.builder()
-                .email("mid@nav.com")
-                .password("asd123123")
-                .nickname("나는짱")
-                .build();
+            User user = createUser("나는짱", "midcon@naver.com", "asd123123");
             userRepository.save(user);
 
-            String toGetEmail = "midcon@nav.com";
+            String toFindEmail = "midcon123@naver.com";
 
             // expected
-            assertThatThrownBy(() -> userService.getUserInfo(toGetEmail))
+            assertThatThrownBy(() -> userService.getUserInfo(toFindEmail))
                 .isInstanceOf(UserException.NotFoundUser.class)
                 .hasMessageContaining(USER_NOT_FOUND.getMessage());
         }
@@ -225,14 +191,10 @@ class UserServiceTest {
         @Test
         void updateUser1() {
             // given
-            User user = User.builder()
-                .email("mid@nav.com")
-                .password("asd123123")
-                .nickname("나는짱")
-                .build();
+            User user = createUser("나는짱", "midcon@naver.com", "asd123123");
             userRepository.save(user);
 
-            String toUpdateUser = "mid@nav.com";
+            String toUpdateUser = "midcon@naver.com";
             UserInfoUpdateRequest request = UserInfoUpdateRequest.builder()
                 .nickname("나는변경된짱")
                 .build();
@@ -251,14 +213,10 @@ class UserServiceTest {
         @Test
         void updateUser2() {
             // given
-            User user = User.builder()
-                .email("mid@nav.com")
-                .password("asd123123")
-                .nickname("나는짱")
-                .build();
+            User user = createUser("나는짱", "midcon@naver.com", "asd123123");
             userRepository.save(user);
 
-            String toUpdateUser = "mid@nav.com";
+            String toUpdateUser = "midcon@naver.com";
             UserInfoUpdateRequest request = UserInfoUpdateRequest.builder()
                 .nickname("")
                 .build();
@@ -268,5 +226,32 @@ class UserServiceTest {
                 .isInstanceOf(TransactionSystemException.class)
                 .hasMessageContaining("Could not commit JPA transaction");
         }
+
+        @DisplayName("이미 존재하는 닉네임으로 변경 시도 시 실패한다.")
+        @Test
+        void updateUser3() {
+            // given
+            User user1 = createUser("수정할 유저", "midcon1@naver.com", "asd123123");
+            User user2 = createUser("나는짱", "midcon2@naver.com", "asd123123");
+            userRepository.saveAll(List.of(user1, user2));
+
+            String toUpdateUser = "midcon1@naver.com";
+            UserInfoUpdateRequest request = UserInfoUpdateRequest.builder()
+                .nickname("나는짱")
+                .build();
+
+            // expected
+            assertThatThrownBy(() -> userService.updateUser(toUpdateUser, request))
+                .isInstanceOf(UserException.AlreadyExistsNickname.class)
+                .hasMessageContaining(ALREADY_EXISTS_NICKNAME.getMessage());
+        }
+    }
+
+    private static User createUser(String nickname, String email, String password) {
+        return User.builder()
+            .nickname(nickname)
+            .email(email)
+            .password(password)
+            .build();
     }
 }

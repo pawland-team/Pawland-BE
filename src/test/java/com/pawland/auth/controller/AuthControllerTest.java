@@ -26,6 +26,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Duration;
 
+import static com.pawland.user.exception.UserExceptionMessage.ALREADY_EXISTS_EMAIL;
+import static com.pawland.user.exception.UserExceptionMessage.ALREADY_EXISTS_NICKNAME;
 import static org.hamcrest.Matchers.oneOf;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -94,6 +96,7 @@ class AuthControllerTest {
                 .password("asd123123")
                 .nickname("나는짱")
                 .build();
+
             userRepository.save(user);
 
             NicknameDupCheckRequest request = new NicknameDupCheckRequest("나는짱");
@@ -106,7 +109,7 @@ class AuthControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("이미 존재하는 유저입니다."));
+                .andExpect(jsonPath("$.message").value(ALREADY_EXISTS_NICKNAME.getMessage()));
         }
     }
 
@@ -153,7 +156,7 @@ class AuthControllerTest {
                 )
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("이미 존재하는 유저입니다."));
+                .andExpect(jsonPath("$.message").value(ALREADY_EXISTS_EMAIL.getMessage()));
         }
     }
 
@@ -379,7 +382,7 @@ class AuthControllerTest {
                 SignupRequest request = SignupRequest.builder()
                     .email("midcon@nav.com")
                     .password("asd123123")
-                    .nickname("나는짱")
+                    .nickname("나는짱123")
                     .build();
 
                 String json = objectMapper.writeValueAsString(request);
@@ -391,7 +394,7 @@ class AuthControllerTest {
                     )
                     .andDo(print())
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").value("이미 존재하는 유저입니다."))
+                    .andExpect(jsonPath("$.message").value(ALREADY_EXISTS_EMAIL.getMessage()))
                     .andExpect(cookie().doesNotExist("jwt"));
             }
         }
