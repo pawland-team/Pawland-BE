@@ -46,7 +46,6 @@ public class UserService {
         User user = userRepository.findByEmail(email)
             .orElseThrow(UserException.NotFoundUser::new);
         // TODO: 평점 조회 로직 구현 필요
-
         return new UserInfoResponse(user, 3.5);
     }
 
@@ -57,12 +56,7 @@ public class UserService {
 
         checkNicknameDuplicate(request.getNickname());
         user.updateProfile(request.toUser());
-
-        return UserInfoUpdateResponse.builder()
-            .id(user.getId())
-            .profileImage(user.getProfileImage())
-            .nickname(user.getNickname())
-            .userDesc(user.getIntroduce())
-            .build();
+        // TODO: 평점 조회 로직 구현 필요
+        return new UserInfoUpdateResponse(user, 3.5);
     }
 }

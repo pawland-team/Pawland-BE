@@ -1,5 +1,6 @@
 package com.pawland.user.dto.response;
 
+import com.pawland.user.domain.LoginType;
 import com.pawland.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -14,6 +15,7 @@ public class UserInfoResponse {
     private String nickname;
     private String email;
     private String userDesc;
+    private LoginType loginType;
     private double stars = 0.0; // 구현중
 
     @Builder
@@ -23,6 +25,7 @@ public class UserInfoResponse {
         this.nickname = user.getNickname();
         this.email = user.getEmail();
         this.userDesc = user.getIntroduce();
+        this.loginType = user.getType();
         this.stars = stars;
     }
 }
