@@ -10,15 +10,15 @@ public enum Species {
     CAT("고양이"),
     ETC("그외");
 
-    private final String species;
+    private final String name;
 
-    Species(String species) {
-        this.species = species;
+    Species(String name) {
+        this.name = name;
     }
 
     public static Species getInstance(String species) {
         return Arrays.stream(Species.values())
-                .filter(s -> s.getSpecies().equals(species))
+                .filter(s -> s.getName().equals(species))
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
     }

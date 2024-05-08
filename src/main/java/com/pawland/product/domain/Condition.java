@@ -8,15 +8,15 @@ import java.util.Arrays;
 public enum Condition {
     NEW("새상품"),USED("중고");
 
-    private final String condition;
+    private final String name;
 
-    Condition(String condition) {
-        this.condition = condition;
+    Condition(String name) {
+        this.name = name;
     }
 
     public static Condition getInstance(String condition) {
         return Arrays.stream(Condition.values())
-                .filter(c -> c.getCondition().equals(condition))
+                .filter(c -> c.getName().equals(condition))
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
     }
