@@ -55,6 +55,8 @@ public class Product extends BaseTimeEntity {
     @OneToMany(mappedBy = "product")
     private Set<WishProduct> wishProducts = new HashSet<>();
 
+    private Long purchaserId = null;
+
     @Builder
     public Product(String category,String species,String condition,String name, int price, String content, String region,User seller,String thumbnailImageUrl,List<String> imageUrls) {
         this.category = Category.getInstance(category);
@@ -105,4 +107,7 @@ public class Product extends BaseTimeEntity {
         wishProduct.setProduct(null);
     }
 
+    public void confirmPurchase(Long purchaserId) {
+        this.purchaserId = purchaserId;
+    }
 }
