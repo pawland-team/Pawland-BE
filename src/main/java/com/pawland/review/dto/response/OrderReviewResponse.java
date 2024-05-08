@@ -13,7 +13,7 @@ public class OrderReviewResponse {
     private LocalDateTime createdAt;
 
 
-    private OrderReviewResponse(Long id, String content, Double star,LocalDateTime createdAt) {
+    private OrderReviewResponse(Long id, String content, Double star, LocalDateTime createdAt) {
         this.id = id;
         this.content = content;
         this.star = star;
@@ -21,6 +21,6 @@ public class OrderReviewResponse {
     }
 
     public static OrderReviewResponse of(OrderReview orderReview) {
-        return new OrderReviewResponse(orderReview.getId(), orderReview.getContent(), orderReview.getStar(),orderReview.getCreatedDate());
+        return new OrderReviewResponse(orderReview.getId(), orderReview.getContent(), orderReview.getStar(), orderReview.getCreatedDate());
     }
 }

@@ -24,6 +24,6 @@ public class ReviewController {
     @Operation(summary = "주문 리뷰 작성")
     @PostMapping("/{orderId}")
     public ResponseEntity<OrderReviewResponse> createOrderReview(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long orderId, @RequestBody CreateReviewRequest createReviewRequest) {
-        return ResponseEntity.ok(reviewService.createReview(userPrincipal.getUserId(), orderId,createReviewRequest));
+        return ResponseEntity.ok(reviewService.createReview(userPrincipal.getUserId(), orderId, createReviewRequest));
     }
 }
