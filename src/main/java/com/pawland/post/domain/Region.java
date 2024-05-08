@@ -1,10 +1,12 @@
 package com.pawland.post.domain;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
 @RequiredArgsConstructor
+@Getter
 public enum Region {
 
     SEOUL("서울"),
@@ -26,18 +28,14 @@ public enum Region {
     JEJU("제주"),
     FOREIGN("해외");
 
-    private final String region;
-
-    public String value() {
-        return region;
-    }
+    private final String name;
 
     public static Region fromString(String input) {
         if (input == null || input.isBlank()) {
             return Region.SEOUL;
         }
         return Arrays.stream(Region.values()).
-            filter(region -> region.value().equals(input))
+            filter(region -> region.getName().equals(input))
             .findFirst()
             .orElseThrow(()-> new IllegalArgumentException("지역 값을 확인해주세요."));  // TODO: 커스텀 예외로 만들어도 될듯
     }

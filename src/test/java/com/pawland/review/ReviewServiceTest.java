@@ -79,8 +79,8 @@ class ReviewServiceTest {
     private ProductResponse createProduct(Long userId) {
         CreateProductRequest createProductRequest = new CreateProductRequest(
                 "사료",
-                "CAT",
-                "NEW",
+                "고양이",
+                "새상품",
                 "상품",
                 10000,
                 "상품입니다.",

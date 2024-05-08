@@ -44,8 +44,8 @@ class ProductServiceTest {
         User user = createUser();
         CreateProductRequest createProductRequest = new CreateProductRequest(
                 "사료",
-                "CAT",
-                "NEW",
+                "고양이",
+                "새상품",
                 "상품",
                 10000,
                 "상품입니다.",
@@ -70,8 +70,8 @@ class ProductServiceTest {
         User user = createUser();
         ProductResponse product = productService.createProduct(user.getId(), new CreateProductRequest(
                 "사료",
-                "CAT",
-                "NEW",
+                "고양이",
+                "새상품",
                 "상품",
                 10000,
                 "상품입니다.",
@@ -94,8 +94,8 @@ class ProductServiceTest {
         User user = createUser();
         ProductResponse product = productService.createProduct(user.getId(), new CreateProductRequest(
                 "사료",
-                "CAT",
-                "NEW",
+                "고양이",
+                "새상품",
                 "상품",
                 10000,
                 "상품입니다.",
@@ -118,8 +118,8 @@ class ProductServiceTest {
         User user = createUser();
         ProductResponse product = productService.createProduct(user.getId(), new CreateProductRequest(
                 "사료",
-                "CAT",
-                "NEW",
+                "고양이",
+                "새상품",
                 "상품",
                 10000,
                 "상품입니다.",
@@ -144,8 +144,8 @@ class ProductServiceTest {
         for (int i = 0; i < 10; i++) {
             productService.createProduct(user.getId(), new CreateProductRequest(
                     "사료",
-                    "CAT",
-                    "NEW",
+                    "고양이",
+                    "새상품",
                     "상품",
                     10000,
                     "상품입니다.",
@@ -174,8 +174,8 @@ class ProductServiceTest {
         for (int i = 0; i < 3; i++) {
             ProductResponse product = productService.createProduct(user.getId(), new CreateProductRequest(
                     "사료",
-                    "CAT",
-                    "NEW",
+                    "고양이",
+                    "새상품",
                     "상품",
                     10000,
                     "상품입니다.",
