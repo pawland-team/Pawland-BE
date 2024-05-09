@@ -57,7 +57,7 @@ class ProductServiceTest {
         ProductResponse product = productService.createProduct(user.getId(), createProductRequest);
 
         //then
-        Assertions.assertEquals("tester",product.getSeller().getNickname());
+        Assertions.assertEquals("tester", product.getSeller().getNickname());
         Assertions.assertEquals("상품", product.getName());
     }
 
@@ -79,11 +79,11 @@ class ProductServiceTest {
                 null,
                 null));
         //when
-        ProductResponse oneProductById = productService.getOneProductById(product.getId());
+        ProductResponse oneProductById = productService.getOneProductById(user.getId(), product.getId());
 
         //then
-        Assertions.assertEquals("상품",oneProductById.getName());
-        Assertions.assertEquals("tester",oneProductById.getSeller().getNickname());
+        Assertions.assertEquals("상품", oneProductById.getName());
+        Assertions.assertEquals("tester", oneProductById.getSeller().getNickname());
     }
 
     @DisplayName("상품 수정")
@@ -107,7 +107,7 @@ class ProductServiceTest {
         ProductResponse updatedProduct = productService.updateProduct(user.getId(), product.getId(), UpdateProductRequest.builder().name("상품1수정").build());
 
         //then
-        Assertions.assertEquals("상품1수정",updatedProduct.getName());
+        Assertions.assertEquals("상품1수정", updatedProduct.getName());
     }
 
     @DisplayName("상품 삭제")
@@ -131,7 +131,7 @@ class ProductServiceTest {
         productService.deleteProduct(user.getId(), product.getId());
 
         //then
-        Assertions.assertThrows(ProductException.NotFoundProduct.class, () -> productService.getOneProductById(product.getId()));
+        Assertions.assertThrows(ProductException.NotFoundProduct.class, () -> productService.getOneProductById(user.getId(), product.getId()));
     }
 
     @DisplayName("상품 최신순 8개 조회")
@@ -155,7 +155,7 @@ class ProductServiceTest {
         }
 
         //when
-        Page<ProductResponse> products = productService.getProducts(SearchProductRequest.builder().page(1).size(8).build());
+        Page<ProductResponse> products = productService.getProducts(user.getId(), SearchProductRequest.builder().page(1).size(8).build());
 
         //then
         Assertions.assertEquals(8, products.getContent().size());
@@ -187,10 +187,10 @@ class ProductServiceTest {
         }
 
         //when
-        Page<ProductResponse> products = productService.getProducts(SearchProductRequest.builder().region("서울").page(1).size(8).build());
+        Page<ProductResponse> products = productService.getProducts(user.getId(), SearchProductRequest.builder().region("서울").page(1).size(8).build());
 
         //then
-        Assertions.assertEquals(2,products.getContent().size());
+        Assertions.assertEquals(2, products.getContent().size());
 
     }
 }

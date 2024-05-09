@@ -110,4 +110,8 @@ public class Product extends BaseTimeEntity {
     public void confirmPurchase(Long purchaserId) {
         this.purchaserId = purchaserId;
     }
+
+    public void upView() {
+        this.view++;
+    }
 }

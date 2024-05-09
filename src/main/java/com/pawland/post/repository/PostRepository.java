@@ -31,18 +31,19 @@ public class PostRepository {
         List<Post> posts = jpaQueryFactory.selectFrom(post)
                 .leftJoin(post.author, QUser.user)
                 .fetchJoin()
-                .where(eqTitle(postSearchRequest.getContent()),
-                        eqContent(postSearchRequest.getContent()),
+                .where(
+                        searchContentOrTitle(postSearchRequest.getContent()),
                         eqRegion(postSearchRequest.getRegion()))
                 .orderBy(createOrderSpecifier(postSearchRequest))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        return new PageImpl<>(posts,pageable,posts.size());
+
+        return new PageImpl<>(posts, pageable, posts.size());
     }
 
-    public Page<Post> getMyPosts(Long userId,Pageable pageable,PostSearchRequest postSearchRequest) {
+    public Page<Post> getMyPosts(Long userId, Pageable pageable, PostSearchRequest postSearchRequest) {
         List<Post> myPosts = jpaQueryFactory.selectFrom(post)
                 .leftJoin(post.author, QUser.user)
                 .fetchJoin()
@@ -52,19 +53,19 @@ public class PostRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        return new PageImpl<>(myPosts,pageable,myPosts.size());
+        return new PageImpl<>(myPosts, pageable, myPosts.size());
     }
 
-    private BooleanExpression eqContent(String content) {
-        return !StringUtils.hasText(content) ? null : post.content.contains(content);
+    private BooleanExpression searchContentOrTitle(String content) {
+        return StringUtils.hasText(content) ? post.content.like("%" + content + "%").or(post.title.like("%" + content + "%")) : null;
     }
 
-    private BooleanExpression eqTitle(String content) {
-        return !StringUtils.hasText(content) ? null : post.title.contains(content);
-    }
+    private BooleanExpression eqRegion(List<String> region) {
+        if (region == null || region.isEmpty()) {
+            return null;
+        }
 
-    private BooleanExpression eqRegion(String region) {
-        return !StringUtils.hasText(region) ? null : post.region.eq(Region.fromString(region));
+        return post.region.in(region.stream().map(Region::fromString).toList());
     }
 
     private OrderSpecifier[] createOrderSpecifier(PostSearchRequest postSearchRequest) {
@@ -72,14 +73,15 @@ public class PostRepository {
 
         if (Objects.isNull(postSearchRequest.getOrderBy())) {
             orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.createdDate));
-        } else if (postSearchRequest.getOrderBy().equals("view")){
+        } else if (postSearchRequest.getOrderBy().equals("view")) {
             orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.views));
-        }else if (postSearchRequest.getOrderBy().equals("recommend")){
+        } else if (postSearchRequest.getOrderBy().equals("recommend")) {
             orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.recommends.size()));
-        }else if (postSearchRequest.getOrderBy().equals("comment")){
+        } else if (postSearchRequest.getOrderBy().equals("comment")) {
             orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.comments.size()));
         }
 
-    return orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]);
+        return orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]);
     }
 }
+

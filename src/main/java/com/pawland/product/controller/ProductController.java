@@ -39,8 +39,8 @@ public class ProductController {
     @ApiResponse(responseCode = "200", description = "상품 조회 성공")
     @ApiResponse(responseCode = "500", description = "상품 조회 실패")
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long productId) {
-        return ResponseEntity.ok(productService.getOneProductById(productId));
+    public ResponseEntity<ProductResponse> getProductById(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long productId) {
+        return ResponseEntity.ok(productService.getOneProductById(userPrincipal.getUserId(), productId));
     }
 
     @Operation(summary = "상품 수정")
@@ -63,15 +63,18 @@ public class ProductController {
     @ApiResponse(responseCode = "200", description = "상품 페이징 조회 성공")
     @ApiResponse(responseCode = "500", description = "상품 페이징 조회 실패")
     @GetMapping
-    public Page<ProductResponse> getProducts(@RequestParam(required = false) String region,
+    public Page<ProductResponse> getProducts(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                             @RequestParam(required = false) String region,
                                              @RequestParam(required = false) String species,
                                              @RequestParam(required = false) String category,
                                              @RequestParam(required = false) String isFree,
                                              @RequestParam(required = false) String orderBy,
+                                             @RequestParam(required = false) String content,
                                              @RequestParam(required = true) int page,
                                              @RequestParam(required = true) int size
+
     ) {
-        return productService.getProducts(SearchProductRequest.builder().region(region).species(species).category(category).isFree(isFree).orderBy(orderBy).page(page).size(size).build());
+        return productService.getProducts(userPrincipal.getUserId(), SearchProductRequest.builder().region(region).species(species).category(category).isFree(isFree).orderBy(orderBy).content(content).page(page).size(size).build());
     }
 
 

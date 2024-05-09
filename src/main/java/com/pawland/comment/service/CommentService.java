@@ -25,9 +25,9 @@ public class CommentService {
     private final PostJpaRepository postJpaRepository;
 
     @Transactional
-    public CommentResponse createComment(Long userId, CreateCommentRequest createCommentRequest) {
+    public CommentResponse createComment(Long userId, Long postId, CreateCommentRequest createCommentRequest) {
         User author = getUserById(userId);
-        Post post = getPostById(createCommentRequest.getPostId());
+        Post post = getPostById(postId);
 
         Comment comment = Comment.builder()
                 .author(author)
@@ -79,6 +79,17 @@ public class CommentService {
         return CommentResponse.of(commentById);
     }
 
+    @Transactional
+    public void createCommentComment(Long userId, Long commentId, CreateCommentRequest createCommentRequest) {
+        User userById = getUserById(userId);
+        Comment comment = new Comment(null, userById, createCommentRequest.getContent());
+        Comment commentById = getCommentById(commentId);
+
+        commentJpaRepository.save(comment);
+
+        commentById.addReply(comment);
+    }
+
     private User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(UserException.NotFoundUser::new);
     }
@@ -90,4 +101,6 @@ public class CommentService {
     private Comment getCommentById(Long commentId) {
         return commentJpaRepository.findById(commentId).orElseThrow(CommentException.NotFoundComment::new);
     }
+
+
 }

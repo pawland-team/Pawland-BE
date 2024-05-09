@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -14,6 +16,6 @@ public class PostSearchRequest {
     @NotBlank
     private int page;
     private String content;
-    private String region;
+    private List<String> region;
     private String orderBy;
 }

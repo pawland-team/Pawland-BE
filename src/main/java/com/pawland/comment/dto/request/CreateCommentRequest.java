@@ -2,15 +2,15 @@ package com.pawland.comment.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Schema(name = "댓글 생성 요청")
+@NoArgsConstructor
 public class CreateCommentRequest {
-    private Long postId;
     private String content;
 
-    public CreateCommentRequest(Long postId, String content) {
-        this.postId = postId;
+    public CreateCommentRequest(String content) {
         this.content = content;
     }
 }

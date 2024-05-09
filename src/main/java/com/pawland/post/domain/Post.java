@@ -81,4 +81,8 @@ public class Post extends BaseTimeEntity {
     public void deleteRecommend(PostRecommend postRecommend) {
         this.recommends.remove(postRecommend);
     }
+
+    public void upView() {
+        this.views++;
+    }
 }

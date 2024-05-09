@@ -38,28 +38,28 @@ public class PostService {
 
         Post post = postJpaRepository.save(request.toPostWith(user));
 
-        return PostResponse.of(post);
+        return PostResponse.of(post,user);
     }
 
     @Transactional
-    public Page<PostResponse> getPosts(PostSearchRequest postSearchRequest) {
+    public Page<PostResponse> getPosts(Long userId,PostSearchRequest postSearchRequest) {
         Pageable pageable = PageRequest.of(postSearchRequest.getPage() - 1, 6);
         Page<Post> posts = postRepository.getPostsBySearch(postSearchRequest, pageable);
 
-        return posts.map(PostResponse::of);
+        return posts.map(p -> PostResponse.of(p,getUserById(userId)));
     }
 
     public Page<PostResponse> getMyPosts(Long userId, PostSearchRequest postSearchRequest) {
         Pageable pageable = PageRequest.of(postSearchRequest.getPage() - 1, 6);
         Page<Post> myPosts = postRepository.getMyPosts(userId, pageable, postSearchRequest);
 
-        return myPosts.map(PostResponse::of);
+        return myPosts.map(post -> PostResponse.of(post,getUserById(userId)));
     }
 
     @Transactional
     public boolean recommend(Long userId, Long postId) {
 
-        if (AleadyRecommendPost(userId, postId)) {
+        if (AlreadyRecommendPost(userId, postId)) {
             throw new IllegalStateException("이미 추천한 게시글 입니다.");
         }
 
@@ -84,7 +84,14 @@ public class PostService {
         return true;
     }
 
-    private boolean AleadyRecommendPost(Long userId, Long postId) {
+    @Transactional
+    public PostResponse getOnePostById(Long userId, Long postId) {
+        Post post = getPostById(postId);
+        post.upView();
+        return PostResponse.of(post,getUserById(userId));
+    }
+
+    private boolean AlreadyRecommendPost(Long userId, Long postId) {
         Post postById = getPostById(postId);
         return postById.getRecommends().stream().map(PostRecommend::getUser).anyMatch(user -> user.getId().equals(userId));
     }
