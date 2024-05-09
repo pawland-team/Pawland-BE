@@ -61,7 +61,7 @@ class ChatServiceTest {
                 User seller = createUser("판매자1", "midcon2@naver.com", "asd123123");
                 userRepository.saveAll(List.of(buyer, seller));
 
-                Product product = createProduct("나는짱물건", 10000, "장난감", "DOG", "NEW");
+                Product product = createProduct("나는짱물건", 10000, "장난감", "강아지", "새상품");
                 productJpaRepository.save(product);
 
                 ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
@@ -89,7 +89,7 @@ class ChatServiceTest {
                 User seller = createUser("판매자1", "midcon2@naver.com", "asd123123");
                 userRepository.saveAll(List.of(buyer, seller));
 
-                Product product = createProduct("나는짱물건", 10000, "장난감", "DOG", "NEW");
+                Product product = createProduct("나는짱물건", 10000, "장난감", "강아지", "새상품");
                 productJpaRepository.save(product);
 
                 ChatRoomCreateRequest requestWithoutSellerId = ChatRoomCreateRequest.builder()
@@ -122,7 +122,7 @@ class ChatServiceTest {
                 User seller = createUser("판매자1", "midcon2@naver.com", "asd123123");
                 userRepository.saveAll(List.of(buyer, seller));
 
-                Product product = createProduct("나는짱물건", 10000, "장난감", "DOG", "NEW");
+                Product product = createProduct("나는짱물건", 10000, "장난감", "강아지", "새상품");
                 productJpaRepository.save(product);
 
                 ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
@@ -150,7 +150,7 @@ class ChatServiceTest {
                 User seller = createUser("판매자1", "midcon2@naver.com", "asd123123");
                 userRepository.saveAll(List.of(buyer, seller));
 
-                Product product = createProduct("나는짱물건", 10000, "장난감", "DOG", "NEW");
+                Product product = createProduct("나는짱물건", 10000, "장난감", "강아지", "새상품");
                 productJpaRepository.save(product);
 
                 Long InvalidSellerId = 0L;
@@ -192,10 +192,10 @@ class ChatServiceTest {
             User buyer2 = createUser("구매자2", "midcon5@naver.com", "asd123123");
             userRepository.saveAll(List.of(myAccount, seller1, seller2, buyer1, buyer2));
 
-            Product product1 = createProduct("나는짱물건1", 1000, "장난감", "DOG", "NEW");
-            Product product2 = createProduct("나는짱물건2", 2000, "장난감", "DOG", "NEW");
-            Product product3 = createProduct("나는짱물건3", 3000, "장난감", "DOG", "NEW");
-            Product product4 = createProduct("나는짱물건4", 4000, "장난감", "DOG", "NEW");
+            Product product1 = createProduct("나는짱물건1", 1000, "장난감", "강아지", "새상품");
+            Product product2 = createProduct("나는짱물건2", 2000, "장난감", "강아지", "새상품");
+            Product product3 = createProduct("나는짱물건3", 3000, "장난감", "강아지", "새상품");
+            Product product4 = createProduct("나는짱물건4", 4000, "장난감", "강아지", "새상품");
             product3.confirmPurchase(1L);
             productJpaRepository.saveAll(List.of(product1, product2, product3, product4));
 
@@ -233,8 +233,8 @@ class ChatServiceTest {
             User buyer2 = createUser("구매자2", "midcon5@naver.com", "asd123123");
             userRepository.saveAll(List.of(myAccount, seller1, seller2, buyer1, buyer2));
 
-            Product product1 = createProduct("나는짱물건1", 1000, "장난감", "DOG", "NEW");
-            Product product2 = createProduct("나는짱물건2", 2000, "장난감", "DOG", "NEW");
+            Product product1 = createProduct("나는짱물건1", 1000, "장난감", "강아지", "새상품");
+            Product product2 = createProduct("나는짱물건2", 2000, "장난감", "강아지", "새상품");
             productJpaRepository.saveAll(List.of(product1, product2));
 
             ChatRoom notMyChatRoom1 = createChatRoom(buyer1.getId(), seller1.getId(), product1.getId());
