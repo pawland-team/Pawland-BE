@@ -3,6 +3,7 @@ package com.pawland.order.dto.response;
 import com.pawland.order.domain.Order;
 import com.pawland.order.domain.OrderStatus;
 import com.pawland.product.dto.response.ProductResponse;
+import com.pawland.review.dto.response.OrderReviewResponse;
 import com.pawland.user.dto.response.UserResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class OrderResponse {
     private boolean sellerCheck;
     private boolean buyerCheck;
     private OrderStatus orderStatus;
+    private OrderReviewResponse orderReviewResponse;
 
     private OrderResponse(Order order) {
         this.id = order.getId();
@@ -26,6 +28,7 @@ public class OrderResponse {
         this.sellerCheck = order.isSellerCheck();
         this.buyerCheck = order.isBuyerCheck();
         this.orderStatus = order.getStatus();
+        this.orderReviewResponse = order.getOrderReview() != null ?OrderReviewResponse.of(order.getOrderReview()) : null;
     }
 
     public static OrderResponse of(Order order) {

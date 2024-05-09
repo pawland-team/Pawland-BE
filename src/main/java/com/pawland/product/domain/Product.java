@@ -56,7 +56,7 @@ public class Product extends BaseTimeEntity {
     private Set<WishProduct> wishProducts = new HashSet<>();
 
     @Builder
-    public Product(String category,String species,String condition,String name, int price, String content, String region,User seller) {
+    public Product(String category,String species,String condition,String name, int price, String content, String region,User seller,String thumbnailImageUrl,List<String> imageUrls) {
         this.category = Category.getInstance(category);
         this.species = Species.getInstance(species);
         this.condition = Condition.getInstance(condition);
@@ -67,9 +67,8 @@ public class Product extends BaseTimeEntity {
         this.view = 0;
         this.seller = seller;
         this.status = Status.SELLING;
-        //todo
-        this.thumbnailImageUrl = "";
-        this.imageUrls = new ArrayList<>();
+        this.thumbnailImageUrl = thumbnailImageUrl;
+        this.imageUrls = imageUrls;
     }
 
     public void update(UpdateProductRequest updateProductRequest) {

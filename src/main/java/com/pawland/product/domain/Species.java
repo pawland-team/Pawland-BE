@@ -6,13 +6,19 @@ import java.util.Arrays;
 
 @Getter
 public enum Species {
-    DOG,
-    CAT,
-    ETC;
+    DOG("강아지"),
+    CAT("고양이"),
+    ETC("그외");
+
+    private final String name;
+
+    Species(String name) {
+        this.name = name;
+    }
 
     public static Species getInstance(String species) {
         return Arrays.stream(Species.values())
-                .filter(s -> s.name().equals(species))
+                .filter(s -> s.getName().equals(species))
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
     }

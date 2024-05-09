@@ -68,8 +68,6 @@ public class OrderService {
         } else {
             throw new OrderException.AccessDeniedException();
         }
-
-
     }
 
     private User getUserById(Long buyerId) {
