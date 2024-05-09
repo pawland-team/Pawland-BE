@@ -52,6 +52,7 @@ public class Order extends BaseTimeEntity {
     }
 
     public void setSellerCheck(boolean sellerCheck) {
+        this.product.confirmPurchase(seller.getId());
         this.sellerCheck = sellerCheck;
         if (sellerCheck && buyerCheck) {
             changeStatus(OrderStatus.DONE);
@@ -59,6 +60,7 @@ public class Order extends BaseTimeEntity {
     }
 
     public void setBuyerCheck(boolean buyerCheck) {
+        this.product.confirmPurchase(buyer.getId());
         this.buyerCheck = buyerCheck;
         if (sellerCheck && buyerCheck) {
             changeStatus(OrderStatus.DONE);
