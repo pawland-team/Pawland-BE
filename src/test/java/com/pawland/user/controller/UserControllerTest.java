@@ -95,7 +95,7 @@ class UserControllerTest {
             UserInfoUpdateRequest request = UserInfoUpdateRequest.builder()
                 .nickname("")
                 .profileImage("변경할 이미지")
-                .introduce("자기 소개")
+                .userDesc("자기 소개")
                 .build();
 
             String json = objectMapper.writeValueAsString(request);

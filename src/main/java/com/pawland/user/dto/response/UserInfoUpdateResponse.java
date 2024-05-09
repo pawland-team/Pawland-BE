@@ -1,25 +1,31 @@
 package com.pawland.user.dto.response;
 
+import com.pawland.user.domain.LoginType;
+import com.pawland.user.domain.User;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-
+@Schema(name = "유저 정보 수정 응답")
 public class UserInfoUpdateResponse {
 
     private Long id;
-
     private String profileImage;
-
     private String nickname;
-
+    private String email;
     private String userDesc;
+    private LoginType loginType;
+    private double stars = 0.0; // 구현중
 
     @Builder
-    public UserInfoUpdateResponse(Long id, String profileImage, String nickname, String userDesc) {
-        this.id = id;
-        this.profileImage = profileImage;
-        this.nickname = nickname;
-        this.userDesc = userDesc;
+    public UserInfoUpdateResponse(User user, double stars) {
+        this.id = user.getId();
+        this.profileImage = user.getProfileImage();
+        this.nickname = user.getNickname();
+        this.email = user.getEmail();
+        this.userDesc = user.getIntroduce();
+        this.loginType = user.getType();
+        this.stars = stars;
     }
 }

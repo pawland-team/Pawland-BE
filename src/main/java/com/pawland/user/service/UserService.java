@@ -7,7 +7,6 @@ import com.pawland.user.exception.UserException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import com.pawland.global.exception.AlreadyExistsUserException;
 import com.pawland.user.domain.User;
 import com.pawland.user.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,14 +24,14 @@ public class UserService {
     public void checkNicknameDuplicate(String nickname) {
         Optional<User> foundUser = userRepository.findByNickname(nickname);
         if (foundUser.isPresent()) {
-            throw new AlreadyExistsUserException();
+            throw new UserException.AlreadyExistsNickname();
         }
     }
 
     public void checkEmailDuplicate(String email) {
         Optional<User> foundUser = userRepository.findByEmail(email);
         if (foundUser.isPresent()) {
-            throw new AlreadyExistsUserException();
+            throw new UserException.AlreadyExistsEmail();
         }
     }
 
@@ -47,7 +46,6 @@ public class UserService {
         User user = userRepository.findByEmail(email)
             .orElseThrow(UserException.NotFoundUser::new);
         // TODO: 평점 조회 로직 구현 필요
-
         return new UserInfoResponse(user, 3.5);
     }
 
@@ -56,13 +54,9 @@ public class UserService {
         User user = userRepository.findByEmail(email)
             .orElseThrow(UserException.NotFoundUser::new);
 
+        checkNicknameDuplicate(request.getNickname());
         user.updateProfile(request.toUser());
-
-        return UserInfoUpdateResponse.builder()
-            .id(user.getId())
-            .profileImage(user.getProfileImage())
-            .nickname(user.getNickname())
-            .userDesc(user.getIntroduce())
-            .build();
+        // TODO: 평점 조회 로직 구현 필요
+        return new UserInfoUpdateResponse(user, 3.5);
     }
 }

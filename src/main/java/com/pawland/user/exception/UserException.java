@@ -21,6 +21,18 @@ public class UserException extends PawLandException {
         }
     }
 
+    public static class AlreadyExistsEmail extends UserException {
+        public AlreadyExistsEmail() {
+            super(UserExceptionMessage.ALREADY_EXISTS_EMAIL.getMessage());
+        }
+    }
+
+    public static class AlreadyExistsNickname extends UserException {
+        public AlreadyExistsNickname() {
+            super(UserExceptionMessage.ALREADY_EXISTS_NICKNAME.getMessage());
+        }
+    }
+
     @Override
     public int getStatusCode() {
         return HttpStatus.BAD_REQUEST.value();
