@@ -54,9 +54,15 @@ public class UserService {
         User user = userRepository.findByEmail(email)
             .orElseThrow(UserException.NotFoundUser::new);
 
-        checkNicknameDuplicate(request.getNickname());
+        if (isNicknameChanged(request.getNickname(), user)) {
+            checkNicknameDuplicate(request.getNickname());
+        }
         user.updateProfile(request.toUser());
         // TODO: 평점 조회 로직 구현 필요
         return new UserInfoUpdateResponse(user, 3.5);
+    }
+
+    private static boolean isNicknameChanged(String requestNickname, User user) {
+        return !requestNickname.equals(user.getNickname());
     }
 }
