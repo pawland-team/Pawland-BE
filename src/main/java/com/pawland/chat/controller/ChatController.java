@@ -38,7 +38,7 @@ public class ChatController {
 
     @Operation(summary = "채팅방 생성", description = "채팅방을 생성합니다.")
     @ApiResponse(responseCode = "201", description = "채팅방 생성 성공")
-    @ApiResponse(responseCode = "400", description = "잘못된 상품 아이디 유저 아이디")
+    @ApiResponse(responseCode = "400", description = "잘못된 상품 아이디 혹은 유저 아이디")
     @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     @PostMapping("/rooms")
     public ResponseEntity<ApiMessageResponse> createChatRoom(@AuthenticationPrincipal UserPrincipal userPrincipal,
