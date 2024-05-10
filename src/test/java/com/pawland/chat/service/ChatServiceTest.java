@@ -1,10 +1,12 @@
 package com.pawland.chat.service;
 
+import com.pawland.chat.domain.ChatMessage;
 import com.pawland.chat.domain.ChatRoom;
 import com.pawland.chat.dto.request.ChatMessageRequest;
 import com.pawland.chat.dto.request.ChatRoomCreateRequest;
 import com.pawland.chat.dto.response.ChatMessageResponse;
 import com.pawland.chat.dto.response.ChatRoomInfoResponse;
+import com.pawland.chat.repository.ChatMessageRepository;
 import com.pawland.chat.repository.ChatRoomRepository;
 import com.pawland.product.domain.Product;
 import com.pawland.product.exception.ProductException;
@@ -44,11 +46,15 @@ class ChatServiceTest {
     @Autowired
     private ChatRoomRepository chatRoomRepository;
 
+    @Autowired
+    private ChatMessageRepository chatMessageRepository;
+
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
         productJpaRepository.deleteAllInBatch();
         chatRoomRepository.deleteAllInBatch();
+        chatMessageRepository.deleteAllInBatch();
     }
 
     @DisplayName("채팅방 생성 시")
@@ -268,12 +274,14 @@ class ChatServiceTest {
 
             // when
             ChatMessageResponse result = chatService.saveMessage(roomId, request);
+            List<ChatMessage> messageList = chatMessageRepository.findAll();
 
             // then
             assertThat(result).extracting("sender", "message")
                 .containsExactlyInAnyOrder("1", "내용");
             assertThat(result.getMessageTime()).isNotBlank();
             assertThat(result.getMessageId()).isNotBlank();
+            assertThat(messageList.size()).isEqualTo(1L);
         }
 
         @DisplayName("발신자 ID와 내용이 빈 값이 아니면 성공한다.")
@@ -291,6 +299,8 @@ class ChatServiceTest {
                 .build();
             String roomId = "123";
 
+            List<ChatMessage> messageList = chatMessageRepository.findAll();
+
             // expected
             assertThatThrownBy(() -> chatService.saveMessage(roomId, requestWithoutSenderId))
                 .isInstanceOf(RuntimeException.class);
@@ -298,6 +308,7 @@ class ChatServiceTest {
                 .isInstanceOf(RuntimeException.class);
             assertThatThrownBy(() -> chatService.saveMessage(roomId, requestWithEmptyMessage))
                 .isInstanceOf(RuntimeException.class);
+            assertThat(messageList.size()).isEqualTo(0L);
         }
     }
 
