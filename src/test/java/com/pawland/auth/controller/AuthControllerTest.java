@@ -579,8 +579,9 @@ class AuthControllerTest {
                     .param("code", code)
                 )
                 .andDo(print())
-                .andExpect(status().is3xxRedirection())
+                .andExpect(status().isFound())
                 .andExpect(redirectedUrl(appConfig.getFrontTestUrl()))
+                .andExpect(jsonPath("$.message").value("소셜 로그인에 성공했습니다."))
                 .andExpect(cookie().exists("jwt"));
         }
 

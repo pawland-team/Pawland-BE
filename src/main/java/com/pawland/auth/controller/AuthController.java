@@ -110,9 +110,12 @@ public class AuthController {
         })
     @ApiResponse(responseCode = "400", description = "잘못된 아이디 혹은 비밀번호")
     @GetMapping("/oauth2/{provider}")
-    public void oauth2Login(@PathVariable String provider, @RequestParam String code, HttpServletResponse response) throws IOException {
+    public ResponseEntity<ApiMessageResponse> oauth2Login(@PathVariable String provider, @RequestParam String code) {
         String jwtCookie = authFacade.oauth2Login(code, provider);
-        response.setHeader(HttpHeaders.SET_COOKIE, jwtCookie);
-        response.sendRedirect(appConfig.getFrontTestUrl());
+        return ResponseEntity
+            .status(HttpStatus.FOUND)
+            .header(HttpHeaders.SET_COOKIE, jwtCookie)
+            .header(HttpHeaders.LOCATION, appConfig.getFrontTestUrl())
+            .body(new ApiMessageResponse("소셜 로그인에 성공했습니다."));
     }
 }
