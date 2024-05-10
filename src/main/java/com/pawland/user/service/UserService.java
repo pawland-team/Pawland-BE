@@ -1,14 +1,14 @@
 package com.pawland.user.service;
 
+import com.pawland.user.domain.User;
 import com.pawland.user.dto.request.UserInfoUpdateRequest;
 import com.pawland.user.dto.response.UserInfoResponse;
 import com.pawland.user.dto.response.UserInfoUpdateResponse;
 import com.pawland.user.exception.UserException;
+import com.pawland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import com.pawland.user.domain.User;
-import com.pawland.user.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -44,19 +44,18 @@ public class UserService {
 
     public UserInfoResponse getUserInfo(String email) {
         User user = userRepository.findByEmail(email)
-            .orElseThrow(UserException.NotFoundUser::new);
-        // TODO: 평점 조회 로직 구현 필요
-        return new UserInfoResponse(user, 3.5);
+                .orElseThrow(UserException.NotFoundUser::new);
+        return new UserInfoResponse(user);
     }
 
     @Transactional
     public UserInfoUpdateResponse updateUser(String email, UserInfoUpdateRequest request) {
         User user = userRepository.findByEmail(email)
-            .orElseThrow(UserException.NotFoundUser::new);
+                .orElseThrow(UserException.NotFoundUser::new);
 
         checkNicknameDuplicate(request.getNickname());
         user.updateProfile(request.toUser());
-        // TODO: 평점 조회 로직 구현 필요
-        return new UserInfoUpdateResponse(user, 3.5);
+        return new UserInfoUpdateResponse(user);
     }
+
 }

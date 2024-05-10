@@ -22,6 +22,7 @@ public class PostRecommendRepository {
                 .fetchJoin()
                 .where(postRecommend.post.id.eq(postId))
                 .where(postRecommend.user.id.eq(userId))
+                .orderBy(postRecommend.createdDate.desc())
                 .fetchOne();
     }
 }

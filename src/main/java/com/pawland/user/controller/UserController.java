@@ -36,8 +36,8 @@ public class UserController {
     public ResponseEntity<UserInfoResponse> getUserInfo(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         UserInfoResponse userInfo = userService.getUserInfo(userPrincipal.getUsername());
         return ResponseEntity
-            .status(OK)
-            .body(userInfo);
+                .status(OK)
+                .body(userInfo);
     }
 
     @Operation(summary = "내 정보 수정", description = "내 정보를 수정합니다.")
@@ -46,10 +46,11 @@ public class UserController {
     @ApiResponse(responseCode = "500", description = "삭제된 회원 또는 잘못된 JWT")
     @PutMapping(value = "/my-info", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserInfoUpdateResponse> updateUserInfo(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                         @Valid @RequestBody UserInfoUpdateRequest request) {
+                                                                 @Valid @RequestBody UserInfoUpdateRequest request) {
         UserInfoUpdateResponse updatedInfo = userService.updateUser(userPrincipal.getUsername(), request);
         return ResponseEntity
-            .status(OK)
-            .body(updatedInfo);
+                .status(OK)
+                .body(updatedInfo);
     }
+
 }

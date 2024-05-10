@@ -28,30 +28,14 @@ public class PostRepository {
 
     public Page<Post> getPostsBySearch(PostSearchRequest postSearchRequest, Pageable pageable) {
 
-        List<Post> posts = jpaQueryFactory.selectFrom(post)
-                .leftJoin(post.author, QUser.user)
-                .fetchJoin()
-                .where(
-                        searchContentOrTitle(postSearchRequest.getContent()),
-                        eqRegion(postSearchRequest.getRegion()))
-                .orderBy(createOrderSpecifier(postSearchRequest))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+        List<Post> posts = jpaQueryFactory.selectFrom(post).leftJoin(post.author, QUser.user).fetchJoin().where(searchContentOrTitle(postSearchRequest.getContent()), eqRegion(postSearchRequest.getRegion())).orderBy(createOrderSpecifier(postSearchRequest)).offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
 
 
         return new PageImpl<>(posts, pageable, posts.size());
     }
 
     public Page<Post> getMyPosts(Long userId, Pageable pageable, PostSearchRequest postSearchRequest) {
-        List<Post> myPosts = jpaQueryFactory.selectFrom(post)
-                .leftJoin(post.author, QUser.user)
-                .fetchJoin()
-                .where(post.author.id.eq(userId))
-                .orderBy(createOrderSpecifier(postSearchRequest))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+        List<Post> myPosts = jpaQueryFactory.selectFrom(post).leftJoin(post.author, QUser.user).fetchJoin().where(post.author.id.eq(userId)).orderBy(createOrderSpecifier(postSearchRequest)).offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
 
         return new PageImpl<>(myPosts, pageable, myPosts.size());
     }
@@ -71,14 +55,22 @@ public class PostRepository {
     private OrderSpecifier[] createOrderSpecifier(PostSearchRequest postSearchRequest) {
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
 
-        if (Objects.isNull(postSearchRequest.getOrderBy())) {
-            orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.createdDate));
-        } else if (postSearchRequest.getOrderBy().equals("view")) {
-            orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.views));
-        } else if (postSearchRequest.getOrderBy().equals("recommend")) {
-            orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.recommends.size()));
-        } else if (postSearchRequest.getOrderBy().equals("comment")) {
-            orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.comments.size()));
+        orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.createdDate));
+
+        if (Objects.nonNull(postSearchRequest.getOrderBy())) {
+            switch (postSearchRequest.getOrderBy()) {
+                case "view":
+                    orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.views));
+                    break;
+                case "recommend":
+                    orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.recommends.size()));
+                    break;
+                case "comment":
+                    orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.comments.size()));
+                    break;
+                default:
+                    break;
+            }
         }
 
         return orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]);

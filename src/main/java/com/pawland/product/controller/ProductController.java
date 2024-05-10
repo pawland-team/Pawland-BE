@@ -18,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/product")
@@ -88,5 +90,11 @@ public class ProductController {
     @PostMapping("/wish/cancel/{productId}")
     public void wishCancelProduct(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long productId) {
         productService.cancelWishProduct(userPrincipal.getUserId(), productId);
+    }
+
+    @Operation(summary = "나의 판매중인 상품 조회")
+    @GetMapping("/my-product")
+    public ResponseEntity<List<ProductResponse>> getMyProduct(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(productService.getMyProduct(userPrincipal.getUserId()));
     }
 }

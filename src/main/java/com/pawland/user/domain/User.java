@@ -45,6 +45,10 @@ public class User extends BaseTimeEntity {
     @NotNull
     private String introduce = "";
 
+    private Double star;
+
+    private int reviewCount;
+
     @Enumerated(EnumType.STRING)
     private LoginType type = NORMAL;
 
@@ -66,7 +70,7 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private Set<WishProduct> wishProductSet = new HashSet<>();
 
-    @OneToMany(mappedBy = "user",orphanRemoval = true)
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
     private Set<OrderReview> orderReviewSet = new HashSet<>();
 
     @Builder
@@ -77,6 +81,7 @@ public class User extends BaseTimeEntity {
         this.type = type == null ? this.type : type;
         this.profileImage = isBlank(profileImage) ? this.profileImage : profileImage;
         this.introduce = isBlank(introduce) ? this.introduce : introduce;
+        this.star = (double) 0;
     }
 
     public void updateProfile(User user) {
@@ -115,5 +120,13 @@ public class User extends BaseTimeEntity {
     public void addOrderReview(OrderReview orderReview) {
         orderReview.setUser(this);
         this.orderReviewSet.add(orderReview);
+    }
+
+    public void setStar(Double star) {
+        this.star = star;
+    }
+
+    public void setReviewCount(int reviewCount) {
+        this.reviewCount = reviewCount;
     }
 }

@@ -5,6 +5,7 @@ import com.pawland.order.exception.OrderException;
 import com.pawland.order.respository.OrderJpaRepository;
 import com.pawland.review.domain.OrderReview;
 import com.pawland.review.dto.request.CreateReviewRequest;
+import com.pawland.review.dto.response.MyReviewResponse;
 import com.pawland.review.dto.response.OrderReviewResponse;
 import com.pawland.review.respository.OrderReviewJpaRepository;
 import com.pawland.user.domain.User;
@@ -13,6 +14,8 @@ import com.pawland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +40,12 @@ public class ReviewService {
         userById.addOrderReview(orderReview);
         orderById.addOrderReview(orderReview);
 
+        List<OrderReview> byOrderSellerEmail = orderReviewJpaRepository.findByOrderSellerEmailOrderByCreatedDateDesc(userById.getEmail());
+        double totalStar = byOrderSellerEmail.stream().mapToDouble(OrderReview::getStar).sum();
+
+        userById.setStar(totalStar / byOrderSellerEmail.size());
+        userById.setReviewCount(byOrderSellerEmail.size());
+
         return OrderReviewResponse.of(orderReview);
     }
 
@@ -46,5 +55,12 @@ public class ReviewService {
 
     private Order getOrderById(Long orderId) {
         return orderJpaRepository.findById(orderId).orElseThrow(OrderException.NotFoundOrder::new);
+    }
+
+    public List<MyReviewResponse> getMyReview(Long userId) {
+        List<OrderReview> byOrderSellerId = orderReviewJpaRepository.findByOrderSellerIdOrderByCreatedDateDesc(userId);
+
+        return byOrderSellerId.stream().map(orderReview ->
+                MyReviewResponse.of(orderReview.getOrder().getProduct().getThumbnailImageUrl(), orderReview.getOrder().getSeller().getNickname(), orderReview.getStar(), orderReview.getContent(), orderReview.getCreatedDate())).toList();
     }
 }

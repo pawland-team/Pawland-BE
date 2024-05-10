@@ -21,6 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -118,6 +120,10 @@ public class ProductService {
         wishProductJpaRepository.delete(wishProductByUserIdAndProductId);
 
         return true;
+    }
+
+    public List<ProductResponse> getMyProduct(Long userId) {
+        return productRepository.getMyProduct(userId).stream().map(product -> ProductResponse.of(product, getUserById(userId))).toList();
     }
 
     private Product getProductById(Long productId) {
