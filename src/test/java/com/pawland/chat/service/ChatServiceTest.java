@@ -1,7 +1,9 @@
 package com.pawland.chat.service;
 
 import com.pawland.chat.domain.ChatRoom;
+import com.pawland.chat.dto.request.ChatMessageRequest;
 import com.pawland.chat.dto.request.ChatRoomCreateRequest;
+import com.pawland.chat.dto.response.ChatMessageResponse;
 import com.pawland.chat.dto.response.ChatRoomInfoResponse;
 import com.pawland.chat.repository.ChatRoomRepository;
 import com.pawland.product.domain.Product;
@@ -17,7 +19,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.pawland.product.domain.Status.SELLING;
@@ -246,6 +250,54 @@ class ChatServiceTest {
 
             // then
             assertThat(result).hasSize(0);
+        }
+    }
+
+    @DisplayName("채팅 내역 저장 시")
+    @Nested
+    class saveMessage {
+        @DisplayName("발신자 ID와 내용이 빈 값이 아니면 성공한다.")
+        @Test
+        void saveMessage1() {
+            // given
+            ChatMessageRequest request = ChatMessageRequest.builder()
+                .sender("1")
+                .message("내용")
+                .build();
+            String roomId = "123";
+
+            // when
+            ChatMessageResponse result = chatService.saveMessage(roomId, request);
+
+            // then
+            assertThat(result).extracting("sender", "message")
+                .containsExactlyInAnyOrder("1", "내용");
+            assertThat(result.getMessageTime()).isNotBlank();
+            assertThat(result.getMessageId()).isNotBlank();
+        }
+
+        @DisplayName("발신자 ID와 내용이 빈 값이 아니면 성공한다.")
+        @Test
+        void saveMessage2() {
+            // given
+            ChatMessageRequest requestWithoutSenderId = ChatMessageRequest.builder()
+                .message("내용")
+                .build();
+            ChatMessageRequest requestWithoutMessage = ChatMessageRequest.builder()
+                .sender("1")
+                .build();
+            ChatMessageRequest requestWithEmptyMessage = ChatMessageRequest.builder()
+                .sender("1")
+                .build();
+            String roomId = "123";
+
+            // expected
+            assertThatThrownBy(() -> chatService.saveMessage(roomId, requestWithoutSenderId))
+                .isInstanceOf(RuntimeException.class);
+            assertThatThrownBy(() -> chatService.saveMessage(roomId, requestWithoutMessage))
+                .isInstanceOf(RuntimeException.class);
+            assertThatThrownBy(() -> chatService.saveMessage(roomId, requestWithEmptyMessage))
+                .isInstanceOf(RuntimeException.class);
         }
     }
 

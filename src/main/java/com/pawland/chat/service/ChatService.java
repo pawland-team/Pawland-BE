@@ -1,7 +1,11 @@
 package com.pawland.chat.service;
 
+import com.pawland.chat.domain.ChatMessage;
+import com.pawland.chat.dto.request.ChatMessageRequest;
 import com.pawland.chat.dto.request.ChatRoomCreateRequest;
+import com.pawland.chat.dto.response.ChatMessageResponse;
 import com.pawland.chat.dto.response.ChatRoomInfoResponse;
+import com.pawland.chat.repository.ChatMessageRepository;
 import com.pawland.chat.repository.ChatRoomRepository;
 import com.pawland.product.exception.ProductException;
 import com.pawland.product.respository.ProductJpaRepository;
@@ -19,6 +23,7 @@ import java.util.List;
 public class ChatService {
 
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
     private final ProductJpaRepository productJpaRepository;
 
@@ -30,6 +35,13 @@ public class ChatService {
 
     public List<ChatRoomInfoResponse> getChatRoomList(Long userId) {
         return chatRoomRepository.getMyChatRoomList(userId);
+    }
+
+    @Transactional
+    public ChatMessageResponse saveMessage(String roomId, ChatMessageRequest request) {
+        ChatMessage chatMessage = request.toChatMessageWith(Long.parseLong(roomId));
+        chatMessageRepository.save(chatMessage);
+        return ChatMessageResponse.from(chatMessage);
     }
 
     private void validateChatRoomCreateRequest(ChatRoomCreateRequest request) {
