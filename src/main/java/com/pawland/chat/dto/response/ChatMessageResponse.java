@@ -1,10 +1,12 @@
 package com.pawland.chat.dto.response;
 
 import com.pawland.chat.domain.ChatMessage;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Schema(name = "채팅 메시지 전송 시 응답 값")
 public class ChatMessageResponse {
 
     private String messageId;
