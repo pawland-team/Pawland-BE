@@ -15,7 +15,7 @@ public class UserInfoResponse {
     private String nickname;
     private String email;
     private String userDesc;
-    private LoginType loginType;
+    private String loginType;
     private double stars = 0.0; // 구현중
 
     @Builder
@@ -25,7 +25,7 @@ public class UserInfoResponse {
         this.nickname = user.getNickname();
         this.email = user.getEmail();
         this.userDesc = user.getIntroduce();
-        this.loginType = user.getType();
+        this.loginType = user.getType().value();
         this.stars = stars;
     }
 }

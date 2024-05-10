@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pawland.auth.dto.request.*;
 import com.pawland.auth.dto.response.OAuthAttributes;
 import com.pawland.auth.service.AuthService;
+import com.pawland.global.config.AppConfig;
 import com.pawland.global.config.security.domain.LoginRequest;
 import com.pawland.global.domain.DefaultImage;
 import com.pawland.mail.repository.MailRepository;
@@ -39,6 +40,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class AuthControllerTest {
+
+    @Autowired
+    private AppConfig appConfig;
 
     @Autowired
     private MockMvc mockMvc;
@@ -575,7 +579,8 @@ class AuthControllerTest {
                     .param("code", code)
                 )
                 .andDo(print())
-                .andExpect(status().isCreated())
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl(appConfig.getFrontTestUrl()))
                 .andExpect(jsonPath("$.message").value("소셜 로그인에 성공했습니다."))
                 .andExpect(cookie().exists("jwt"));
         }
