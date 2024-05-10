@@ -1,6 +1,8 @@
 package com.pawland.chat.controller;
 
+import com.pawland.chat.dto.request.ChatMessageRequest;
 import com.pawland.chat.dto.request.ChatRoomCreateRequest;
+import com.pawland.chat.dto.response.ChatMessageResponse;
 import com.pawland.chat.dto.response.ChatRoomInfoResponse;
 import com.pawland.chat.service.ChatService;
 import com.pawland.global.config.security.domain.UserPrincipal;
@@ -9,7 +11,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +22,7 @@ import java.util.List;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
@@ -47,5 +52,11 @@ public class ChatController {
         return ResponseEntity
             .status(CREATED)
             .body(new ApiMessageResponse("채팅방 생성 완료"));
+    }
+
+    @MessageMapping("/chat.sendMessage/{roomId}") // 프론트가 publish 할 때 사용할 백엔드 엔드포인트
+    @SendTo("/topic/chatroom/{roomId}")   // 백엔드에서 프론트에 메시지를 보낼 구독 url
+    public ChatMessageResponse sendMessage(@Valid @Payload ChatMessageRequest request, @DestinationVariable String roomId) {
+        return chatService.saveMessage(roomId, request);
     }
 }

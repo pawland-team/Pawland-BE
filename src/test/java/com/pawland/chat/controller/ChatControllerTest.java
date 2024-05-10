@@ -3,7 +3,6 @@ package com.pawland.chat.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pawland.chat.domain.ChatRoom;
 import com.pawland.chat.dto.request.ChatRoomCreateRequest;
-import com.pawland.chat.dto.response.ChatRoomInfoResponse;
 import com.pawland.chat.repository.ChatRoomRepository;
 import com.pawland.global.config.TestSecurityConfig;
 import com.pawland.global.utils.PawLandMockUser;
