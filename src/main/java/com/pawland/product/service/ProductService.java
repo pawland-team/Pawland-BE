@@ -51,13 +51,14 @@ public class ProductService {
 
         productJpaRepository.save(product);
 
-        return ProductResponse.of(product);
+        return ProductResponse.of(product, user);
     }
 
-    public ProductResponse getOneProductById(Long productId) {
+    @Transactional
+    public ProductResponse getOneProductById(Long userId, Long productId) {
         Product product = getProductById(productId);
-
-        return ProductResponse.of(product);
+        product.upView();
+        return ProductResponse.of(product, getUserById(userId));
     }
 
     @Transactional
@@ -66,7 +67,7 @@ public class ProductService {
 
         if (canUpdateOrDelete(userId, product)) {
             product.update(updateProductRequest);
-            return ProductResponse.of(product);
+            return ProductResponse.of(product, getUserById(userId));
         } else {
             throw new ProductException.AccessDeniedException();
         }
@@ -85,11 +86,11 @@ public class ProductService {
     }
 
     @Transactional
-    public Page<ProductResponse> getProducts(SearchProductRequest searchProductRequest) {
+    public Page<ProductResponse> getProducts(Long userId, SearchProductRequest searchProductRequest) {
         Pageable pageable = PageRequest.of(searchProductRequest.getPage() - 1, searchProductRequest.getSize());
-        Page<Product> allProducts = productRepository.getAllProducts(searchProductRequest,pageable);
+        Page<Product> allProducts = productRepository.getAllProducts(searchProductRequest, pageable);
 
-        return allProducts.map(ProductResponse::of);
+        return allProducts.map(product -> ProductResponse.of(product, getUserById(userId)));
     }
 
     @Transactional

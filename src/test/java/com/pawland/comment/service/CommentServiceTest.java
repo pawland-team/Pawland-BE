@@ -57,7 +57,7 @@ class CommentServiceTest {
         PostResponse post = createPost(user);
 
         //when
-        CommentResponse comment = commentService.createComment(user.getId(),new CreateCommentRequest(post.getId(),"댓글입니다."));
+        CommentResponse comment = commentService.createComment(user.getId(),post.getId(),new CreateCommentRequest("댓글입니다."));
         Post findPost = postJpaRepository.findById(post.getId()).orElseThrow(PostException.NotFoundException::new);
 
         //then
@@ -74,7 +74,7 @@ class CommentServiceTest {
         //given
         User user = createUser();
         PostResponse post = createPost(user);
-        CommentResponse comment = commentService.createComment(user.getId(), new CreateCommentRequest(post.getId(), "댓글입니다"));
+        CommentResponse comment = commentService.createComment(user.getId(),post.getId(), new CreateCommentRequest("댓글입니다"));
 
 
         //when
@@ -93,7 +93,7 @@ class CommentServiceTest {
         //given
         User user = createUser();
         PostResponse post = createPost(user);
-        CommentResponse comment = commentService.createComment(user.getId(), new CreateCommentRequest(post.getId(), "댓글입니다"));
+        CommentResponse comment = commentService.createComment(user.getId(),post.getId(), new CreateCommentRequest("댓글입니다"));
 
         //when
         commentService.deleteComment(user.getId(), comment.getId());

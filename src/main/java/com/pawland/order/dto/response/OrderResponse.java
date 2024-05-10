@@ -24,11 +24,11 @@ public class OrderResponse {
         this.id = order.getId();
         this.seller = UserResponse.of(order.getSeller());
         this.buyer = UserResponse.of(order.getBuyer());
-        this.product = ProductResponse.of(order.getProduct());
+        this.product = ProductResponse.of(order.getProduct(), null);
         this.sellerCheck = order.isSellerCheck();
         this.buyerCheck = order.isBuyerCheck();
         this.orderStatus = order.getStatus();
-        this.orderReviewResponse = order.getOrderReview() != null ?OrderReviewResponse.of(order.getOrderReview()) : null;
+        this.orderReviewResponse = order.getOrderReview() != null ? OrderReviewResponse.of(order.getOrderReview()) : null;
     }
 
     public static OrderResponse of(Order order) {

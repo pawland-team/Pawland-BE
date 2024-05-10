@@ -15,6 +15,7 @@ public class SearchProductRequest {
     private String category;
     private String isFree;
     private String orderBy;
+    private String content;
     private int page;
     private int size;
 

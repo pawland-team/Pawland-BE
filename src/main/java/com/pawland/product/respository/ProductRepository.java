@@ -38,7 +38,8 @@ public class ProductRepository {
                         eqRegion(searchProductRequest.getRegion()),
                         eqSpecies(searchProductRequest.getSpecies()),
                         eqCategory(searchProductRequest.getCategory()),
-                        eqPrice(searchProductRequest.getIsFree())
+                        eqPrice(searchProductRequest.getIsFree()),
+                        searchContentOrName(searchProductRequest.getContent())
                 )
                 .orderBy(createOrderSpecifier(searchProductRequest))
                 .offset(pageable.getOffset())
@@ -69,6 +70,11 @@ public class ProductRepository {
         }
         return null;
     }
+
+    private BooleanExpression searchContentOrName(String content) {
+        return StringUtils.hasText(content) ? product.content.like("%" + content + "%").or(product.name.like("%" + content + "%")) : null;
+    }
+
     private OrderSpecifier[] createOrderSpecifier(SearchProductRequest searchProductRequest) {
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
 

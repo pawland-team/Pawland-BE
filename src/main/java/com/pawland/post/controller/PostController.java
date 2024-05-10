@@ -18,6 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Optional;
+
 import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
@@ -44,11 +47,13 @@ public class PostController {
     @Operation(summary = "게시글 조회", description = "게시글을 조회 합니다")
     @ApiResponse(responseCode = "201", description = "게시글 조회 성공")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<PostResponse>> getPosts(@RequestParam(required = true, defaultValue = "1") int page,
+    public ResponseEntity<Page<PostResponse>> getPosts(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                       @RequestParam(required = true, defaultValue = "1") int page,
                                                        @RequestParam(required = false) String content,
-                                                       @RequestParam(required = false) String region,
+                                                       @RequestParam(required = false) List<String> region,
                                                        @RequestParam(required = false) String orderBy) {
-        return ResponseEntity.ok(postService.getPosts(PostSearchRequest.builder().page(page).content(content).region(region).orderBy(orderBy).build()));
+        Long userId = Optional.ofNullable(userPrincipal).map(UserPrincipal::getUserId).orElse(null);
+        return ResponseEntity.ok(postService.getPosts(userId,PostSearchRequest.builder().page(page).content(content).region(region).orderBy(orderBy).build()));
     }
 
     @Operation(summary = "내가 쓴글 조회", description = "글쓴이가 자신인 글을 조회 합니다.")
@@ -57,13 +62,22 @@ public class PostController {
         return ResponseEntity.ok(postService.getMyPosts(userPrincipal.getUserId(), PostSearchRequest.builder().page(page).orderBy(orderBy).build()));
     }
 
+    @Operation(summary = "게시글 추천")
     @PostMapping("/recommend/{postId}")
     public ResponseEntity<Boolean> recommendPost(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
         return ResponseEntity.ok(postService.recommend(userPrincipal.getUserId(), postId));
     }
 
+    @Operation(summary = "게시글 추천 취소")
     @PostMapping("/recommend/cancel/{postId}")
     public ResponseEntity<Boolean> recommendCancel(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
-        return ResponseEntity.ok(postService.recommend(userPrincipal.getUserId(), postId));
+        return ResponseEntity.ok(postService.cancelRecommend(userPrincipal.getUserId(), postId));
+    }
+
+    @Operation(summary = "게시글 단건 조회")
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponse> getPostById(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
+        Long userId = Optional.ofNullable(userPrincipal).map(UserPrincipal::getUserId).orElse(null);
+        return ResponseEntity.ok(postService.getOnePostById(userId, postId));
     }
 }
