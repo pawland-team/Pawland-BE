@@ -16,6 +16,6 @@ public class WebSocketExceptionHandler {
             .stream()
             .map(fieldError -> fieldError.getDefaultMessage())
             .toArray(String[]::new);
-        log.info("[예외처리] = {}", errorMessages[0]);
+        log.error("[예외 처리] = {}", errorMessages[0]);
     }
 }

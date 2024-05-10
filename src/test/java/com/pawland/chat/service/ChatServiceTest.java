@@ -14,16 +14,13 @@ import com.pawland.product.respository.ProductJpaRepository;
 import com.pawland.user.domain.User;
 import com.pawland.user.exception.UserException;
 import com.pawland.user.repository.UserRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.pawland.product.domain.Status.SELLING;
