@@ -2,6 +2,7 @@ package com.pawland.auth.controller;
 
 import com.pawland.auth.dto.request.*;
 import com.pawland.auth.facade.AuthFacade;
+import com.pawland.global.config.AppConfig;
 import com.pawland.global.config.security.domain.LoginRequest;
 import com.pawland.global.dto.ApiMessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,12 +10,14 @@ import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -28,6 +31,7 @@ import static org.springframework.http.HttpStatus.OK;
 public class AuthController {
 
     private final AuthFacade authFacade;
+    private final AppConfig appConfig;
 
     @Operation(summary = "닉네임 중복 확인", description = "요청한 닉네임이 이미 가입된 닉네임인지 확인합니다.")
     @ApiResponse(responseCode = "200", description = "사용할 수 있는 닉네임")
@@ -106,11 +110,9 @@ public class AuthController {
         })
     @ApiResponse(responseCode = "400", description = "잘못된 아이디 혹은 비밀번호")
     @GetMapping("/oauth2/{provider}")
-    public ResponseEntity<ApiMessageResponse> oauth2Login(@PathVariable String provider, @RequestParam String code) {
+    public void oauth2Login(@PathVariable String provider, @RequestParam String code, HttpServletResponse response) throws IOException {
         String jwtCookie = authFacade.oauth2Login(code, provider);
-        return ResponseEntity
-            .status(CREATED)
-            .header(HttpHeaders.SET_COOKIE, jwtCookie)
-            .body(new ApiMessageResponse("소셜 로그인에 성공했습니다."));
+        response.setHeader(HttpHeaders.SET_COOKIE, jwtCookie);
+        response.sendRedirect(appConfig.getFrontTestUrl());
     }
 }
