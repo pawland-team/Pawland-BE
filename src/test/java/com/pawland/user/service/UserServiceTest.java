@@ -44,7 +44,7 @@ class UserServiceTest {
 
             // expected
             assertThatCode(() -> userService.checkNicknameDuplicate(nickname))
-                .doesNotThrowAnyException();
+                    .doesNotThrowAnyException();
         }
 
         @DisplayName("중복된 닉네임이 있으면 실패한다.")
@@ -58,8 +58,8 @@ class UserServiceTest {
 
             // expected
             assertThatThrownBy(() -> userService.checkNicknameDuplicate(duplicateNickname))
-                .isInstanceOf(UserException.AlreadyExistsNickname.class)
-                .hasMessageContaining(ALREADY_EXISTS_NICKNAME.getMessage());
+                    .isInstanceOf(UserException.AlreadyExistsNickname.class)
+                    .hasMessageContaining(ALREADY_EXISTS_NICKNAME.getMessage());
         }
     }
 
@@ -74,7 +74,7 @@ class UserServiceTest {
 
             // expected
             assertThatCode(() -> userService.checkEmailDuplicate(email))
-                .doesNotThrowAnyException();
+                    .doesNotThrowAnyException();
         }
 
         @DisplayName("중복된 이메일이 있으면 실패한다.")
@@ -88,8 +88,8 @@ class UserServiceTest {
 
             // expected
             assertThatThrownBy(() -> userService.checkEmailDuplicate(duplicateEmail))
-                .isInstanceOf(UserException.AlreadyExistsEmail.class)
-                .hasMessageContaining(ALREADY_EXISTS_EMAIL.getMessage());
+                    .isInstanceOf(UserException.AlreadyExistsEmail.class)
+                    .hasMessageContaining(ALREADY_EXISTS_EMAIL.getMessage());
         }
     }
 
@@ -106,7 +106,7 @@ class UserServiceTest {
             // when
             userService.register(user);
             User result = userRepository.findByEmail(toFindEmail)
-                .orElseThrow(IllegalArgumentException::new);
+                    .orElseThrow(IllegalArgumentException::new);
 
             // then
             assertThat(result.getEmail()).isEqualTo(user.getEmail());
@@ -124,8 +124,8 @@ class UserServiceTest {
 
             // expected
             assertThatThrownBy(() -> userService.register(duplicateEmailUser))
-                .isInstanceOf(UserException.AlreadyExistsEmail.class)
-                .hasMessageContaining(ALREADY_EXISTS_EMAIL.getMessage());
+                    .isInstanceOf(UserException.AlreadyExistsEmail.class)
+                    .hasMessageContaining(ALREADY_EXISTS_EMAIL.getMessage());
         }
 
         @DisplayName("정상적인 정보 입력 시 중복 닉네임이 존재하면 실패한다.")
@@ -139,8 +139,8 @@ class UserServiceTest {
 
             // expected
             assertThatThrownBy(() -> userService.register(duplicateNicknameUser))
-                .isInstanceOf(UserException.AlreadyExistsNickname.class)
-                .hasMessageContaining(ALREADY_EXISTS_NICKNAME.getMessage());
+                    .isInstanceOf(UserException.AlreadyExistsNickname.class)
+                    .hasMessageContaining(ALREADY_EXISTS_NICKNAME.getMessage());
         }
     }
 
@@ -155,7 +155,7 @@ class UserServiceTest {
             userRepository.save(user);
 
             String toFindEmail = "midcon@naver.com";
-            double tempStars = 3.5;  // TODO 평점 조회 로직 구현시 수정 필요
+            double tempStars = 0;
 
             // when
             UserInfoResponse result = userService.getUserInfo(toFindEmail);
@@ -179,8 +179,8 @@ class UserServiceTest {
 
             // expected
             assertThatThrownBy(() -> userService.getUserInfo(toFindEmail))
-                .isInstanceOf(UserException.NotFoundUser.class)
-                .hasMessageContaining(USER_NOT_FOUND.getMessage());
+                    .isInstanceOf(UserException.NotFoundUser.class)
+                    .hasMessageContaining(USER_NOT_FOUND.getMessage());
         }
     }
 
@@ -196,8 +196,8 @@ class UserServiceTest {
 
             String toUpdateUser = "midcon@naver.com";
             UserInfoUpdateRequest request = UserInfoUpdateRequest.builder()
-                .nickname("나는변경된짱")
-                .build();
+                    .nickname("나는변경된짱")
+                    .build();
 
             // when
             UserInfoUpdateResponse result = userService.updateUser(toUpdateUser, request);
@@ -218,13 +218,13 @@ class UserServiceTest {
 
             String toUpdateUser = "midcon@naver.com";
             UserInfoUpdateRequest request = UserInfoUpdateRequest.builder()
-                .nickname("")
-                .build();
+                    .nickname("")
+                    .build();
 
             // expected
             assertThatThrownBy(() -> userService.updateUser(toUpdateUser, request))
-                .isInstanceOf(TransactionSystemException.class)
-                .hasMessageContaining("Could not commit JPA transaction");
+                    .isInstanceOf(TransactionSystemException.class)
+                    .hasMessageContaining("Could not commit JPA transaction");
         }
 
         @DisplayName("이미 존재하는 닉네임으로 변경 시도 시 실패한다.")
@@ -237,21 +237,21 @@ class UserServiceTest {
 
             String toUpdateUser = "midcon1@naver.com";
             UserInfoUpdateRequest request = UserInfoUpdateRequest.builder()
-                .nickname("나는짱")
-                .build();
+                    .nickname("나는짱")
+                    .build();
 
             // expected
             assertThatThrownBy(() -> userService.updateUser(toUpdateUser, request))
-                .isInstanceOf(UserException.AlreadyExistsNickname.class)
-                .hasMessageContaining(ALREADY_EXISTS_NICKNAME.getMessage());
+                    .isInstanceOf(UserException.AlreadyExistsNickname.class)
+                    .hasMessageContaining(ALREADY_EXISTS_NICKNAME.getMessage());
         }
     }
 
     private static User createUser(String nickname, String email, String password) {
         return User.builder()
-            .nickname(nickname)
-            .email(email)
-            .password(password)
-            .build();
+                .nickname(nickname)
+                .email(email)
+                .password(password)
+                .build();
     }
 }

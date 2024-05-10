@@ -45,7 +45,6 @@ public class OrderService {
         if (isSeller(userId, orderId)) {
 
             Order order = getOrderById(orderId);
-            order.setBuyerCheck(true);
             order.setSellerCheck(true);
             return true;
         } else if (isBuyer(userId, orderId)) {

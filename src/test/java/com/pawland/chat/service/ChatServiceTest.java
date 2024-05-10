@@ -1,8 +1,12 @@
 package com.pawland.chat.service;
 
+import com.pawland.chat.domain.ChatMessage;
 import com.pawland.chat.domain.ChatRoom;
+import com.pawland.chat.dto.request.ChatMessageRequest;
 import com.pawland.chat.dto.request.ChatRoomCreateRequest;
+import com.pawland.chat.dto.response.ChatMessageResponse;
 import com.pawland.chat.dto.response.ChatRoomInfoResponse;
+import com.pawland.chat.repository.ChatMessageRepository;
 import com.pawland.chat.repository.ChatRoomRepository;
 import com.pawland.product.domain.Product;
 import com.pawland.product.exception.ProductException;
@@ -10,7 +14,6 @@ import com.pawland.product.respository.ProductJpaRepository;
 import com.pawland.user.domain.User;
 import com.pawland.user.exception.UserException;
 import com.pawland.user.repository.UserRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -40,11 +43,15 @@ class ChatServiceTest {
     @Autowired
     private ChatRoomRepository chatRoomRepository;
 
+    @Autowired
+    private ChatMessageRepository chatMessageRepository;
+
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
         productJpaRepository.deleteAllInBatch();
         chatRoomRepository.deleteAllInBatch();
+        chatMessageRepository.deleteAllInBatch();
     }
 
     @DisplayName("채팅방 생성 시")
@@ -246,6 +253,59 @@ class ChatServiceTest {
 
             // then
             assertThat(result).hasSize(0);
+        }
+    }
+
+    @DisplayName("채팅 내역 저장 시")
+    @Nested
+    class saveMessage {
+        @DisplayName("발신자 ID와 내용이 빈 값이 아니면 성공한다.")
+        @Test
+        void saveMessage1() {
+            // given
+            ChatMessageRequest request = ChatMessageRequest.builder()
+                .sender("1")
+                .message("내용")
+                .build();
+            String roomId = "123";
+
+            // when
+            ChatMessageResponse result = chatService.saveMessage(roomId, request);
+            List<ChatMessage> messageList = chatMessageRepository.findAll();
+
+            // then
+            assertThat(result).extracting("sender", "message")
+                .containsExactlyInAnyOrder("1", "내용");
+            assertThat(result.getMessageTime()).isNotBlank();
+            assertThat(result.getMessageId()).isNotBlank();
+            assertThat(messageList.size()).isEqualTo(1L);
+        }
+
+        @DisplayName("발신자 ID와 내용이 빈 값이 아니면 성공한다.")
+        @Test
+        void saveMessage2() {
+            // given
+            ChatMessageRequest requestWithoutSenderId = ChatMessageRequest.builder()
+                .message("내용")
+                .build();
+            ChatMessageRequest requestWithoutMessage = ChatMessageRequest.builder()
+                .sender("1")
+                .build();
+            ChatMessageRequest requestWithEmptyMessage = ChatMessageRequest.builder()
+                .sender("1")
+                .build();
+            String roomId = "123";
+
+            List<ChatMessage> messageList = chatMessageRepository.findAll();
+
+            // expected
+            assertThatThrownBy(() -> chatService.saveMessage(roomId, requestWithoutSenderId))
+                .isInstanceOf(RuntimeException.class);
+            assertThatThrownBy(() -> chatService.saveMessage(roomId, requestWithoutMessage))
+                .isInstanceOf(RuntimeException.class);
+            assertThatThrownBy(() -> chatService.saveMessage(roomId, requestWithEmptyMessage))
+                .isInstanceOf(RuntimeException.class);
+            assertThat(messageList.size()).isEqualTo(0L);
         }
     }
 
