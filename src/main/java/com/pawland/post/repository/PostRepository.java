@@ -55,8 +55,6 @@ public class PostRepository {
     private OrderSpecifier[] createOrderSpecifier(PostSearchRequest postSearchRequest) {
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
 
-        orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.createdDate));
-
         if (Objects.nonNull(postSearchRequest.getOrderBy())) {
             switch (postSearchRequest.getOrderBy()) {
                 case "view":
@@ -72,6 +70,8 @@ public class PostRepository {
                     break;
             }
         }
+
+        orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.createdDate));
 
         return orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]);
     }
