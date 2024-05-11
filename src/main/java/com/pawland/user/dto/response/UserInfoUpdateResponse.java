@@ -16,16 +16,18 @@ public class UserInfoUpdateResponse {
     private String email;
     private String userDesc;
     private LoginType loginType;
-    private double stars = 0.0; // 구현중
+    private double stars;
+    private int reviewCount;
 
     @Builder
-    public UserInfoUpdateResponse(User user, double stars) {
+    public UserInfoUpdateResponse(User user) {
         this.id = user.getId();
         this.profileImage = user.getProfileImage();
         this.nickname = user.getNickname();
         this.email = user.getEmail();
         this.userDesc = user.getIntroduce();
         this.loginType = user.getType();
-        this.stars = stars;
+        this.stars = user.getStar();
+        this.reviewCount = user.getReviewCount();
     }
 }

@@ -80,7 +80,7 @@ public class CommentService {
     }
 
     @Transactional
-    public void createCommentComment(Long userId, Long commentId, CreateCommentRequest createCommentRequest) {
+    public CommentResponse createCommentComment(Long userId, Long commentId, CreateCommentRequest createCommentRequest) {
         User userById = getUserById(userId);
         Comment comment = new Comment(null, userById, createCommentRequest.getContent());
         Comment commentById = getCommentById(commentId);
@@ -88,6 +88,8 @@ public class CommentService {
         commentJpaRepository.save(comment);
 
         commentById.addReply(comment);
+
+        return CommentResponse.of(comment);
     }
 
     private User getUserById(Long userId) {

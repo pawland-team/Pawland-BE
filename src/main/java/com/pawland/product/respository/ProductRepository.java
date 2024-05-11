@@ -49,6 +49,15 @@ public class ProductRepository {
         return new PageImpl<>(products, pageable, products.size());
     }
 
+    public List<Product> getMyProduct(Long userId) {
+        return jpaQueryFactory.selectFrom(product)
+                .leftJoin(product.seller, QUser.user)
+                .fetchJoin()
+                .where(product.seller.id.eq(userId))
+                .orderBy(product.createdDate.desc())
+                .fetch();
+    }
+
     private BooleanExpression eqRegion(String region) {
         return !StringUtils.hasText(region) ? null : product.region.eq(Region.fromString(region));
     }
@@ -78,16 +87,27 @@ public class ProductRepository {
     private OrderSpecifier[] createOrderSpecifier(SearchProductRequest searchProductRequest) {
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
 
-        if (Objects.isNull(searchProductRequest.getOrderBy())) {
+        if (Objects.nonNull(searchProductRequest.getOrderBy())) {
+            switch (searchProductRequest.getOrderBy()) {
+                case "높은가격순":
+                    orderSpecifiers.add(new OrderSpecifier(Order.DESC, product.price));
+                    break;
+                case "낮은가격순":
+                    orderSpecifiers.add(new OrderSpecifier(Order.ASC, product.price));
+                    break;
+                case "조회순":
+                    orderSpecifiers.add(new OrderSpecifier(Order.DESC, product.view));
+                    break;
+                case "인기순":
+                    orderSpecifiers.add(new OrderSpecifier(Order.DESC, product.wishProducts.size()));
+                    break;
+                default:
+                    break;
+            }
+        }
+        
+        if (orderSpecifiers.isEmpty()) {
             orderSpecifiers.add(new OrderSpecifier(Order.DESC, product.createdDate));
-        } else if (searchProductRequest.getOrderBy().equals("높은가격순")){
-            orderSpecifiers.add(new OrderSpecifier(Order.DESC, product.price));
-        }else if (searchProductRequest.getOrderBy().equals("낮은가격순")){
-            orderSpecifiers.add(new OrderSpecifier(Order.ASC, product.price));
-        }else if (searchProductRequest.getOrderBy().equals("조회순")){
-            orderSpecifiers.add(new OrderSpecifier(Order.DESC, product.view));
-        }else if (searchProductRequest.getOrderBy().equals("인기순")){
-            orderSpecifiers.add(new OrderSpecifier(Order.DESC, product.wishProducts.size()));
         }
 
         return orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]);

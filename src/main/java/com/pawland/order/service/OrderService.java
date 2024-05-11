@@ -40,10 +40,10 @@ public class OrderService {
     }
 
 
-
     @Transactional
     public boolean doneOrder(Long userId, Long orderId) {
         if (isSeller(userId, orderId)) {
+
             Order order = getOrderById(orderId);
             order.setSellerCheck(true);
             return true;

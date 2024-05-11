@@ -37,8 +37,8 @@ public class ChatController {
     public ResponseEntity<List<ChatRoomInfoResponse>> getChatRoomList(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         List<ChatRoomInfoResponse> chatRoomList = chatService.getChatRoomList(userPrincipal.getUserId());
         return ResponseEntity
-            .status(OK)
-            .body(chatRoomList);
+                .status(OK)
+                .body(chatRoomList);
     }
 
     @Operation(summary = "채팅방 생성", description = "채팅방을 생성합니다.")
@@ -50,8 +50,8 @@ public class ChatController {
                                                              @Valid @RequestBody ChatRoomCreateRequest request) {
         chatService.createChatRoom(userPrincipal.getUserId(), request);
         return ResponseEntity
-            .status(CREATED)
-            .body(new ApiMessageResponse("채팅방 생성 완료"));
+                .status(CREATED)
+                .body(new ApiMessageResponse("채팅방 생성 완료"));
     }
 
     @MessageMapping("/chat.sendMessage/{roomId}") // 프론트가 publish 할 때 사용할 백엔드 엔드포인트

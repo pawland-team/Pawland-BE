@@ -76,20 +76,20 @@ class ChatControllerTest {
             productJpaRepository.save(product);
 
             ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
-                .sellerId(seller.getId())
-                .productId(product.getId())
-                .build();
+                    .sellerId(seller.getId())
+                    .productId(product.getId())
+                    .build();
 
             String json = objectMapper.writeValueAsString(request);
 
             // expected
             mockMvc.perform(post("/api/chat/rooms")
-                    .contentType(APPLICATION_JSON)
-                    .content(json)
-                )
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.message").value("채팅방 생성 완료"));
+                            .contentType(APPLICATION_JSON)
+                            .content(json)
+                    )
+                    .andDo(print())
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.message").value("채팅방 생성 완료"));
         }
 
         @DisplayName("요청한 상품 ID로 DB에서 상품 정보를 조회할 수 없으면 에러 메시지를 출력한다.")
@@ -103,20 +103,20 @@ class ChatControllerTest {
             Long invalidProductId = 0L;
 
             ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
-                .sellerId(seller.getId())
-                .productId(invalidProductId)
-                .build();
+                    .sellerId(seller.getId())
+                    .productId(invalidProductId)
+                    .build();
 
             String json = objectMapper.writeValueAsString(request);
 
             // expected
             mockMvc.perform(post("/api/chat/rooms")
-                    .contentType(APPLICATION_JSON)
-                    .content(json)
-                )
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(PRODUCT_NOT_FOUND.getMessage()));
+                            .contentType(APPLICATION_JSON)
+                            .content(json)
+                    )
+                    .andDo(print())
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(PRODUCT_NOT_FOUND.getMessage()));
         }
 
         @DisplayName("요청한 판매자 ID로 DB에서 판매자 정보를 조회할 수 없으면 에러 메시지를 출력한다.")
@@ -130,20 +130,20 @@ class ChatControllerTest {
             Long invalidSellerId = 0L;
 
             ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
-                .sellerId(invalidSellerId)
-                .productId(product.getId())
-                .build();
+                    .sellerId(invalidSellerId)
+                    .productId(product.getId())
+                    .build();
 
             String json = objectMapper.writeValueAsString(request);
 
             // expected
             mockMvc.perform(post("/api/chat/rooms")
-                    .contentType(APPLICATION_JSON)
-                    .content(json)
-                )
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(USER_NOT_FOUND.getMessage()));
+                            .contentType(APPLICATION_JSON)
+                            .content(json)
+                    )
+                    .andDo(print())
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(USER_NOT_FOUND.getMessage()));
         }
     }
 
@@ -162,7 +162,7 @@ class ChatControllerTest {
             userRepository.saveAll(List.of(seller1, seller2, buyer1, buyer2));
 
             User myAccount = userRepository.findByEmail("midcondria@naver.com")
-                .orElseThrow(UserException.NotFoundUser::new);
+                    .orElseThrow(UserException.NotFoundUser::new);
 
             Product product1 = createProduct("나는짱물건1", 1000, "장난감", "강아지", "새상품");
             Product product2 = createProduct("나는짱물건2", 2000, "장난감", "강아지", "새상품");
@@ -180,9 +180,9 @@ class ChatControllerTest {
 
             // expected
             mockMvc.perform(get("/api/chat/rooms"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(3));
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(3));
         }
 
         @DisplayName("내가 참여하고 있는 채팅방이 없을 시 빈 리스트를 반환한다.")
@@ -196,7 +196,7 @@ class ChatControllerTest {
             userRepository.saveAll(List.of(seller1, seller2, buyer1, buyer2));
 
             User myAccount = userRepository.findByEmail("midcondria@naver.com")
-                .orElseThrow(UserException.NotFoundUser::new);
+                    .orElseThrow(UserException.NotFoundUser::new);
 
             Product product1 = createProduct("나는짱물건1", 1000, "장난감", "강아지", "새상품");
             Product product2 = createProduct("나는짱물건2", 2000, "장난감", "강아지", "새상품");
@@ -208,36 +208,36 @@ class ChatControllerTest {
 
             // expected
             mockMvc.perform(get("/api/chat/rooms"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isEmpty());
         }
     }
 
     private static User createUser(String nickname, String email, String password) {
         return User.builder()
-            .nickname(nickname)
-            .email(email)
-            .password(password)
-            .build();
+                .nickname(nickname)
+                .email(email)
+                .password(password)
+                .build();
     }
 
     private Product createProduct(String name, int price, String category, String species, String condition) {
         return Product.builder()
-            .name(name)
-            .price(price)
-            .category(category)
-            .species(species)
-            .condition(condition)
-            .build();
+                .name(name)
+                .price(price)
+                .category(category)
+                .species(species)
+                .condition(condition)
+                .build();
     }
 
     private static ChatRoom createChatRoom(Long buyerId, Long sellerId, Long productId) {
         ChatRoom chatRoom = ChatRoom.builder()
-            .buyerId(buyerId)
-            .sellerId(sellerId)
-            .productId(productId)
-            .build();
+                .buyerId(buyerId)
+                .sellerId(sellerId)
+                .productId(productId)
+                .build();
         return chatRoom;
     }
 }
