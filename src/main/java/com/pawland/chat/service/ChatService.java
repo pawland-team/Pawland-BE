@@ -2,6 +2,7 @@ package com.pawland.chat.service;
 
 import com.pawland.chat.domain.ChatMessage;
 import com.pawland.chat.dto.request.ChatMessageRequest;
+import com.pawland.chat.dto.request.ChatMessageHistoryRequest;
 import com.pawland.chat.dto.request.ChatRoomCreateRequest;
 import com.pawland.chat.dto.response.ChatMessageResponse;
 import com.pawland.chat.dto.response.ChatRoomInfoResponse;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -39,9 +41,13 @@ public class ChatService {
 
     @Transactional
     public ChatMessageResponse saveMessage(String roomId, ChatMessageRequest request) {
-        ChatMessage chatMessage = request.toChatMessageWith(Long.parseLong(roomId));
+        ChatMessage chatMessage = request.toChatMessageWith(Long.parseLong(roomId), LocalDateTime.now());
         chatMessageRepository.save(chatMessage);
         return ChatMessageResponse.from(chatMessage);
+    }
+
+    public void getChatHistory(ChatMessageHistoryRequest request) {
+        chatMessageRepository.getChatMessageHistory(request);
     }
 
     private void validateChatRoomCreateRequest(ChatRoomCreateRequest request) {
