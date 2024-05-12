@@ -2,8 +2,8 @@ package com.pawland.chat.service;
 
 import com.pawland.chat.domain.ChatMessage;
 import com.pawland.chat.dto.request.ChatMessageRequest;
-import com.pawland.chat.dto.request.ChatMessageHistoryRequest;
 import com.pawland.chat.dto.request.ChatRoomCreateRequest;
+import com.pawland.chat.dto.response.ChatMessageHistoryResponse;
 import com.pawland.chat.dto.response.ChatMessageResponse;
 import com.pawland.chat.dto.response.ChatRoomInfoResponse;
 import com.pawland.chat.repository.ChatMessageRepository;
@@ -28,6 +28,7 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
     private final ProductJpaRepository productJpaRepository;
+    private static final int CHAT_MESSAGE_HISTORY_SIZE = 10;
 
     @Transactional
     public void createChatRoom(Long userId, ChatRoomCreateRequest request) {
@@ -46,8 +47,15 @@ public class ChatService {
         return ChatMessageResponse.from(chatMessage);
     }
 
-    public void getChatHistory(ChatMessageHistoryRequest request) {
-        chatMessageRepository.getChatMessageHistory(request);
+    public ChatMessageHistoryResponse getChatMessageHistory(String roomId, String messageTime) {
+        List<ChatMessage> messageList = chatMessageRepository.getChatMessageHistory(roomId, messageTime, CHAT_MESSAGE_HISTORY_SIZE + 1);
+        boolean hasNext = messageList.size() > CHAT_MESSAGE_HISTORY_SIZE;
+        if (hasNext) {
+            ChatMessage nextCursor = messageList.remove(CHAT_MESSAGE_HISTORY_SIZE);
+            return ChatMessageHistoryResponse.of(nextCursor.getMessageTime().toString(), messageList);
+        } else {
+            return ChatMessageHistoryResponse.of(null, messageList);
+        }
     }
 
     private void validateChatRoomCreateRequest(ChatRoomCreateRequest request) {
