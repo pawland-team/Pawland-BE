@@ -22,7 +22,7 @@ public class ChatMessageResponse {
         this.messageTime = messageTime;
     }
 
-    public static ChatMessageResponse from(ChatMessage chatMessage) {
+    public static ChatMessageResponse of(ChatMessage chatMessage) {
         return ChatMessageResponse.builder()
             .messageId(chatMessage.getId())
             .sender(chatMessage.getSenderId().toString())

@@ -44,7 +44,7 @@ public class ChatService {
     public ChatMessageResponse saveMessage(String roomId, ChatMessageRequest request) {
         ChatMessage chatMessage = request.toChatMessageWith(Long.parseLong(roomId), LocalDateTime.now());
         chatMessageRepository.save(chatMessage);
-        return ChatMessageResponse.from(chatMessage);
+        return ChatMessageResponse.of(chatMessage);
     }
 
     public ChatMessageHistoryResponse getChatMessageHistory(String roomId, String messageTime) {

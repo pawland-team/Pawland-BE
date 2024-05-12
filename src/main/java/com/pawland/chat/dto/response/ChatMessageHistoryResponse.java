@@ -1,15 +1,14 @@
 package com.pawland.chat.dto.response;
 
 import com.pawland.chat.domain.ChatMessage;
-import lombok.AccessLevel;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Schema(name = "이전 채팅 내역 조회 시 응답 값")
 public class ChatMessageHistoryResponse {
 
     private String nextCursor;
@@ -19,7 +18,7 @@ public class ChatMessageHistoryResponse {
     public ChatMessageHistoryResponse(String nextCursor, List<ChatMessage> chatMessageHistory) {
         this.nextCursor = nextCursor;
         this.messageList = chatMessageHistory.stream()
-            .map(ChatMessageResponse::from)
+            .map(ChatMessageResponse::of)
             .toList();
     }
 
