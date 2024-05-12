@@ -2,6 +2,7 @@ package com.pawland.chat.controller;
 
 import com.pawland.chat.dto.request.ChatMessageRequest;
 import com.pawland.chat.dto.request.ChatRoomCreateRequest;
+import com.pawland.chat.dto.response.ChatMessageHistoryResponse;
 import com.pawland.chat.dto.response.ChatMessageResponse;
 import com.pawland.chat.dto.response.ChatRoomInfoResponse;
 import com.pawland.chat.service.ChatService;
@@ -9,6 +10,8 @@ import com.pawland.global.config.security.domain.UserPrincipal;
 import com.pawland.global.dto.ApiMessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +29,8 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "jwt-cookie")
+@Tag(name = "ChatController", description = "채팅 관련 컨트롤러 입니다.")
 public class ChatController {
 
     private final ChatService chatService;
@@ -52,6 +57,18 @@ public class ChatController {
         return ResponseEntity
                 .status(CREATED)
                 .body(new ApiMessageResponse("채팅방 생성 완료"));
+    }
+
+    @Operation(summary = "해당 채팅방의 채팅 내역 조회", description = "해당 채팅방의 채팅 내역을 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "채팅 내역 조회 성공")
+    @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    @GetMapping("/previous/{roomId}")
+    public ResponseEntity<ChatMessageHistoryResponse> getPreviousChatMessage(@PathVariable String roomId,
+                                                            @RequestParam(required = false) String messageTime) {
+        ChatMessageHistoryResponse chatMessageHistory = chatService.getChatMessageHistory(roomId, messageTime);
+        return ResponseEntity
+            .status(OK)
+            .body(chatMessageHistory);
     }
 
     @MessageMapping("/chat.sendMessage/{roomId}") // 프론트가 publish 할 때 사용할 백엔드 엔드포인트
