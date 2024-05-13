@@ -2,6 +2,7 @@ package com.pawland.order.service;
 
 import com.pawland.order.domain.Order;
 import com.pawland.order.domain.OrderStatus;
+import com.pawland.order.dto.request.MyOrderRequest;
 import com.pawland.order.dto.response.OrderResponse;
 import com.pawland.order.exception.OrderException;
 import com.pawland.order.respository.OrderJpaRepository;
@@ -14,6 +15,8 @@ import com.pawland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -68,6 +71,15 @@ public class OrderService {
         } else {
             throw new OrderException.AccessDeniedException();
         }
+    }
+
+    public List<OrderResponse> getMyOrder(Long userId, MyOrderRequest myOrderRequest) {
+        if (myOrderRequest.getType().equals("판매내역")) {
+            return orderJpaRepository.findBySellerIdOrderByCreatedDate(userId).stream().map(OrderResponse::of).toList();
+        } else if (myOrderRequest.getType().equals("구매내역")) {
+            return orderJpaRepository.findByBuyerIdOrderByCreatedDate(userId).stream().map(OrderResponse::of).toList();
+        }
+        return orderJpaRepository.findBySellerIdOrBuyerIdOrderByCreatedDate(userId, userId).stream().map(OrderResponse::of).toList();
     }
 
     private User getUserById(Long buyerId) {

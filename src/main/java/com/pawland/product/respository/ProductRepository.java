@@ -49,13 +49,17 @@ public class ProductRepository {
         return new PageImpl<>(products, pageable, products.size());
     }
 
-    public List<Product> getMyProduct(Long userId) {
-        return jpaQueryFactory.selectFrom(product)
+    public Page<Product> getMyProduct(Long userId,String type,Pageable pageable) {
+        List<Product> products = jpaQueryFactory.selectFrom(product)
                 .leftJoin(product.seller, QUser.user)
                 .fetchJoin()
-                .where(product.seller.id.eq(userId))
+                .where(product.seller.id.eq(userId), searchProductType(type))
                 .orderBy(product.createdDate.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
+
+        return new PageImpl<>(products,pageable,products.size());
     }
 
     private BooleanExpression eqRegion(String region) {
@@ -77,6 +81,19 @@ public class ProductRepository {
         if (price.equals("free")) {
             return product.price.eq(0);
         }
+        return null;
+    }
+
+    private BooleanExpression searchProductType(String type) {
+        if (type != null) {
+            if (type.equals("판매중")) {
+                return product.status.eq(Status.SELLING);
+            }
+            if (type.equals("판매완료")) {
+                return product.status.eq(Status.DONE);
+            }
+        }
+
         return null;
     }
 

@@ -2,6 +2,7 @@ package com.pawland.product.controller;
 
 import com.pawland.global.config.security.domain.UserPrincipal;
 import com.pawland.product.dto.request.CreateProductRequest;
+import com.pawland.product.dto.request.SearchMyProductRequest;
 import com.pawland.product.dto.request.SearchProductRequest;
 import com.pawland.product.dto.request.UpdateProductRequest;
 import com.pawland.product.dto.response.ProductResponse;
@@ -92,9 +93,15 @@ public class ProductController {
         productService.cancelWishProduct(userPrincipal.getUserId(), productId);
     }
 
-    @Operation(summary = "나의 판매중인 상품 조회")
+    @Operation(summary = "내가 등록한 상품 조회")
     @GetMapping("/my-product")
-    public ResponseEntity<List<ProductResponse>> getMyProduct(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return ResponseEntity.ok(productService.getMyProduct(userPrincipal.getUserId()));
+    public ResponseEntity<List<ProductResponse>> getMyProduct(@AuthenticationPrincipal UserPrincipal userPrincipal,@RequestParam(required = false) String type,@RequestParam(required = true) int page,@RequestParam(required = true) int size) {
+        return ResponseEntity.ok(productService.getMyProduct(userPrincipal.getUserId(),new SearchMyProductRequest(type,page,size)));
+    }
+
+    @Operation(summary = "나의 관심 상품 조회")
+    @GetMapping("/my-wish-product")
+    public List<ProductResponse> getMyWishedProduct(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return productService.getWishedProduct(userPrincipal.getUserId());
     }
 }
