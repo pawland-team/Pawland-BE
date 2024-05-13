@@ -42,7 +42,7 @@ public class AuthFacade {
     }
 
     public String signup(SignupRequest request) {
-//        mailVerificationService.checkEmailVerification(request.getEmail());
+        mailVerificationService.checkEmailVerification(request.getEmail());
         User user = User.builder()
             .email(request.getEmail())
             .password(passwordEncoder.encode(request.getPassword()))
