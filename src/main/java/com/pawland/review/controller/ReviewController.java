@@ -35,4 +35,10 @@ public class ReviewController {
     public ResponseEntity<List<MyReviewResponse>> getMyReview(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         return ResponseEntity.ok(reviewService.getMyReview(userPrincipal.getUserId()));
     }
+
+    @Operation(summary = "유저가 받은 리뷰 조회")
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<MyReviewResponse>> getReviewByUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(reviewService.getMyReview(userId));
+    }
 }

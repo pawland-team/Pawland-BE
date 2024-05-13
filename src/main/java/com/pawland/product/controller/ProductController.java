@@ -104,4 +104,10 @@ public class ProductController {
     public List<ProductResponse> getMyWishedProduct(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         return productService.getWishedProduct(userPrincipal.getUserId());
     }
+
+    @Operation(summary = "유저가 등록한 상품 조회")
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<ProductResponse>> getProductByUser(@PathVariable Long userId, @RequestParam(required = true) int page, @RequestParam(required = true) int size) {
+        return ResponseEntity.ok(productService.getMyProduct(userId,new SearchMyProductRequest(null,page,size)));
+    }
 }

@@ -53,7 +53,7 @@ public class PostController {
                                                        @RequestParam(required = false) List<String> region,
                                                        @RequestParam(required = false) String orderBy) {
         Long userId = Optional.ofNullable(userPrincipal).map(UserPrincipal::getUserId).orElse(null);
-        return ResponseEntity.ok(postService.getPosts(userId,PostSearchRequest.builder().page(page).content(content).region(region).orderBy(orderBy).build()));
+        return ResponseEntity.ok(postService.getPosts(userId, PostSearchRequest.builder().page(page).content(content).region(region).orderBy(orderBy).build()));
     }
 
     @Operation(summary = "내가 쓴글 조회", description = "글쓴이가 자신인 글을 조회 합니다.")
@@ -79,5 +79,11 @@ public class PostController {
     public ResponseEntity<PostResponse> getPostById(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
         Long userId = Optional.ofNullable(userPrincipal).map(UserPrincipal::getUserId).orElse(null);
         return ResponseEntity.ok(postService.getOnePostById(userId, postId));
+    }
+
+    @Operation(summary = "유저의 게시글 조회")
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<PostResponse>> getPostByUser(@PathVariable Long userId, @RequestParam(required = true) int page) {
+        return ResponseEntity.ok(postService.getMyPosts(userId, PostSearchRequest.builder().build()));
     }
 }
