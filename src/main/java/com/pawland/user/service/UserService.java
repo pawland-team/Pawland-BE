@@ -58,4 +58,9 @@ public class UserService {
         return new UserInfoUpdateResponse(user);
     }
 
+    public UserInfoResponse getUserInfoByUserId(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserException.NotFoundUser::new);
+
+        return new UserInfoResponse(user);
+    }
 }
