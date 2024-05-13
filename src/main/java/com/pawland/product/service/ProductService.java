@@ -98,6 +98,11 @@ public class ProductService {
 
     @Transactional
     public boolean wishProduct(Long userId, Long productId) {
+
+        if (wishProductRepository.findWishProductByUserIdAndProductId(userId, productId) != null) {
+            throw new IllegalStateException("이미 찜한 상품입니다.");
+        }
+
         Product productById = getProductById(productId);
         User userById = getUserById(userId);
 
