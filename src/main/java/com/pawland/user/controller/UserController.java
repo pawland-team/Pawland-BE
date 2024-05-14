@@ -53,4 +53,10 @@ public class UserController {
                 .body(updatedInfo);
     }
 
+    @Operation(summary = "유저 프로필 조회")
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserInfoResponse> getUserProfile(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(userService.getUserInfoByUserId(userId));
+    }
+
 }

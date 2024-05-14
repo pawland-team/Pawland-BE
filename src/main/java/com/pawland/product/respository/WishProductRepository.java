@@ -7,6 +7,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 import static com.pawland.product.domain.QWishProduct.wishProduct;
 
 
@@ -25,6 +27,17 @@ public class WishProductRepository {
                 .where(wishProduct.product.id.eq(productId))
                 .where(wishProduct.user.id.eq(userId))
                 .fetchOne();
+    }
+
+    public List<WishProduct> getWishProductByUserId(Long userId) {
+        return jpaQueryFactory.selectFrom(wishProduct)
+                .leftJoin(wishProduct.product, QProduct.product)
+                .fetchJoin()
+                .leftJoin(wishProduct.user, QUser.user)
+                .fetchJoin()
+                .where(wishProduct.user.id.eq(userId))
+                .fetch();
+
     }
 
 }

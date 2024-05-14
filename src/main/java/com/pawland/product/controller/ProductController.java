@@ -2,6 +2,7 @@ package com.pawland.product.controller;
 
 import com.pawland.global.config.security.domain.UserPrincipal;
 import com.pawland.product.dto.request.CreateProductRequest;
+import com.pawland.product.dto.request.SearchMyProductRequest;
 import com.pawland.product.dto.request.SearchProductRequest;
 import com.pawland.product.dto.request.UpdateProductRequest;
 import com.pawland.product.dto.response.ProductResponse;
@@ -66,12 +67,12 @@ public class ProductController {
     @ApiResponse(responseCode = "500", description = "상품 페이징 조회 실패")
     @GetMapping
     public Page<ProductResponse> getProducts(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                             @RequestParam(required = false) String region,
-                                             @RequestParam(required = false) String species,
-                                             @RequestParam(required = false) String category,
-                                             @RequestParam(required = false) String isFree,
+                                             @RequestParam(required = false) List<String> region,
+                                             @RequestParam(required = false) List<String> species,
+                                             @RequestParam(required = false) List<String> category,
                                              @RequestParam(required = false) String orderBy,
                                              @RequestParam(required = false) String content,
+                                             @RequestParam(required = false,defaultValue = "false") Boolean isFree,
                                              @RequestParam(required = true) int page,
                                              @RequestParam(required = true) int size
 
@@ -88,13 +89,25 @@ public class ProductController {
 
     @Operation(summary = "상품 찜 취소")
     @PostMapping("/wish/cancel/{productId}")
-    public void wishCancelProduct(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long productId) {
-        productService.cancelWishProduct(userPrincipal.getUserId(), productId);
+    public ResponseEntity<Boolean> wishCancelProduct(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long productId) {
+        return ResponseEntity.ok(productService.cancelWishProduct(userPrincipal.getUserId(), productId));
     }
 
-    @Operation(summary = "나의 판매중인 상품 조회")
+    @Operation(summary = "내가 등록한 상품 조회")
     @GetMapping("/my-product")
-    public ResponseEntity<List<ProductResponse>> getMyProduct(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return ResponseEntity.ok(productService.getMyProduct(userPrincipal.getUserId()));
+    public ResponseEntity<List<ProductResponse>> getMyProduct(@AuthenticationPrincipal UserPrincipal userPrincipal,@RequestParam(required = false) String type,@RequestParam(required = true) int page,@RequestParam(required = true) int size) {
+        return ResponseEntity.ok(productService.getMyProduct(userPrincipal.getUserId(),new SearchMyProductRequest(type,page,size)));
+    }
+
+    @Operation(summary = "나의 관심 상품 조회")
+    @GetMapping("/my-wish-product")
+    public List<ProductResponse> getMyWishedProduct(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return productService.getWishedProduct(userPrincipal.getUserId());
+    }
+
+    @Operation(summary = "유저가 등록한 상품 조회")
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<ProductResponse>> getProductByUser(@PathVariable Long userId, @RequestParam(required = true) int page, @RequestParam(required = true) int size) {
+        return ResponseEntity.ok(productService.getMyProduct(userId,new SearchMyProductRequest(null,page,size)));
     }
 }

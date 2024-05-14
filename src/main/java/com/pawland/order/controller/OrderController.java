@@ -1,6 +1,7 @@
 package com.pawland.order.controller;
 
 import com.pawland.global.config.security.domain.UserPrincipal;
+import com.pawland.order.dto.request.MyOrderRequest;
 import com.pawland.order.dto.response.OrderResponse;
 import com.pawland.order.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,5 +54,11 @@ public class OrderController {
     @PutMapping("/cancel/{orderId}")
     public ResponseEntity<Boolean> cancelOrder(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long orderId) {
         return ResponseEntity.ok(orderService.cancelOrder(userPrincipal.getUserId(), orderId));
+    }
+
+    @Operation(summary = "나의 거래내역 조회")
+    @GetMapping("/my-order")
+    public ResponseEntity<List<OrderResponse>> getMyOrder(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(required = false) String type, @RequestParam(required = true) int page, @RequestParam(required = true) int size) {
+        return ResponseEntity.ok(orderService.getMyOrder(userPrincipal.getUserId(), new MyOrderRequest(type, page, size)));
     }
 }

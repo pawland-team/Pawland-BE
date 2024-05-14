@@ -3,6 +3,7 @@ package com.pawland.product.service;
 import com.pawland.product.domain.Product;
 import com.pawland.product.domain.WishProduct;
 import com.pawland.product.dto.request.CreateProductRequest;
+import com.pawland.product.dto.request.SearchMyProductRequest;
 import com.pawland.product.dto.request.SearchProductRequest;
 import com.pawland.product.dto.request.UpdateProductRequest;
 import com.pawland.product.dto.response.ProductResponse;
@@ -97,6 +98,11 @@ public class ProductService {
 
     @Transactional
     public boolean wishProduct(Long userId, Long productId) {
+
+        if (wishProductRepository.findWishProductByUserIdAndProductId(userId, productId) != null) {
+            throw new IllegalStateException("이미 찜한 상품입니다.");
+        }
+
         Product productById = getProductById(productId);
         User userById = getUserById(userId);
 
@@ -122,8 +128,13 @@ public class ProductService {
         return true;
     }
 
-    public List<ProductResponse> getMyProduct(Long userId) {
-        return productRepository.getMyProduct(userId).stream().map(product -> ProductResponse.of(product, getUserById(userId))).toList();
+    public List<ProductResponse> getWishedProduct(Long userId) {
+        return wishProductRepository.getWishProductByUserId(userId).stream().map(WishProduct::getProduct).toList().stream().map(p -> ProductResponse.of(p, getUserById(userId))).toList();
+    }
+
+    public List<ProductResponse> getMyProduct(Long userId, SearchMyProductRequest searchMyProductRequest) {
+        Pageable pageable = PageRequest.of(searchMyProductRequest.getPage() - 1, searchMyProductRequest.getSize());
+        return productRepository.getMyProduct(userId, searchMyProductRequest.getType(), pageable).stream().map(product -> ProductResponse.of(product, getUserById(userId))).toList();
     }
 
     private Product getProductById(Long productId) {

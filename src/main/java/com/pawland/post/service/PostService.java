@@ -4,6 +4,7 @@ import com.pawland.post.domain.Post;
 import com.pawland.post.domain.PostRecommend;
 import com.pawland.post.dto.request.PostCreateRequest;
 import com.pawland.post.dto.request.PostSearchRequest;
+import com.pawland.post.dto.request.UpdatePostRequest;
 import com.pawland.post.dto.response.PostResponse;
 import com.pawland.post.exception.PostException;
 import com.pawland.post.repository.PostJpaRepository;
@@ -20,6 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -34,26 +37,26 @@ public class PostService {
     @Transactional
     public PostResponse uploadPost(Long userId, PostCreateRequest request) {
         User user = userRepository.findById(userId)
-            .orElseThrow(UserException.NotFoundUser::new);
+                .orElseThrow(UserException.NotFoundUser::new);
 
         Post post = postJpaRepository.save(request.toPostWith(user));
 
-        return PostResponse.of(post,user);
+        return PostResponse.of(post, user);
     }
 
     @Transactional
-    public Page<PostResponse> getPosts(Long userId,PostSearchRequest postSearchRequest) {
+    public Page<PostResponse> getPosts(Long userId, PostSearchRequest postSearchRequest) {
         Pageable pageable = PageRequest.of(postSearchRequest.getPage() - 1, 6);
         Page<Post> posts = postRepository.getPostsBySearch(postSearchRequest, pageable);
 
-        return posts.map(p -> PostResponse.of(p,getUserById(userId)));
+        return posts.map(p -> PostResponse.of(p, getUserById(userId)));
     }
 
     public Page<PostResponse> getMyPosts(Long userId, PostSearchRequest postSearchRequest) {
         Pageable pageable = PageRequest.of(postSearchRequest.getPage() - 1, 6);
         Page<Post> myPosts = postRepository.getMyPosts(userId, pageable, postSearchRequest);
 
-        return myPosts.map(post -> PostResponse.of(post,getUserById(userId)));
+        return myPosts.map(post -> PostResponse.of(post, getUserById(userId)));
     }
 
     @Transactional
@@ -88,7 +91,32 @@ public class PostService {
     public PostResponse getOnePostById(Long userId, Long postId) {
         Post post = getPostById(postId);
         post.upView();
+        return PostResponse.of(post, getUserById(userId));
+    }
+
+    @Transactional
+    public PostResponse updatePost(Long userId, Long postId, UpdatePostRequest updatePostRequest) {
+        Post post = getPostById(postId);
+
+        if (!Objects.equals(post.getAuthor().getId(), userId)) {
+            throw new UserException.AccessDeniedException();
+        }
+
+        post.updatePost(updatePostRequest);
+
         return PostResponse.of(post,getUserById(userId));
+    }
+
+    @Transactional
+    public boolean deletePost(Long userId, Long postId) {
+        Post post = getPostById(postId);
+        if (!Objects.equals(post.getAuthor().getId(), userId)) {
+            throw new UserException.AccessDeniedException();
+        }
+
+        postJpaRepository.delete(post);
+
+        return true;
     }
 
     private boolean AlreadyRecommendPost(Long userId, Long postId) {

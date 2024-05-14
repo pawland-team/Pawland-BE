@@ -10,11 +10,12 @@ import com.pawland.user.domain.QUser;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -38,7 +39,7 @@ public class ProductRepository {
                         eqRegion(searchProductRequest.getRegion()),
                         eqSpecies(searchProductRequest.getSpecies()),
                         eqCategory(searchProductRequest.getCategory()),
-                        eqPrice(searchProductRequest.getIsFree()),
+                        eqPrice(searchProductRequest.isFree()),
                         searchContentOrName(searchProductRequest.getContent())
                 )
                 .orderBy(createOrderSpecifier(searchProductRequest))
@@ -46,37 +47,80 @@ public class ProductRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        return new PageImpl<>(products, pageable, products.size());
+        JPAQuery<Long> countQuery = jpaQueryFactory
+                .select(product.count())
+                .from(product)
+                .where(product.status.eq(Status.SELLING),
+                        eqRegion(searchProductRequest.getRegion()),
+                        eqSpecies(searchProductRequest.getSpecies()),
+                        eqCategory(searchProductRequest.getCategory()),
+                        eqPrice(searchProductRequest.isFree()),
+                        searchContentOrName(searchProductRequest.getContent())
+                );
+
+        return PageableExecutionUtils.getPage(products, pageable, countQuery::fetchOne);
     }
 
-    public List<Product> getMyProduct(Long userId) {
-        return jpaQueryFactory.selectFrom(product)
+    public Page<Product> getMyProduct(Long userId,String type,Pageable pageable) {
+        List<Product> products = jpaQueryFactory.selectFrom(product)
                 .leftJoin(product.seller, QUser.user)
                 .fetchJoin()
-                .where(product.seller.id.eq(userId))
+                .where(product.seller.id.eq(userId), searchProductType(type))
                 .orderBy(product.createdDate.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
+
+
+        JPAQuery<Long> countQuery = jpaQueryFactory
+                .select(product.count())
+                .from(product)
+                .where(product.seller.id.eq(userId), searchProductType(type));
+
+        return PageableExecutionUtils.getPage(products, pageable, countQuery::fetchOne);
     }
 
-    private BooleanExpression eqRegion(String region) {
-        return !StringUtils.hasText(region) ? null : product.region.eq(Region.fromString(region));
+    private BooleanExpression eqRegion(List<String> region) {
+        if (region == null || region.isEmpty()) {
+            return null;
+        }
+        return product.region.in(region.stream().map(Region::fromString).toList());
     }
 
-    private BooleanExpression eqSpecies(String species) {
-        return !StringUtils.hasText(species) ? null : product.species.eq(Species.getInstance(species));
+    private BooleanExpression eqSpecies(List<String> species) {
+        if(species == null || species.isEmpty()) {
+            return null;
+        }
+        return product.species.in(species.stream().map(Species::getInstance).toList());
     }
 
-    private BooleanExpression eqCategory(String category) {
-        return !StringUtils.hasText(category) ? null : product.category.eq(Category.getInstance(category));
+    private BooleanExpression eqCategory(List<String> category) {
+        if (category == null || category.isEmpty()) {
+            return null;
+        }
+        return product.category.in(category.stream().map(Category::getInstance).toList());
     }
 
-    private BooleanExpression eqPrice(String price) {
+    private BooleanExpression eqPrice(Boolean price) {
         if (price == null) {
             return null;
         }
-        if (price.equals("free")) {
+        if (price) {
             return product.price.eq(0);
         }
+        return null;
+    }
+
+    private BooleanExpression searchProductType(String type) {
+        if (type != null) {
+            if (type.equals("판매중")) {
+                return product.status.eq(Status.SELLING);
+            }
+            if (type.equals("판매완료")) {
+                return product.status.eq(Status.DONE);
+            }
+        }
+
         return null;
     }
 
@@ -89,10 +133,10 @@ public class ProductRepository {
 
         if (Objects.nonNull(searchProductRequest.getOrderBy())) {
             switch (searchProductRequest.getOrderBy()) {
-                case "높은가격순":
+                case "높은 가격순":
                     orderSpecifiers.add(new OrderSpecifier(Order.DESC, product.price));
                     break;
-                case "낮은가격순":
+                case "낮은 가격순":
                     orderSpecifiers.add(new OrderSpecifier(Order.ASC, product.price));
                     break;
                 case "조회순":
