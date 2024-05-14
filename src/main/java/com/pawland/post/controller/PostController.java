@@ -59,7 +59,7 @@ public class PostController {
 
     @Operation(summary = "게시글 수정")
     @PutMapping("/{postId}")
-    public ResponseEntity<PostResponse> updatePost(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId, @RequestBody UpdatePostRequest updatePostRequest) {
+    public ResponseEntity<PostResponse> updatePost(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId, @Valid @RequestBody UpdatePostRequest updatePostRequest) {
         return ResponseEntity.ok(postService.updatePost(userPrincipal.getUserId(),postId, updatePostRequest));
     }
 

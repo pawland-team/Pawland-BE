@@ -39,7 +39,7 @@ public class ProductRepository {
                         eqRegion(searchProductRequest.getRegion()),
                         eqSpecies(searchProductRequest.getSpecies()),
                         eqCategory(searchProductRequest.getCategory()),
-//                        eqPrice(searchProductRequest.isFree()),
+                        eqPrice(searchProductRequest.isFree()),
                         searchContentOrName(searchProductRequest.getContent())
                 )
                 .orderBy(createOrderSpecifier(searchProductRequest))
