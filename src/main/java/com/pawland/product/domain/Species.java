@@ -8,7 +8,7 @@ import java.util.Arrays;
 public enum Species {
     DOG("강아지"),
     CAT("고양이"),
-    ETC("그외");
+    ETC("그외 동물");
 
     private final String name;
 

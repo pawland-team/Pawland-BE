@@ -133,10 +133,10 @@ public class ProductRepository {
 
         if (Objects.nonNull(searchProductRequest.getOrderBy())) {
             switch (searchProductRequest.getOrderBy()) {
-                case "높은가격순":
+                case "높은 가격순":
                     orderSpecifiers.add(new OrderSpecifier(Order.DESC, product.price));
                     break;
-                case "낮은가격순":
+                case "낮은 가격순":
                     orderSpecifiers.add(new OrderSpecifier(Order.ASC, product.price));
                     break;
                 case "조회순":

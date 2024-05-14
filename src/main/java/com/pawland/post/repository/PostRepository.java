@@ -85,13 +85,13 @@ public class PostRepository {
 
         if (Objects.nonNull(postSearchRequest.getOrderBy())) {
             switch (postSearchRequest.getOrderBy()) {
-                case "view":
+                case "조회순":
                     orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.views));
                     break;
-                case "recommend":
+                case "추천순":
                     orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.recommends.size()));
                     break;
-                case "comment":
+                case "댓글순":
                     orderSpecifiers.add(new OrderSpecifier(Order.DESC, post.comments.size()));
                     break;
                 default:
