@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Schema(name = "채팅 메시지 전송 시 요청 값")
@@ -22,11 +24,12 @@ public class ChatMessageRequest {
         this.message = message;
     }
 
-    public ChatMessage toChatMessageWith(Long roomId) {
+    public ChatMessage toChatMessageWith(Long roomId, LocalDateTime messageTime) {
         return ChatMessage.builder()
             .roomId(roomId)
             .senderId(Long.parseLong(sender))
             .message(message)
+            .messageTime(messageTime)
             .build();
     }
 }

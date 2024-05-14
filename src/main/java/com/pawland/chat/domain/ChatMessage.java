@@ -28,11 +28,11 @@ public class ChatMessage {
     private LocalDateTime messageTime;
 
     @Builder
-    public ChatMessage(Long roomId, String message, Long senderId) {
+    public ChatMessage(Long roomId, String message, Long senderId, LocalDateTime messageTime) {
         this.id = UUID.randomUUID().toString();
         this.roomId = roomId;
         this.message = message;
         this.senderId = senderId;
-        this.messageTime = LocalDateTime.now();
+        this.messageTime = messageTime;
     }
 }
