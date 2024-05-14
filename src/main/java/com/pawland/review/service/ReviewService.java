@@ -59,10 +59,10 @@ public class ReviewService {
         return orderJpaRepository.findById(orderId).orElseThrow(OrderException.NotFoundOrder::new);
     }
 
-    public List<MyReviewResponse> getMyReview(Long userId,int page,int size) {
-        Page<OrderReview> byOrderSellerId = orderReviewJpaRepository.findByOrderSellerIdOrderByCreatedDateDesc(userId,PageRequest.of(page,size));
+    public List<MyReviewResponse> getMyReview(Long userId, int page, int size) {
+        Page<OrderReview> byOrderSellerId = orderReviewJpaRepository.findByOrderSellerIdOrderByCreatedDateDesc(userId, PageRequest.of(page, size));
 
         return byOrderSellerId.stream().map(orderReview ->
-                MyReviewResponse.of(orderReview.getOrder().getProduct().getThumbnailImageUrl(), orderReview.getUser().getNickname(),orderReview.getUser().getProfileImage(), orderReview.getStar(), orderReview.getContent(), orderReview.getCreatedDate())).toList();
+                MyReviewResponse.of(orderReview.getOrder().getProduct().getThumbnailImageUrl(), orderReview.getUser().getId(),orderReview.getId(), orderReview.getUser().getNickname(), orderReview.getUser().getProfileImage(), orderReview.getStar(), orderReview.getContent(), orderReview.getCreatedDate())).toList();
     }
 }
