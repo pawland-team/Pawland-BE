@@ -1,8 +1,10 @@
 package com.pawland.chat.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pawland.chat.domain.ChatMessage;
 import com.pawland.chat.domain.ChatRoom;
 import com.pawland.chat.dto.request.ChatRoomCreateRequest;
+import com.pawland.chat.repository.ChatMessageRepository;
 import com.pawland.chat.repository.ChatRoomRepository;
 import com.pawland.global.config.TestSecurityConfig;
 import com.pawland.global.utils.PawLandMockUser;
@@ -11,6 +13,7 @@ import com.pawland.product.respository.ProductJpaRepository;
 import com.pawland.user.domain.User;
 import com.pawland.user.exception.UserException;
 import com.pawland.user.repository.UserRepository;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,7 +25,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static com.pawland.product.exception.ProductExceptionMessage.PRODUCT_NOT_FOUND;
 import static com.pawland.user.exception.UserExceptionMessage.USER_NOT_FOUND;
@@ -54,11 +59,15 @@ class ChatControllerTest {
     @Autowired
     private ChatRoomRepository chatRoomRepository;
 
+    @Autowired
+    private ChatMessageRepository chatMessageRepository;
+
     @AfterEach
     void tearDown() {
         userRepository.deleteAll();
         productJpaRepository.deleteAllInBatch();
         chatRoomRepository.deleteAllInBatch();
+        chatMessageRepository.deleteAllInBatch();
     }
 
     @DisplayName("채팅방 생성 시")
@@ -214,6 +223,209 @@ class ChatControllerTest {
         }
     }
 
+    @DisplayName("채팅 내역 조회 시")
+    @Nested
+    class getPreviousChatMessage {
+        @DisplayName("채팅방 진입 시(messageTime == null)")
+        @Nested
+        class getPreviousChatMessageWithoutMessageTime {
+            @DisplayName("전체 데이터 수가 pageSize(10개)보다 크면 최근 생성 순서대로 pageSize 만큼 채팅 내역을 조회하고, nextCursor 값이 존재한다.")
+            @Test
+            void getPreviousChatMessage1() throws Exception {
+                // given
+                Long roomId = 1L;
+                Long userId1 = 1L;
+                Long userId2 = 2L;
+                List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 11)
+                    .mapToObj(i -> i % 2 == 1
+                        ? createChatMessage(roomId, "내용" + i, userId1, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        : createChatMessage(roomId, "내용" + i, userId2, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                    )
+                    .toList();
+                chatMessageRepository.saveAll(chatMessages);
+
+                // expected
+                mockMvc.perform(get("/api/chat/previous/{roomId}", roomId))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.nextCursor").value("2024-05-11T21:00:00.001"))
+                    .andExpect(jsonPath("$.messageList.length()").value(10L))
+                    .andExpect(jsonPath("$.messageList[0].messageTime").value("2024-05-11T21:00:00.011"))
+                    .andExpect(jsonPath("$.messageList[9].messageTime").value("2024-05-11T21:00:00.002"));
+            }
+
+            @DisplayName("전체 데이터 수가 pageSize(10개)와 같으면 최근 생성 순서대로 pageSize 만큼 조회하고 nextCursor 값은 null이다.")
+            @Test
+            void getPreviousChatMessage2() throws Exception {
+                // given
+                Long roomId = 1L;
+                Long userId1 = 1L;
+                Long userId2 = 2L;
+                List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 10)
+                    .mapToObj(i -> i % 2 == 1
+                        ? createChatMessage(roomId, "내용" + i, userId1, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        : createChatMessage(roomId, "내용" + i, userId2, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                    )
+                    .toList();
+                chatMessageRepository.saveAll(chatMessages);
+
+                // expected
+                mockMvc.perform(get("/api/chat/previous/{roomId}", roomId))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.nextCursor", Matchers.nullValue()))
+                    .andExpect(jsonPath("$.messageList.length()").value(10L))
+                    .andExpect(jsonPath("$.messageList[0].messageTime").value("2024-05-11T21:00:00.010"))
+                    .andExpect(jsonPath("$.messageList[9].messageTime").value("2024-05-11T21:00:00.001"));
+            }
+
+            @DisplayName("전체 데이터 수가 pageSize(10개)보다 작으면 최근 생성 순서대로 데이터 수 만큼 조회하고, nextCursor 값은 null이다.")
+            @Test
+            void getPreviousChatMessage3() throws Exception {
+                // given
+                Long roomId = 1L;
+                Long userId1 = 1L;
+                Long userId2 = 2L;
+                List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 5)
+                    .mapToObj(i -> i % 2 == 1
+                        ? createChatMessage(roomId, "내용" + i, userId1, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        : createChatMessage(roomId, "내용" + i, userId2, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                    )
+                    .toList();
+                chatMessageRepository.saveAll(chatMessages);
+
+                // expected
+                mockMvc.perform(get("/api/chat/previous/{roomId}", roomId))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.nextCursor", Matchers.nullValue()))
+                    .andExpect(jsonPath("$.messageList.length()").value(5L))
+                    .andExpect(jsonPath("$.messageList[0].messageTime").value("2024-05-11T21:00:00.005"))
+                    .andExpect(jsonPath("$.messageList[4].messageTime").value("2024-05-11T21:00:00.001"));
+            }
+
+            @DisplayName("전체 데이터 수가 0이면 빈 리스트를 반환하고, nextCursor 값은 null이다.")
+            @Test
+            void getPreviousChatMessage4() throws Exception {
+                // given
+                Long roomId = 1L;
+
+                // expected
+                mockMvc.perform(get("/api/chat/previous/{roomId}", roomId))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.nextCursor", Matchers.nullValue()))
+                    .andExpect(jsonPath("$.messageList.length()").value(0L));
+            }
+        }
+
+        @DisplayName("이전 채팅 내역 조회 시(messageTime != null)")
+        @Nested
+        class getPreviousChatMessageWithMessageTime {
+            @DisplayName("이전 채팅 데이터 수가 pageSize(10개)보다 크면 최근 생성 순서대로 pageSize 만큼 채팅 내역을 조회하고, nextCursor 값이 존재한다.")
+            @Test
+            void getPreviousChatMessage1() throws Exception {
+                // given
+                Long roomId = 1L;
+                Long userId1 = 1L;
+                Long userId2 = 2L;
+                List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 12)
+                    .mapToObj(i -> i % 2 == 1
+                        ? createChatMessage(roomId, "내용" + i, userId1, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        : createChatMessage(roomId, "내용" + i, userId2, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                    )
+                    .toList();
+                chatMessageRepository.saveAll(chatMessages);
+
+                // expected
+                mockMvc.perform(get("/api/chat/previous/{roomId}", roomId)
+                        .param("messageTime", "2024-05-11T21:00:00.012"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.nextCursor").value("2024-05-11T21:00:00.001"))
+                    .andExpect(jsonPath("$.messageList.length()").value(10L))
+                    .andExpect(jsonPath("$.messageList[0].messageTime").value("2024-05-11T21:00:00.011"))
+                    .andExpect(jsonPath("$.messageList[9].messageTime").value("2024-05-11T21:00:00.002"));
+            }
+
+            @DisplayName("이전 채팅 데이터 수가 pageSize(10개)와 같으면 최근 생성 순서대로 pageSize 만큼 조회하고 nextCursor 값은 null이다.")
+            @Test
+            void getPreviousChatMessage2() throws Exception {
+                // given
+                Long roomId = 1L;
+                Long userId1 = 1L;
+                Long userId2 = 2L;
+                List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 11)
+                    .mapToObj(i -> i % 2 == 1
+                        ? createChatMessage(roomId, "내용" + i, userId1, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        : createChatMessage(roomId, "내용" + i, userId2, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                    )
+                    .toList();
+                chatMessageRepository.saveAll(chatMessages);
+
+                // expected
+                mockMvc.perform(get("/api/chat/previous/{roomId}", roomId)
+                        .param("messageTime", "2024-05-11T21:00:00.011"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.nextCursor", Matchers.nullValue()))
+                    .andExpect(jsonPath("$.messageList.length()").value(10L))
+                    .andExpect(jsonPath("$.messageList[0].messageTime").value("2024-05-11T21:00:00.010"))
+                    .andExpect(jsonPath("$.messageList[9].messageTime").value("2024-05-11T21:00:00.001"));
+            }
+
+            @DisplayName("이전 채팅 데이터 수가 pageSize(10개)보다 작으면 최근 생성 순서대로 데이터 수 만큼 조회하고, nextCursor 값은 null이다.")
+            @Test
+            void getPreviousChatMessage3() throws Exception {
+                // given
+                Long roomId = 1L;
+                Long userId1 = 1L;
+                Long userId2 = 2L;
+                List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 5)
+                    .mapToObj(i -> i % 2 == 1
+                        ? createChatMessage(roomId, "내용" + i, userId1, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        : createChatMessage(roomId, "내용" + i, userId2, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                    )
+                    .toList();
+                chatMessageRepository.saveAll(chatMessages);
+
+                // expected
+                mockMvc.perform(get("/api/chat/previous/{roomId}", roomId)
+                        .param("messageTime", "2024-05-11T21:00:00.004"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.nextCursor", Matchers.nullValue()))
+                    .andExpect(jsonPath("$.messageList.length()").value(3L))
+                    .andExpect(jsonPath("$.messageList[0].messageTime").value("2024-05-11T21:00:00.003"))
+                    .andExpect(jsonPath("$.messageList[2].messageTime").value("2024-05-11T21:00:00.001"));
+            }
+
+            @DisplayName("이전 채팅 데이터 수가 0이면 빈 리스트를 반환하고, nextCursor 값은 null이다.")
+            @Test
+            void getPreviousChatMessage4() throws Exception {
+                // given
+                Long roomId = 1L;
+                Long userId1 = 1L;
+                Long userId2 = 2L;
+                List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 5)
+                    .mapToObj(i -> i % 2 == 1
+                        ? createChatMessage(roomId, "내용" + i, userId1, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        : createChatMessage(roomId, "내용" + i, userId2, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                    )
+                    .toList();
+                chatMessageRepository.saveAll(chatMessages);
+
+                // expected
+                mockMvc.perform(get("/api/chat/previous/{roomId}", roomId)
+                        .param("messageTime", "2024-05-11T21:00:00.001"))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.nextCursor", Matchers.nullValue()))
+                    .andExpect(jsonPath("$.messageList.length()").value(0L));
+            }
+        }
+    }
+
     private static User createUser(String nickname, String email, String password) {
         return User.builder()
                 .nickname(nickname)
@@ -239,5 +451,14 @@ class ChatControllerTest {
                 .productId(productId)
                 .build();
         return chatRoom;
+    }
+
+    private static ChatMessage createChatMessage(Long roomId, String message, Long senderId, String messageTime) {
+        return ChatMessage.builder()
+            .roomId(roomId)
+            .message(message)
+            .senderId(senderId)
+            .messageTime(LocalDateTime.parse(messageTime))
+            .build();
     }
 }
