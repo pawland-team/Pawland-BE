@@ -16,6 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @SpringBootTest
 class ProductServiceTest {
 
@@ -187,7 +189,7 @@ class ProductServiceTest {
         }
 
         //when
-        Page<ProductResponse> products = productService.getProducts(user.getId(), SearchProductRequest.builder().region("서울").page(1).size(8).build());
+        Page<ProductResponse> products = productService.getProducts(user.getId(), SearchProductRequest.builder().region(List.of("서울")).page(1).size(8).build());
 
         //then
         Assertions.assertEquals(2, products.getContent().size());
