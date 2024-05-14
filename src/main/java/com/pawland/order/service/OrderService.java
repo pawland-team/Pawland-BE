@@ -13,6 +13,8 @@ import com.pawland.user.domain.User;
 import com.pawland.user.exception.UserException;
 import com.pawland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,12 +77,13 @@ public class OrderService {
     }
 
     public List<OrderResponse> getMyOrder(Long userId, MyOrderRequest myOrderRequest) {
-        if (myOrderRequest == null) {
-            return orderJpaRepository.findBySellerIdOrBuyerIdOrderByCreatedDate(userId, userId).stream().map(OrderResponse::of).toList();
+        Pageable pageable = PageRequest.of(myOrderRequest.getPage() - 1, myOrderRequest.getSize());
+        if (myOrderRequest.getType() == null) {
+            return orderJpaRepository.findBySellerIdOrBuyerIdOrderByCreatedDate(userId, userId,pageable).stream().map(OrderResponse::of).toList();
         } else if (myOrderRequest.getType().equals("판매내역")) {
-            return orderJpaRepository.findBySellerIdOrderByCreatedDate(userId).stream().map(OrderResponse::of).toList();
+            return orderJpaRepository.findBySellerIdOrderByCreatedDate(userId,pageable).stream().map(OrderResponse::of).toList();
         } else if (myOrderRequest.getType().equals("구매내역")) {
-            return orderJpaRepository.findByBuyerIdOrderByCreatedDate(userId).stream().map(OrderResponse::of).toList();
+            return orderJpaRepository.findByBuyerIdOrderByCreatedDate(userId,pageable).stream().map(OrderResponse::of).toList();
         }
 
         return Collections.emptyList();

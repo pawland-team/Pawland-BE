@@ -58,7 +58,7 @@ public class OrderController {
 
     @Operation(summary = "나의 거래내역 조회")
     @GetMapping("/my-order")
-    public ResponseEntity<List<OrderResponse>> getMyOrder(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(required = false)String type, @RequestParam(required = true)int page, @RequestParam(required = true)int size) {
+    public ResponseEntity<List<OrderResponse>> getMyOrder(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(required = false) String type, @RequestParam(required = true) int page, @RequestParam(required = true) int size) {
         return ResponseEntity.ok(orderService.getMyOrder(userPrincipal.getUserId(), new MyOrderRequest(type, page, size)));
     }
 }
