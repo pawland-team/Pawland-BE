@@ -2,6 +2,7 @@ package com.pawland.post.domain;
 
 import com.pawland.comment.domain.Comment;
 import com.pawland.global.domain.BaseTimeEntity;
+import com.pawland.post.dto.request.UpdatePostRequest;
 import com.pawland.user.domain.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -57,6 +58,13 @@ public class Post extends BaseTimeEntity {
         this.content = isBlank(content) ? this.content : content;
         this.thumbnail = isBlank(thumbnail) ? this.thumbnail : thumbnail;
         this.region = isBlank(region) ? this.region : region;
+    }
+
+    public void  updatePost(UpdatePostRequest updatePostRequest) {
+        this.title = updatePostRequest.getTitle();
+        this.content = updatePostRequest.getContent();
+        this.thumbnail = updatePostRequest.getThumbnail();
+        this.region = Region.fromString(updatePostRequest.getRegion());
     }
 
     private boolean isBlank(Object value) {

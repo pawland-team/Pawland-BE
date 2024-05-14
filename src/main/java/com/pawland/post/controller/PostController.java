@@ -4,6 +4,7 @@ import com.pawland.global.config.security.domain.UserPrincipal;
 import com.pawland.global.dto.ApiMessageResponse;
 import com.pawland.post.dto.request.PostCreateRequest;
 import com.pawland.post.dto.request.PostSearchRequest;
+import com.pawland.post.dto.request.UpdatePostRequest;
 import com.pawland.post.dto.response.PostResponse;
 import com.pawland.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,6 +55,18 @@ public class PostController {
                                                        @RequestParam(required = false) String orderBy) {
         Long userId = Optional.ofNullable(userPrincipal).map(UserPrincipal::getUserId).orElse(null);
         return ResponseEntity.ok(postService.getPosts(userId, PostSearchRequest.builder().page(page).content(content).region(region).orderBy(orderBy).build()));
+    }
+
+    @Operation(summary = "게시글 수정")
+    @PutMapping("/{postId}")
+    public ResponseEntity<PostResponse> updatePost(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId, @RequestBody UpdatePostRequest updatePostRequest) {
+        return ResponseEntity.ok(postService.updatePost(userPrincipal.getUserId(),postId, updatePostRequest));
+    }
+
+    @Operation(summary = "게시글 삭제")
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Boolean> deletePost(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
+        return ResponseEntity.ok(postService.deletePost(userPrincipal.getUserId(),postId));
     }
 
     @Operation(summary = "내가 쓴글 조회", description = "글쓴이가 자신인 글을 조회 합니다.")
