@@ -67,9 +67,9 @@ public class ProductController {
     @ApiResponse(responseCode = "500", description = "상품 페이징 조회 실패")
     @GetMapping
     public Page<ProductResponse> getProducts(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                             @RequestParam(required = false) String region,
-                                             @RequestParam(required = false) String species,
-                                             @RequestParam(required = false) String category,
+                                             @RequestParam(required = false) List<String> region,
+                                             @RequestParam(required = false) List<String> species,
+                                             @RequestParam(required = false) List<String> category,
                                              @RequestParam(required = false) String orderBy,
                                              @RequestParam(required = false) String content,
                                              @RequestParam(required = false,defaultValue = "false") Boolean isFree,

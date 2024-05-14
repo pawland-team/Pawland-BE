@@ -80,16 +80,25 @@ public class ProductRepository {
         return PageableExecutionUtils.getPage(products, pageable, countQuery::fetchOne);
     }
 
-    private BooleanExpression eqRegion(String region) {
-        return !StringUtils.hasText(region) ? null : product.region.eq(Region.fromString(region));
+    private BooleanExpression eqRegion(List<String> region) {
+        if (region == null || region.isEmpty()) {
+            return null;
+        }
+        return product.region.in(region.stream().map(Region::fromString).toList());
     }
 
-    private BooleanExpression eqSpecies(String species) {
-        return !StringUtils.hasText(species) ? null : product.species.eq(Species.getInstance(species));
+    private BooleanExpression eqSpecies(List<String> species) {
+        if(species == null || species.isEmpty()) {
+            return null;
+        }
+        return product.species.in(species.stream().map(Species::getInstance).toList());
     }
 
-    private BooleanExpression eqCategory(String category) {
-        return !StringUtils.hasText(category) ? null : product.category.eq(Category.getInstance(category));
+    private BooleanExpression eqCategory(List<String> category) {
+        if (category == null || category.isEmpty()) {
+            return null;
+        }
+        return product.category.in(category.stream().map(Category::getInstance).toList());
     }
 
     private BooleanExpression eqPrice(Boolean price) {
