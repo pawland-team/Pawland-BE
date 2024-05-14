@@ -13,9 +13,9 @@ public class SearchProductRequest {
     private String region;
     private String species;
     private String category;
-    private String isFree;
     private String orderBy;
     private String content;
+    private boolean isFree;
     private int page;
     private int size;
 

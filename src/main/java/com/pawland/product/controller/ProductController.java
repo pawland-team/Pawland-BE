@@ -70,9 +70,9 @@ public class ProductController {
                                              @RequestParam(required = false) String region,
                                              @RequestParam(required = false) String species,
                                              @RequestParam(required = false) String category,
-                                             @RequestParam(required = false) String isFree,
                                              @RequestParam(required = false) String orderBy,
                                              @RequestParam(required = false) String content,
+                                             @RequestParam(required = false,defaultValue = "false") Boolean isFree,
                                              @RequestParam(required = true) int page,
                                              @RequestParam(required = true) int size
 

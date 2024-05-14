@@ -39,7 +39,7 @@ public class ProductRepository {
                         eqRegion(searchProductRequest.getRegion()),
                         eqSpecies(searchProductRequest.getSpecies()),
                         eqCategory(searchProductRequest.getCategory()),
-                        eqPrice(searchProductRequest.getIsFree()),
+//                        eqPrice(searchProductRequest.isFree()),
                         searchContentOrName(searchProductRequest.getContent())
                 )
                 .orderBy(createOrderSpecifier(searchProductRequest))
@@ -54,7 +54,7 @@ public class ProductRepository {
                         eqRegion(searchProductRequest.getRegion()),
                         eqSpecies(searchProductRequest.getSpecies()),
                         eqCategory(searchProductRequest.getCategory()),
-                        eqPrice(searchProductRequest.getIsFree()),
+                        eqPrice(searchProductRequest.isFree()),
                         searchContentOrName(searchProductRequest.getContent())
                 );
 
@@ -92,11 +92,11 @@ public class ProductRepository {
         return !StringUtils.hasText(category) ? null : product.category.eq(Category.getInstance(category));
     }
 
-    private BooleanExpression eqPrice(String price) {
+    private BooleanExpression eqPrice(Boolean price) {
         if (price == null) {
             return null;
         }
-        if (price.equals("free")) {
+        if (price) {
             return product.price.eq(0);
         }
         return null;
