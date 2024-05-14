@@ -97,6 +97,6 @@ public class PostController {
     @Operation(summary = "유저의 게시글 조회")
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<PostResponse>> getPostByUser(@PathVariable Long userId, @RequestParam(required = true) int page) {
-        return ResponseEntity.ok(postService.getMyPosts(userId, PostSearchRequest.builder().build()));
+        return ResponseEntity.ok(postService.getMyPosts(userId, PostSearchRequest.builder().page(page).build()));
     }
 }
