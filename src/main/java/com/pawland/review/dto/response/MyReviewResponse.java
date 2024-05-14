@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Data
 public class MyReviewResponse {
     private String productImage;
-    private String sellerId;
+    private String sellerNickName;
     private String sellerProfileImage;
     private Double star;
     private String content;
@@ -15,7 +15,7 @@ public class MyReviewResponse {
 
     private MyReviewResponse(String productImage, String sellerId, String sellerProfileImage, Double star, String content, LocalDateTime createAt) {
         this.productImage = productImage;
-        this.sellerId = sellerId;
+        this.sellerNickName = sellerId;
         this.sellerProfileImage = sellerProfileImage;
         this.star = star;
         this.content = content;
