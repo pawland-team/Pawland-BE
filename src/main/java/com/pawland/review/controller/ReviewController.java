@@ -32,13 +32,13 @@ public class ReviewController {
 
     @Operation(summary = "나의 상품 리뷰 조회")
     @GetMapping("/my-review")
-    public ResponseEntity<List<MyReviewResponse>> getMyReview(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return ResponseEntity.ok(reviewService.getMyReview(userPrincipal.getUserId()));
+    public ResponseEntity<List<MyReviewResponse>> getMyReview(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(required = true) int page, @RequestParam(required = true) int size) {
+        return ResponseEntity.ok(reviewService.getMyReview(userPrincipal.getUserId(), page, size));
     }
 
     @Operation(summary = "유저가 받은 리뷰 조회")
     @GetMapping("/{userId}")
-    public ResponseEntity<List<MyReviewResponse>> getReviewByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(reviewService.getMyReview(userId));
+    public ResponseEntity<List<MyReviewResponse>> getReviewByUser(@PathVariable Long userId, @RequestParam(required = true) int page, @RequestParam(required = true) int size) {
+        return ResponseEntity.ok(reviewService.getMyReview(userId,page,size));
     }
 }

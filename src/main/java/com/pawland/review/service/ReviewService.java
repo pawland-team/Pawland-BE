@@ -12,6 +12,8 @@ import com.pawland.user.domain.User;
 import com.pawland.user.exception.UserException;
 import com.pawland.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,8 +59,8 @@ public class ReviewService {
         return orderJpaRepository.findById(orderId).orElseThrow(OrderException.NotFoundOrder::new);
     }
 
-    public List<MyReviewResponse> getMyReview(Long userId) {
-        List<OrderReview> byOrderSellerId = orderReviewJpaRepository.findByOrderSellerIdOrderByCreatedDateDesc(userId);
+    public List<MyReviewResponse> getMyReview(Long userId,int page,int size) {
+        Page<OrderReview> byOrderSellerId = orderReviewJpaRepository.findByOrderSellerIdOrderByCreatedDateDesc(userId,PageRequest.of(page,size));
 
         return byOrderSellerId.stream().map(orderReview ->
                 MyReviewResponse.of(orderReview.getOrder().getProduct().getThumbnailImageUrl(), orderReview.getOrder().getSeller().getNickname(), orderReview.getStar(), orderReview.getContent(), orderReview.getCreatedDate())).toList();

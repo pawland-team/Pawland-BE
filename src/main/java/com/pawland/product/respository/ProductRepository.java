@@ -10,11 +10,12 @@ import com.pawland.user.domain.QUser;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -46,7 +47,18 @@ public class ProductRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        return new PageImpl<>(products, pageable, products.size());
+        JPAQuery<Long> countQuery = jpaQueryFactory
+                .select(product.count())
+                .from(product)
+                .where(product.status.eq(Status.SELLING),
+                        eqRegion(searchProductRequest.getRegion()),
+                        eqSpecies(searchProductRequest.getSpecies()),
+                        eqCategory(searchProductRequest.getCategory()),
+                        eqPrice(searchProductRequest.getIsFree()),
+                        searchContentOrName(searchProductRequest.getContent())
+                );
+
+        return PageableExecutionUtils.getPage(products, pageable, countQuery::fetchOne);
     }
 
     public Page<Product> getMyProduct(Long userId,String type,Pageable pageable) {
@@ -59,7 +71,13 @@ public class ProductRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        return new PageImpl<>(products,pageable,products.size());
+
+        JPAQuery<Long> countQuery = jpaQueryFactory
+                .select(product.count())
+                .from(product)
+                .where(product.seller.id.eq(userId), searchProductType(type));
+
+        return PageableExecutionUtils.getPage(products, pageable, countQuery::fetchOne);
     }
 
     private BooleanExpression eqRegion(String region) {

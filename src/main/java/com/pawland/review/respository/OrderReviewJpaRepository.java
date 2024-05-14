@@ -1,12 +1,14 @@
 package com.pawland.review.respository;
 
 import com.pawland.review.domain.OrderReview;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
 public interface OrderReviewJpaRepository extends JpaRepository<OrderReview, Long> {
-    List<OrderReview> findByOrderSellerIdOrderByCreatedDateDesc(Long orderSellerId);
+    Page<OrderReview> findByOrderSellerIdOrderByCreatedDateDesc(Long orderSellerId, Pageable pageable);
 
     List<OrderReview> findByOrderSellerEmailOrderByCreatedDateDesc(String email);
 }

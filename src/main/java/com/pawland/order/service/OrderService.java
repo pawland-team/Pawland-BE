@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -74,12 +75,15 @@ public class OrderService {
     }
 
     public List<OrderResponse> getMyOrder(Long userId, MyOrderRequest myOrderRequest) {
-        if (myOrderRequest.getType().equals("판매내역")) {
+        if (myOrderRequest == null) {
+            return orderJpaRepository.findBySellerIdOrBuyerIdOrderByCreatedDate(userId, userId).stream().map(OrderResponse::of).toList();
+        } else if (myOrderRequest.getType().equals("판매내역")) {
             return orderJpaRepository.findBySellerIdOrderByCreatedDate(userId).stream().map(OrderResponse::of).toList();
         } else if (myOrderRequest.getType().equals("구매내역")) {
             return orderJpaRepository.findByBuyerIdOrderByCreatedDate(userId).stream().map(OrderResponse::of).toList();
         }
-        return orderJpaRepository.findBySellerIdOrBuyerIdOrderByCreatedDate(userId, userId).stream().map(OrderResponse::of).toList();
+
+        return Collections.emptyList();
     }
 
     private User getUserById(Long buyerId) {

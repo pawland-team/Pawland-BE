@@ -7,11 +7,12 @@ import com.pawland.user.domain.QUser;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -28,16 +29,43 @@ public class PostRepository {
 
     public Page<Post> getPostsBySearch(PostSearchRequest postSearchRequest, Pageable pageable) {
 
-        List<Post> posts = jpaQueryFactory.selectFrom(post).leftJoin(post.author, QUser.user).fetchJoin().where(searchContentOrTitle(postSearchRequest.getContent()), eqRegion(postSearchRequest.getRegion())).orderBy(createOrderSpecifier(postSearchRequest)).offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
+        List<Post> posts = jpaQueryFactory
+                .selectFrom(post)
+                .leftJoin(post.author, QUser.user)
+                .fetchJoin()
+                .where(searchContentOrTitle(postSearchRequest.getContent()),
+                        eqRegion(postSearchRequest.getRegion()))
+                .orderBy(createOrderSpecifier(postSearchRequest))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
+        JPAQuery<Long> countQuery = jpaQueryFactory
+                .select(post.count())
+                .from(post)
+                .where(searchContentOrTitle(postSearchRequest.getContent()),
+                        eqRegion(postSearchRequest.getRegion()));
 
-        return new PageImpl<>(posts, pageable, posts.size());
+        return PageableExecutionUtils.getPage(posts, pageable, countQuery::fetchOne);
     }
 
     public Page<Post> getMyPosts(Long userId, Pageable pageable, PostSearchRequest postSearchRequest) {
-        List<Post> myPosts = jpaQueryFactory.selectFrom(post).leftJoin(post.author, QUser.user).fetchJoin().where(post.author.id.eq(userId)).orderBy(createOrderSpecifier(postSearchRequest)).offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
+        List<Post> myPosts = jpaQueryFactory
+                .selectFrom(post)
+                .leftJoin(post.author, QUser.user)
+                .fetchJoin()
+                .where(post.author.id.eq(userId))
+                .orderBy(createOrderSpecifier(postSearchRequest))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
-        return new PageImpl<>(myPosts, pageable, myPosts.size());
+        JPAQuery<Long> countQuery = jpaQueryFactory
+                .select(post.count())
+                .from(post)
+                .where(post.author.id.eq(userId));
+
+        return PageableExecutionUtils.getPage(myPosts, pageable, countQuery::fetchOne);
     }
 
     private BooleanExpression searchContentOrTitle(String content) {
