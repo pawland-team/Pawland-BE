@@ -53,7 +53,7 @@ public class PostService {
     }
 
     public Page<PostResponse> getMyPosts(Long userId, PostSearchRequest postSearchRequest) {
-        Pageable pageable = PageRequest.of(postSearchRequest.getPage() - 1, 6);
+        Pageable pageable = PageRequest.of(postSearchRequest.getPage() - 1, postSearchRequest.getSize());
         Page<Post> myPosts = postRepository.getMyPosts(userId, pageable, postSearchRequest);
 
         return myPosts.map(post -> PostResponse.of(post, getUserById(userId)));
