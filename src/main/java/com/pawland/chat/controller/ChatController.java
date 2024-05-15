@@ -40,7 +40,7 @@ public class ChatController {
     @Operation(summary = "내 채팅 목록 조회", description = "내 채팅 목록을 반환합니다.(미완성)")
     @ApiResponse(responseCode = "200", description = "채팅 목록 조회 성공")
     @ApiResponse(responseCode = "500", description = "서버 내부 오류")
-    @GetMapping("/rooms")
+    @GetMapping("/room")
     public ResponseEntity<List<ChatRoomInfoResponse>> getChatRoomList(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         List<ChatRoomInfoResponse> chatRoomList = chatService.getChatRoomList(userPrincipal.getUserId());
         return ResponseEntity
@@ -53,7 +53,7 @@ public class ChatController {
     @ApiResponse(responseCode = "201", description = "채팅방 생성 성공")
     @ApiResponse(responseCode = "400", description = "잘못된 상품 아이디 혹은 유저 아이디")
     @ApiResponse(responseCode = "500", description = "서버 내부 오류")
-    @PostMapping("/rooms")
+    @PostMapping("/room")
     public ResponseEntity<ApiMessageResponse> createChatRoom(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                              @Valid @RequestBody ChatRoomCreateRequest request) {
         chatService.createChatRoom(userPrincipal.getUserId(), request);

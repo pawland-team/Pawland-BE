@@ -92,7 +92,7 @@ class ChatControllerTest {
             String json = objectMapper.writeValueAsString(request);
 
             // expected
-            mockMvc.perform(post("/api/chat/rooms")
+            mockMvc.perform(post("/api/chat/room")
                             .contentType(APPLICATION_JSON)
                             .content(json)
                     )
@@ -119,7 +119,7 @@ class ChatControllerTest {
             String json = objectMapper.writeValueAsString(request);
 
             // expected
-            mockMvc.perform(post("/api/chat/rooms")
+            mockMvc.perform(post("/api/chat/room")
                             .contentType(APPLICATION_JSON)
                             .content(json)
                     )
@@ -146,7 +146,7 @@ class ChatControllerTest {
             String json = objectMapper.writeValueAsString(request);
 
             // expected
-            mockMvc.perform(post("/api/chat/rooms")
+            mockMvc.perform(post("/api/chat/room")
                             .contentType(APPLICATION_JSON)
                             .content(json)
                     )
@@ -188,7 +188,7 @@ class ChatControllerTest {
             chatRoomRepository.saveAll(List.of(myChatRoom1, myChatRoom2, myChatRoom3, notMyChatRoom1, notMyChatRoom2));
 
             // expected
-            mockMvc.perform(get("/api/chat/rooms"))
+            mockMvc.perform(get("/api/chat/room"))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.length()").value(3));
@@ -216,7 +216,7 @@ class ChatControllerTest {
             chatRoomRepository.saveAll(List.of(notMyChatRoom1, notMyChatRoom2));
 
             // expected
-            mockMvc.perform(get("/api/chat/rooms"))
+            mockMvc.perform(get("/api/chat/room"))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isEmpty());
