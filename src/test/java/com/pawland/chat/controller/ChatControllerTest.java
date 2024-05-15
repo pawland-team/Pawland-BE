@@ -224,6 +224,7 @@ class ChatControllerTest {
     }
 
     @DisplayName("채팅 내역 조회 시")
+    @PawLandMockUser
     @Nested
     class getPreviousChatMessage {
         @DisplayName("채팅방 진입 시(messageTime == null)")
@@ -233,19 +234,24 @@ class ChatControllerTest {
             @Test
             void getPreviousChatMessage1() throws Exception {
                 // given
-                Long roomId = 1L;
-                Long userId1 = 1L;
-                Long userId2 = 2L;
+                User myAccount = userRepository.findByEmail("midcondria@naver.com")
+                    .orElseThrow(UserException.NotFoundUser::new);
+                Long opponentUserId = 2L;
+                Long productId = 1L;
+
+                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, productId);
+                chatRoomRepository.save(chatRoom);
+
                 List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 11)
                     .mapToObj(i -> i % 2 == 1
-                        ? createChatMessage(roomId, "내용" + i, userId1, "2024-05-11T21:00:00.0" + String.format("%02d", i))
-                        : createChatMessage(roomId, "내용" + i, userId2, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        ? createChatMessage(chatRoom.getId(), "내용" + i, myAccount.getId(), "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        : createChatMessage(chatRoom.getId(), "내용" + i, opponentUserId, "2024-05-11T21:00:00.0" + String.format("%02d", i))
                     )
                     .toList();
                 chatMessageRepository.saveAll(chatMessages);
 
                 // expected
-                mockMvc.perform(get("/api/chat/previous/{roomId}", roomId))
+                mockMvc.perform(get("/api/chat/previous/{roomId}", chatRoom.getId()))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.nextCursor").value("2024-05-11T21:00:00.001"))
@@ -258,19 +264,24 @@ class ChatControllerTest {
             @Test
             void getPreviousChatMessage2() throws Exception {
                 // given
-                Long roomId = 1L;
-                Long userId1 = 1L;
-                Long userId2 = 2L;
+                User myAccount = userRepository.findByEmail("midcondria@naver.com")
+                    .orElseThrow(UserException.NotFoundUser::new);
+                Long opponentUserId = 2L;
+                Long productId = 1L;
+
+                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, productId);
+                chatRoomRepository.save(chatRoom);
+
                 List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 10)
                     .mapToObj(i -> i % 2 == 1
-                        ? createChatMessage(roomId, "내용" + i, userId1, "2024-05-11T21:00:00.0" + String.format("%02d", i))
-                        : createChatMessage(roomId, "내용" + i, userId2, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        ? createChatMessage(chatRoom.getId(), "내용" + i, myAccount.getId(), "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        : createChatMessage(chatRoom.getId(), "내용" + i, opponentUserId, "2024-05-11T21:00:00.0" + String.format("%02d", i))
                     )
                     .toList();
                 chatMessageRepository.saveAll(chatMessages);
 
                 // expected
-                mockMvc.perform(get("/api/chat/previous/{roomId}", roomId))
+                mockMvc.perform(get("/api/chat/previous/{roomId}", chatRoom.getId()))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.nextCursor", Matchers.nullValue()))
@@ -283,19 +294,24 @@ class ChatControllerTest {
             @Test
             void getPreviousChatMessage3() throws Exception {
                 // given
-                Long roomId = 1L;
-                Long userId1 = 1L;
-                Long userId2 = 2L;
+                User myAccount = userRepository.findByEmail("midcondria@naver.com")
+                    .orElseThrow(UserException.NotFoundUser::new);
+                Long opponentUserId = 2L;
+                Long productId = 1L;
+
+                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, productId);
+                chatRoomRepository.save(chatRoom);
+
                 List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 5)
                     .mapToObj(i -> i % 2 == 1
-                        ? createChatMessage(roomId, "내용" + i, userId1, "2024-05-11T21:00:00.0" + String.format("%02d", i))
-                        : createChatMessage(roomId, "내용" + i, userId2, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        ? createChatMessage(chatRoom.getId(), "내용" + i, myAccount.getId(), "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        : createChatMessage(chatRoom.getId(), "내용" + i, opponentUserId, "2024-05-11T21:00:00.0" + String.format("%02d", i))
                     )
                     .toList();
                 chatMessageRepository.saveAll(chatMessages);
 
                 // expected
-                mockMvc.perform(get("/api/chat/previous/{roomId}", roomId))
+                mockMvc.perform(get("/api/chat/previous/{roomId}", chatRoom.getId()))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.nextCursor", Matchers.nullValue()))
@@ -308,10 +324,17 @@ class ChatControllerTest {
             @Test
             void getPreviousChatMessage4() throws Exception {
                 // given
-                Long roomId = 1L;
+                // given
+                User myAccount = userRepository.findByEmail("midcondria@naver.com")
+                    .orElseThrow(UserException.NotFoundUser::new);
+                Long opponentUserId = 2L;
+                Long productId = 1L;
+
+                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, productId);
+                chatRoomRepository.save(chatRoom);
 
                 // expected
-                mockMvc.perform(get("/api/chat/previous/{roomId}", roomId))
+                mockMvc.perform(get("/api/chat/previous/{roomId}", chatRoom.getId()))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.nextCursor", Matchers.nullValue()))
@@ -326,19 +349,24 @@ class ChatControllerTest {
             @Test
             void getPreviousChatMessage1() throws Exception {
                 // given
-                Long roomId = 1L;
-                Long userId1 = 1L;
-                Long userId2 = 2L;
+                User myAccount = userRepository.findByEmail("midcondria@naver.com")
+                    .orElseThrow(UserException.NotFoundUser::new);
+                Long opponentUserId = 2L;
+                Long productId = 1L;
+
+                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, productId);
+                chatRoomRepository.save(chatRoom);
+
                 List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 12)
                     .mapToObj(i -> i % 2 == 1
-                        ? createChatMessage(roomId, "내용" + i, userId1, "2024-05-11T21:00:00.0" + String.format("%02d", i))
-                        : createChatMessage(roomId, "내용" + i, userId2, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        ? createChatMessage(chatRoom.getId(), "내용" + i, myAccount.getId(), "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        : createChatMessage(chatRoom.getId(), "내용" + i, opponentUserId, "2024-05-11T21:00:00.0" + String.format("%02d", i))
                     )
                     .toList();
                 chatMessageRepository.saveAll(chatMessages);
 
                 // expected
-                mockMvc.perform(get("/api/chat/previous/{roomId}", roomId)
+                mockMvc.perform(get("/api/chat/previous/{roomId}", chatRoom.getId())
                         .param("messageTime", "2024-05-11T21:00:00.012"))
                     .andDo(print())
                     .andExpect(status().isOk())
@@ -352,19 +380,24 @@ class ChatControllerTest {
             @Test
             void getPreviousChatMessage2() throws Exception {
                 // given
-                Long roomId = 1L;
-                Long userId1 = 1L;
-                Long userId2 = 2L;
+                User myAccount = userRepository.findByEmail("midcondria@naver.com")
+                    .orElseThrow(UserException.NotFoundUser::new);
+                Long opponentUserId = 2L;
+                Long productId = 1L;
+
+                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, productId);
+                chatRoomRepository.save(chatRoom);
+
                 List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 11)
                     .mapToObj(i -> i % 2 == 1
-                        ? createChatMessage(roomId, "내용" + i, userId1, "2024-05-11T21:00:00.0" + String.format("%02d", i))
-                        : createChatMessage(roomId, "내용" + i, userId2, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        ? createChatMessage(chatRoom.getId(), "내용" + i, myAccount.getId(), "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        : createChatMessage(chatRoom.getId(), "내용" + i, opponentUserId, "2024-05-11T21:00:00.0" + String.format("%02d", i))
                     )
                     .toList();
                 chatMessageRepository.saveAll(chatMessages);
 
                 // expected
-                mockMvc.perform(get("/api/chat/previous/{roomId}", roomId)
+                mockMvc.perform(get("/api/chat/previous/{roomId}", chatRoom.getId())
                         .param("messageTime", "2024-05-11T21:00:00.011"))
                     .andDo(print())
                     .andExpect(status().isOk())
@@ -378,19 +411,24 @@ class ChatControllerTest {
             @Test
             void getPreviousChatMessage3() throws Exception {
                 // given
-                Long roomId = 1L;
-                Long userId1 = 1L;
-                Long userId2 = 2L;
+                User myAccount = userRepository.findByEmail("midcondria@naver.com")
+                    .orElseThrow(UserException.NotFoundUser::new);
+                Long opponentUserId = 2L;
+                Long productId = 1L;
+
+                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, productId);
+                chatRoomRepository.save(chatRoom);
+
                 List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 5)
                     .mapToObj(i -> i % 2 == 1
-                        ? createChatMessage(roomId, "내용" + i, userId1, "2024-05-11T21:00:00.0" + String.format("%02d", i))
-                        : createChatMessage(roomId, "내용" + i, userId2, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        ? createChatMessage(chatRoom.getId(), "내용" + i, myAccount.getId(), "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        : createChatMessage(chatRoom.getId(), "내용" + i, opponentUserId, "2024-05-11T21:00:00.0" + String.format("%02d", i))
                     )
                     .toList();
                 chatMessageRepository.saveAll(chatMessages);
 
                 // expected
-                mockMvc.perform(get("/api/chat/previous/{roomId}", roomId)
+                mockMvc.perform(get("/api/chat/previous/{roomId}", chatRoom.getId())
                         .param("messageTime", "2024-05-11T21:00:00.004"))
                     .andDo(print())
                     .andExpect(status().isOk())
@@ -404,19 +442,24 @@ class ChatControllerTest {
             @Test
             void getPreviousChatMessage4() throws Exception {
                 // given
-                Long roomId = 1L;
-                Long userId1 = 1L;
-                Long userId2 = 2L;
+                User myAccount = userRepository.findByEmail("midcondria@naver.com")
+                    .orElseThrow(UserException.NotFoundUser::new);
+                Long opponentUserId = 2L;
+                Long productId = 1L;
+
+                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, productId);
+                chatRoomRepository.save(chatRoom);
+
                 List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 5)
                     .mapToObj(i -> i % 2 == 1
-                        ? createChatMessage(roomId, "내용" + i, userId1, "2024-05-11T21:00:00.0" + String.format("%02d", i))
-                        : createChatMessage(roomId, "내용" + i, userId2, "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        ? createChatMessage(chatRoom.getId(), "내용" + i, myAccount.getId(), "2024-05-11T21:00:00.0" + String.format("%02d", i))
+                        : createChatMessage(chatRoom.getId(), "내용" + i, opponentUserId, "2024-05-11T21:00:00.0" + String.format("%02d", i))
                     )
                     .toList();
                 chatMessageRepository.saveAll(chatMessages);
 
                 // expected
-                mockMvc.perform(get("/api/chat/previous/{roomId}", roomId)
+                mockMvc.perform(get("/api/chat/previous/{roomId}", chatRoom.getId())
                         .param("messageTime", "2024-05-11T21:00:00.001"))
                     .andDo(print())
                     .andExpect(status().isOk())

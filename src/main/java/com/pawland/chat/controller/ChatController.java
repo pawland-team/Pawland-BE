@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +36,7 @@ public class ChatController {
 
     private final ChatService chatService;
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "내 채팅 목록 조회", description = "내 채팅 목록을 반환합니다.(미완성)")
     @ApiResponse(responseCode = "200", description = "채팅 목록 조회 성공")
     @ApiResponse(responseCode = "500", description = "서버 내부 오류")
@@ -46,6 +48,7 @@ public class ChatController {
                 .body(chatRoomList);
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "채팅방 생성", description = "채팅방을 생성합니다.")
     @ApiResponse(responseCode = "201", description = "채팅방 생성 성공")
     @ApiResponse(responseCode = "400", description = "잘못된 상품 아이디 혹은 유저 아이디")
@@ -59,6 +62,7 @@ public class ChatController {
                 .body(new ApiMessageResponse("채팅방 생성 완료"));
     }
 
+    @PreAuthorize("hasRole('ROLE_USER') && hasPermission(#roomId, 'CHATROOM', 'READ')")
     @Operation(summary = "해당 채팅방의 채팅 내역 조회", description = "해당 채팅방의 채팅 내역을 반환합니다.")
     @ApiResponse(responseCode = "200", description = "채팅 내역 조회 성공")
     @ApiResponse(responseCode = "500", description = "서버 내부 오류")

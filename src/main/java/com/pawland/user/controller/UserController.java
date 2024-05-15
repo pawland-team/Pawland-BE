@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,7 @@ public class UserController {
 
     private final UserService userService;
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "내 정보 조회", description = "JWT로 내 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "내 정보 조회 성공")
     @ApiResponse(responseCode = "500", description = "삭제된 회원 또는 잘못된 JWT")
@@ -40,6 +42,7 @@ public class UserController {
                 .body(userInfo);
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "내 정보 수정", description = "내 정보를 수정합니다.")
     @ApiResponse(responseCode = "200", description = "내 정보 수정 성공")
     @ApiResponse(responseCode = "400", description = "요청 값에 닉네임 누락 시")
@@ -58,5 +61,4 @@ public class UserController {
     public ResponseEntity<UserInfoResponse> getUserProfile(@PathVariable("userId") Long userId) {
         return ResponseEntity.ok(userService.getUserInfoByUserId(userId));
     }
-
 }

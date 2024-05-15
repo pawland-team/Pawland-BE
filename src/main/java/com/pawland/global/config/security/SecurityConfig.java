@@ -1,7 +1,6 @@
 package com.pawland.global.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pawland.global.config.security.filter.ExcludeUrlsRequestMatcher;
 import com.pawland.global.config.security.filter.JsonAuthFilter;
 import com.pawland.global.config.security.filter.JwtAuthFilter;
 import com.pawland.global.config.security.handler.Http401Handler;
@@ -53,14 +52,7 @@ public class SecurityConfig {
         return http
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers(
-                    "/api/v1/auth/**",
-                    "/swagger-ui/**",
-                    "/swagger-resources/**",
-                    "/v3/api-docs/**").permitAll()
-                .requestMatchers("/**").permitAll() // TODO: 배포 시 제거
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
             )
             .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jsonAuthFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -74,12 +66,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthFilter jwtAuthFilter() {
-        return new JwtAuthFilter(jwtUtils, new ExcludeUrlsRequestMatcher(
-            "/api/auth/**",
-            "/api/v1/auth/**",
-            "/swagger-ui/**",
-            "/swagger-resources/**",
-            "/v3/api-docs/**"));
+        return new JwtAuthFilter(jwtUtils);
     }
 
     @Bean

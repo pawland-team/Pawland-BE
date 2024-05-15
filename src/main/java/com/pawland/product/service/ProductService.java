@@ -61,7 +61,7 @@ public class ProductService {
     public ProductResponse getOneProductById(Long userId, Long productId) {
         Product product = getProductById(productId);
         product.upView();
-        return ProductResponse.of(product, getUserById(userId));
+        return ProductResponse.of(product, getUserByIdOrGuest(userId));
     }
 
     @Transactional
@@ -93,7 +93,7 @@ public class ProductService {
         Pageable pageable = PageRequest.of(searchProductRequest.getPage() - 1, searchProductRequest.getSize());
         Page<Product> allProducts = productRepository.getAllProducts(searchProductRequest, pageable);
 
-        return allProducts.map(product -> ProductResponse.of(product, getUserById(userId)));
+        return allProducts.map(product -> ProductResponse.of(product, getUserByIdOrGuest(userId)));
     }
 
     @Transactional
@@ -134,7 +134,7 @@ public class ProductService {
 
     public List<ProductResponse> getMyProduct(Long userId, SearchMyProductRequest searchMyProductRequest) {
         Pageable pageable = PageRequest.of(searchMyProductRequest.getPage() - 1, searchMyProductRequest.getSize());
-        return productRepository.getMyProduct(userId, searchMyProductRequest.getType(), pageable).stream().map(product -> ProductResponse.of(product, getUserById(userId))).toList();
+        return productRepository.getMyProduct(userId, searchMyProductRequest.getType(), pageable).stream().map(product -> ProductResponse.of(product, getUserByIdOrGuest(userId))).toList();
     }
 
     private Product getProductById(Long productId) {
@@ -143,6 +143,15 @@ public class ProductService {
 
     private User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(UserException.NotFoundUser::new);
+    }
+
+    private User getUserByIdOrGuest(Long userId) {
+        return userRepository.findById(userId)
+            .orElse(User.builder()
+                .email("guest")
+                .password("guest")
+                .build()
+            );
     }
 
     private boolean canUpdateOrDelete(Long userId, Product product) {
