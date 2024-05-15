@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -25,35 +26,51 @@ public class CommentController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "댓글 등록")
     @PostMapping("/post/{postId}")
-    public CommentResponse createComment(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId, @RequestBody CreateCommentRequest createCommentRequest) {
-        return commentService.createComment(userPrincipal.getUserId(), postId, createCommentRequest);
+    public ResponseEntity<CommentResponse> createComment(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId, @RequestBody CreateCommentRequest createCommentRequest) {
+        return ResponseEntity.ok(commentService.createComment(userPrincipal.getUserId(), postId, createCommentRequest));
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "댓글 수정")
     @PutMapping("/{commentId}")
-    public CommentResponse updateComment(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long commentId, @RequestBody UpdateCommentRequest updateCommentRequest) {
-        return commentService.updateComment(userPrincipal.getUserId(), commentId, updateCommentRequest);
+    public ResponseEntity<CommentResponse> updateComment(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long commentId, @RequestBody UpdateCommentRequest updateCommentRequest) {
+        return ResponseEntity.ok(commentService.updateComment(userPrincipal.getUserId(), commentId, updateCommentRequest));
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "댓글 삭제")
     @DeleteMapping("/{commentId}")
-    public void deleteComment(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long commentId) {
-        commentService.deleteComment(userPrincipal.getUserId(), commentId);
+    public ResponseEntity<Boolean> deleteComment(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long commentId) {
+        return ResponseEntity.ok(commentService.deleteComment(userPrincipal.getUserId(), commentId));
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "댓글 추천")
     @PostMapping("/recommend/{commentId}")
-    public void recommendComment(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long commentId) {
-        commentService.recommendComment(userPrincipal.getUserId(), commentId);
+    public ResponseEntity<CommentResponse> recommendComment(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long commentId) {
+        return ResponseEntity.ok(commentService.recommendComment(userPrincipal.getUserId(), commentId));
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "대댓글 등록")
-    @PostMapping("/{commentId}")
-    public CommentResponse createCommentComment(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long commentId, @RequestBody CreateCommentRequest createCommentRequest) {
-        return commentService.createCommentComment(userPrincipal.getUserId(), commentId, createCommentRequest);
+    @PostMapping("/reply/{commentId}")
+    public ResponseEntity<CommentResponse> createCommentComment(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long commentId, @RequestBody CreateCommentRequest createCommentRequest) {
+        return ResponseEntity.ok(commentService.createCommentComment(userPrincipal.getUserId(), commentId, createCommentRequest));
     }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @Operation(summary = "대댓글 수정")
+    @PutMapping("/reply/{commentId}")
+    public ResponseEntity<CommentResponse> updateCommentComment(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long commentId, @RequestBody UpdateCommentRequest updateCommentRequest) {
+        return ResponseEntity.ok(commentService.updateComment(userPrincipal.getUserId(), commentId, updateCommentRequest));
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @Operation(summary = "대댓글 삭제")
+    @DeleteMapping("/reply/{commentId}")
+    public ResponseEntity<Boolean> deleteCommentComment(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long commentId) {
+        return ResponseEntity.ok(commentService.removeCommentComment(userPrincipal.getUserId(), commentId));
+    }
+
+
 }
