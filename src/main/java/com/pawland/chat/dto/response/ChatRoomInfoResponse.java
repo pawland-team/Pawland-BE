@@ -38,16 +38,16 @@ public class ChatRoomInfoResponse {
         private Long id;
         private int price;
         private String productName;
-        private String imageThumbnail;
+        private String thumbnailImage;
         private Status saleState;
         private Long purchaser;
 
         public ProductInfo(Long id, int price, String productName,
-                           String imageThumbnail, Status saleState, Long purchaser) {
+                           String thumbnailImage, Status saleState, Long purchaser) {
             this.id = id;
             this.price = price;
             this.productName = productName;
-            this.imageThumbnail = imageThumbnail;
+            this.thumbnailImage = thumbnailImage;
             this.saleState = saleState;
             this.purchaser = purchaser;
         }
