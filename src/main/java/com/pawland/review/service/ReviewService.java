@@ -35,6 +35,8 @@ public class ReviewService {
             throw new IllegalStateException("구매완료가 되지 않은 상품은 리뷰를 작성할수 없습니다.");
         }
 
+        User seller = orderById.getSeller();
+
         OrderReview orderReview = new OrderReview(orderById, userById, createReviewRequest.getContent(), createReviewRequest.getStar());
 
         orderReviewJpaRepository.save(orderReview);
@@ -42,11 +44,11 @@ public class ReviewService {
         userById.addOrderReview(orderReview);
         orderById.addOrderReview(orderReview);
 
-        List<OrderReview> byOrderSellerEmail = orderReviewJpaRepository.findByOrderSellerEmailOrderByCreatedDateDesc(userById.getEmail());
-        double totalStar = byOrderSellerEmail.stream().mapToDouble(OrderReview::getStar).sum();
+        List<OrderReview> allOrderReviews = orderReviewJpaRepository.findAllByOrderSellerIdOrOrderBuyerIdOrderByCreatedDateDesc(userId,userId);
+        double totalStar = allOrderReviews.stream().mapToDouble(OrderReview::getStar).sum();
 
-        userById.setStar(totalStar / byOrderSellerEmail.size());
-        userById.setReviewCount(byOrderSellerEmail.size());
+        seller.setStar(totalStar / allOrderReviews.size());
+        seller.setReviewCount(allOrderReviews.size());
 
         return OrderReviewResponse.of(orderReview);
     }

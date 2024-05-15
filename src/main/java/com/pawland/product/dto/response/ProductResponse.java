@@ -24,7 +24,7 @@ public class ProductResponse {
     private String region;
     private int view;
     private String status;
-    private String thumbnailUrl;
+    private String thumbnailImage;
     private List<String> imageUrls;
     private boolean isWished;
     private LocalDateTime createAt;
@@ -41,7 +41,7 @@ public class ProductResponse {
         this.region = product.getRegion().getName();
         this.view = product.getView();
         this.status = product.getStatus().getName();
-        this.thumbnailUrl = product.getThumbnailImageUrl();
+        this.thumbnailImage = product.getThumbnailImageUrl();
         this.imageUrls = product.getImageUrls();
         this.isWished = product.getWishProducts().stream().map(WishProduct::getUser).toList().contains(user);
         this.createAt = product.getCreatedDate();
