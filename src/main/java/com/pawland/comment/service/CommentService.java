@@ -57,7 +57,7 @@ public class CommentService {
     }
 
     @Transactional
-    public void deleteComment(Long userId, Long commentId) {
+    public boolean deleteComment(Long userId, Long commentId) {
         User userById = getUserById(userId);
         Comment commentById = getCommentById(commentId);
 
@@ -67,6 +67,8 @@ public class CommentService {
 
         commentById.getPost().getComments().remove(commentById);
         commentJpaRepository.delete(commentById);
+
+        return true;
     }
 
     @Transactional
@@ -90,6 +92,19 @@ public class CommentService {
         commentById.addReply(comment);
 
         return CommentResponse.of(comment);
+    }
+
+    @Transactional
+    public boolean removeCommentComment(Long userId, Long commentId) {
+        User userById = getUserById(userId);
+        Comment commentById = getCommentById(commentId);
+        if (!userById.getId().equals(commentById.getAuthor().getId())) {
+            throw new CommentException.AccessDeniedException();
+        }
+
+        commentJpaRepository.delete(commentById);
+
+        return true;
     }
 
     private User getUserById(Long userId) {

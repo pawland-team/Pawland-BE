@@ -16,10 +16,10 @@ public class OrderReview extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     private Order order;
 
-    @ManyToOne(fetch =FetchType.LAZY)
+    @ManyToOne
     private User user;
 
     private String content;
