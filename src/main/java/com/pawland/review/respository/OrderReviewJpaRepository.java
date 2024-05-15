@@ -8,9 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface OrderReviewJpaRepository extends JpaRepository<OrderReview, Long> {
-    Page<OrderReview> findByOrderSellerIdOrderByCreatedDateDesc(Long orderSellerId, Pageable pageable);
-
-    List<OrderReview> findByOrderSellerEmailOrderByCreatedDateDesc(String email);
+    Page<OrderReview> findAllByOrderSellerIdOrderByCreatedDateDesc(Long orderSellerId, Pageable pageable);
     List<OrderReview> findAllByOrderSellerIdOrOrderBuyerIdOrderByCreatedDateDesc(Long sellerId, Long buyerId);
 
 }
