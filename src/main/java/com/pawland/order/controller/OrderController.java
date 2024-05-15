@@ -9,13 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -64,7 +63,7 @@ public class OrderController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "나의 거래내역 조회")
     @GetMapping("/my-order")
-    public ResponseEntity<List<OrderResponse>> getMyOrder(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(required = false) String type, @RequestParam(required = true) int page, @RequestParam(required = true) int size) {
-        return ResponseEntity.ok(orderService.getMyOrder(userPrincipal.getUserId(), new MyOrderRequest(type, page, size)));
+    public ResponseEntity<Page<OrderResponse>> getMyOrder(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(required = false) String type, @RequestParam(required = true) int page, @RequestParam(required = true) int size) {
+        return ResponseEntity.ok(orderService.getMyOrder(userPrincipal.getUserId(), new MyOrderRequest(type, page,size)));
     }
 }

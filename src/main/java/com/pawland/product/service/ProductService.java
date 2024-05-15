@@ -22,8 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -35,6 +33,7 @@ public class ProductService {
     private final WishProductJpaRepository wishProductJpaRepository;
     private final WishProductRepository wishProductRepository;
 
+    @Transactional
     public ProductResponse createProduct(Long userId, CreateProductRequest createProductRequest) {
 
         User user = getUserById(userId);
@@ -128,13 +127,14 @@ public class ProductService {
         return true;
     }
 
-    public List<ProductResponse> getWishedProduct(Long userId) {
-        return wishProductRepository.getWishProductByUserId(userId).stream().map(WishProduct::getProduct).toList().stream().map(p -> ProductResponse.of(p, getUserById(userId))).toList();
+    public Page<ProductResponse> getWishedProduct(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page-1, size);
+        return wishProductRepository.getWishProductByUserId(userId,pageable).map(WishProduct::getProduct).map(p -> ProductResponse.of(p, getUserById(userId)));
     }
 
-    public List<ProductResponse> getMyProduct(Long userId, SearchMyProductRequest searchMyProductRequest) {
+    public Page<ProductResponse> getMyProduct(Long userId, SearchMyProductRequest searchMyProductRequest) {
         Pageable pageable = PageRequest.of(searchMyProductRequest.getPage() - 1, searchMyProductRequest.getSize());
-        return productRepository.getMyProduct(userId, searchMyProductRequest.getType(), pageable).stream().map(product -> ProductResponse.of(product, getUserByIdOrGuest(userId))).toList();
+        return productRepository.getMyProduct(userId, searchMyProductRequest.getType(), pageable).map(product -> ProductResponse.of(product, getUserByIdOrGuest(userId)));
     }
 
     private Product getProductById(Long productId) {

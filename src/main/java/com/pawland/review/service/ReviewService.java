@@ -62,7 +62,7 @@ public class ReviewService {
     }
 
     public Page<MyReviewResponse> getMyReview(Long userId, int page, int size) {
-        Page<OrderReview> byOrderSellerId = orderReviewJpaRepository.findByOrderSellerIdOrderByCreatedDateDesc(userId, PageRequest.of(page, size));
+        Page<OrderReview> byOrderSellerId = orderReviewJpaRepository.findAllByOrderSellerIdOrderByCreatedDateDesc(userId, PageRequest.of(page-1, size));
         return byOrderSellerId.map(orderReview ->
                 MyReviewResponse.of(orderReview.getOrder().getProduct().getThumbnailImageUrl(), orderReview.getUser().getId(), orderReview.getId(), orderReview.getUser().getNickname(), orderReview.getUser().getProfileImage(), orderReview.getStar(), orderReview.getContent(), orderReview.getCreatedDate()));
     }
