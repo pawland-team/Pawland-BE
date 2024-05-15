@@ -9,11 +9,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,13 +31,13 @@ public class ReviewController {
 
     @Operation(summary = "나의 상품 리뷰 조회")
     @GetMapping("/my-review")
-    public ResponseEntity<List<MyReviewResponse>> getMyReview(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(required = true) int page, @RequestParam(required = true) int size) {
+    public ResponseEntity<Page<MyReviewResponse>> getMyReview(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(required = true) int page, @RequestParam(required = true) int size) {
         return ResponseEntity.ok(reviewService.getMyReview(userPrincipal.getUserId(), page, size));
     }
 
     @Operation(summary = "유저가 받은 리뷰 조회")
     @GetMapping("/{userId}")
-    public ResponseEntity<List<MyReviewResponse>> getReviewByUser(@PathVariable Long userId, @RequestParam(required = true) int page, @RequestParam(required = true) int size) {
+    public ResponseEntity<Page<MyReviewResponse>> getReviewByUser(@PathVariable Long userId, @RequestParam(required = true) int page, @RequestParam(required = true) int size) {
         return ResponseEntity.ok(reviewService.getMyReview(userId,page,size));
     }
 }
