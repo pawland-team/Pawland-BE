@@ -33,6 +33,7 @@ public class Post extends BaseTimeEntity {
     private String title;
 
     @NotNull
+    @Lob
     private String content = "";
 
     private String thumbnail = DEFAULT_POST_IMAGE.value();

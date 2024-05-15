@@ -35,6 +35,7 @@ public class Product extends BaseTimeEntity {
 
     private int price;
 
+    @Lob
     private String content;
 
     @Enumerated(EnumType.STRING)
