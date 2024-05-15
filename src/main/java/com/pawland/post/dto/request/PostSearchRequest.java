@@ -15,6 +15,8 @@ import java.util.List;
 public class PostSearchRequest {
     @NotBlank
     private int page;
+    @NotBlank
+    private int size;
     private String content;
     private List<String> region;
     private String orderBy;

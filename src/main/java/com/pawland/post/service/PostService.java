@@ -46,14 +46,14 @@ public class PostService {
 
     @Transactional
     public Page<PostResponse> getPosts(Long userId, PostSearchRequest postSearchRequest) {
-        Pageable pageable = PageRequest.of(postSearchRequest.getPage() - 1, 6);
+        Pageable pageable = PageRequest.of(postSearchRequest.getPage() - 1, postSearchRequest.getSize());
         Page<Post> posts = postRepository.getPostsBySearch(postSearchRequest, pageable);
 
         return posts.map(p -> PostResponse.of(p, getUserById(userId)));
     }
 
     public Page<PostResponse> getMyPosts(Long userId, PostSearchRequest postSearchRequest) {
-        Pageable pageable = PageRequest.of(postSearchRequest.getPage() - 1, 6);
+        Pageable pageable = PageRequest.of(postSearchRequest.getPage() - 1, postSearchRequest.getSize());
         Page<Post> myPosts = postRepository.getMyPosts(userId, pageable, postSearchRequest);
 
         return myPosts.map(post -> PostResponse.of(post, getUserById(userId)));
