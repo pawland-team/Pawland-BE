@@ -1,6 +1,7 @@
 package com.pawland.post.controller;
 
 import com.pawland.global.config.security.domain.UserPrincipal;
+import com.pawland.global.config.swagger.SecurityNotRequired;
 import com.pawland.global.dto.ApiMessageResponse;
 import com.pawland.post.dto.request.PostCreateRequest;
 import com.pawland.post.dto.request.PostSearchRequest;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +35,7 @@ public class PostController {
 
     private final PostService postService;
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "게시글 등록", description = "게시글을 등록합니다.")
     @ApiResponse(responseCode = "201", description = "게시글 등록 성공")
     @ApiResponse(responseCode = "400", description = "제목 누락 시")
@@ -45,6 +48,7 @@ public class PostController {
                 .body(new ApiMessageResponse("게시글이 등록되었습니다."));
     }
 
+    @SecurityNotRequired
     @Operation(summary = "게시글 조회", description = "게시글을 조회 합니다")
     @ApiResponse(responseCode = "201", description = "게시글 조회 성공")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -57,36 +61,42 @@ public class PostController {
         return ResponseEntity.ok(postService.getPosts(userId, PostSearchRequest.builder().page(page).content(content).region(region).orderBy(orderBy).build()));
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "게시글 수정")
     @PutMapping("/{postId}")
     public ResponseEntity<PostResponse> updatePost(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId, @Valid @RequestBody UpdatePostRequest updatePostRequest) {
         return ResponseEntity.ok(postService.updatePost(userPrincipal.getUserId(),postId, updatePostRequest));
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "게시글 삭제")
     @DeleteMapping("/{postId}")
     public ResponseEntity<Boolean> deletePost(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
         return ResponseEntity.ok(postService.deletePost(userPrincipal.getUserId(),postId));
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "내가 쓴글 조회", description = "글쓴이가 자신인 글을 조회 합니다.")
     @GetMapping("/my-post")
     public ResponseEntity<Page<PostResponse>> getMyPosts(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(required = true) int page, @RequestParam(required = false) String orderBy) {
         return ResponseEntity.ok(postService.getMyPosts(userPrincipal.getUserId(), PostSearchRequest.builder().page(page).orderBy(orderBy).build()));
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "게시글 추천")
     @PostMapping("/recommend/{postId}")
     public ResponseEntity<Boolean> recommendPost(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
         return ResponseEntity.ok(postService.recommend(userPrincipal.getUserId(), postId));
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "게시글 추천 취소")
     @PostMapping("/recommend/cancel/{postId}")
     public ResponseEntity<Boolean> recommendCancel(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
         return ResponseEntity.ok(postService.cancelRecommend(userPrincipal.getUserId(), postId));
     }
 
+    @SecurityNotRequired
     @Operation(summary = "게시글 단건 조회")
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponse> getPostById(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long postId) {
@@ -94,6 +104,7 @@ public class PostController {
         return ResponseEntity.ok(postService.getOnePostById(userId, postId));
     }
 
+    @SecurityNotRequired
     @Operation(summary = "유저의 게시글 조회")
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<PostResponse>> getPostByUser(@PathVariable Long userId, @RequestParam(required = true) int page) {

@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,7 @@ public class ImageController {
 
     private final ImageService imageService;
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "이미지 저장용 Presigned URL 발급", description = "요청한 이미지 파일명으로 Presigned URL을 발급합니다.")
     @ApiResponse(responseCode = "201", description = "Presigned URL 발급 성공")
     @ApiResponse(responseCode = "500", description = "서버 내부 오류")

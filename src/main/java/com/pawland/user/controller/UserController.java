@@ -1,6 +1,7 @@
 package com.pawland.user.controller;
 
 import com.pawland.global.config.security.domain.UserPrincipal;
+import com.pawland.global.config.swagger.SecurityNotRequired;
 import com.pawland.user.dto.request.UserInfoUpdateRequest;
 import com.pawland.user.dto.response.UserInfoResponse;
 import com.pawland.user.dto.response.UserInfoUpdateResponse;
@@ -56,6 +57,7 @@ public class UserController {
                 .body(updatedInfo);
     }
 
+    @SecurityNotRequired
     @Operation(summary = "유저 프로필 조회")
     @GetMapping("/{userId}")
     public ResponseEntity<UserInfoResponse> getUserProfile(@PathVariable("userId") Long userId) {
