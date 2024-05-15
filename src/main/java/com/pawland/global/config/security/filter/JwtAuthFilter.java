@@ -40,6 +40,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (AuthenticationException e) {
             User guest = User.builder()
+                .id(0L)
                 .email("guest")
                 .password("guest")
                 .build();

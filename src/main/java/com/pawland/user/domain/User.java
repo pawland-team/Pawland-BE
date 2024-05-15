@@ -74,7 +74,8 @@ public class User extends BaseTimeEntity {
     private Set<OrderReview> orderReviewSet = new HashSet<>();
 
     @Builder
-    public User(String email, String password, String introduce, LoginType type, String nickname, String profileImage) {
+    public User(Long id, String email, String password, String introduce, LoginType type, String nickname, String profileImage) {
+        this.id = id;
         this.email = email;
         this.password = password;
         this.nickname = nickname;
