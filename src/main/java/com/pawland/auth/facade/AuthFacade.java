@@ -56,4 +56,8 @@ public class AuthFacade {
         User user = authService.oauth2Login(code, provider);
         return jwtUtils.generateJwtCookie(user.getEmail(), new Date());
     }
+
+    public String logout(String email) {
+        return jwtUtils.expireJwtCookie(email);
+    }
 }
