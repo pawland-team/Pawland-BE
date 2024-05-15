@@ -4,12 +4,10 @@ import com.pawland.user.domain.LoginType;
 import com.pawland.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
 
 import java.util.Map;
 
 @Getter
-@ToString
 public class OAuthAttributes {
 
     private String nickname;
