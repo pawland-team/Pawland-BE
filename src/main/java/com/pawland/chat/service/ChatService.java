@@ -8,6 +8,8 @@ import com.pawland.chat.dto.response.ChatMessageResponse;
 import com.pawland.chat.dto.response.ChatRoomInfoResponse;
 import com.pawland.chat.repository.ChatMessageRepository;
 import com.pawland.chat.repository.ChatRoomRepository;
+import com.pawland.order.exception.OrderException;
+import com.pawland.order.respository.OrderJpaRepository;
 import com.pawland.product.exception.ProductException;
 import com.pawland.product.respository.ProductJpaRepository;
 import com.pawland.user.exception.UserException;
@@ -28,6 +30,7 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
     private final ProductJpaRepository productJpaRepository;
+    private final OrderJpaRepository orderJpaRepository;
     private static final int CHAT_MESSAGE_HISTORY_SIZE = 10;
 
     @Transactional
@@ -63,5 +66,7 @@ public class ChatService {
             .orElseThrow(UserException.NotFoundUser::new);
         productJpaRepository.findById(request.getProductId())
             .orElseThrow(ProductException.NotFoundProduct::new);
+        orderJpaRepository.findById(request.getOrderId())
+            .orElseThrow(OrderException.NotFoundOrder::new);
     }
 }

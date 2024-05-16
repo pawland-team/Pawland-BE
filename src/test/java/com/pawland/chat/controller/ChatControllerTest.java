@@ -8,16 +8,15 @@ import com.pawland.chat.repository.ChatMessageRepository;
 import com.pawland.chat.repository.ChatRoomRepository;
 import com.pawland.global.config.TestSecurityConfig;
 import com.pawland.global.utils.PawLandMockUser;
+import com.pawland.order.domain.Order;
+import com.pawland.order.respository.OrderJpaRepository;
 import com.pawland.product.domain.Product;
 import com.pawland.product.respository.ProductJpaRepository;
 import com.pawland.user.domain.User;
 import com.pawland.user.exception.UserException;
 import com.pawland.user.repository.UserRepository;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static com.pawland.order.exception.OrderExceptionMessage.ORDER_NOT_FOUND;
 import static com.pawland.product.exception.ProductExceptionMessage.PRODUCT_NOT_FOUND;
 import static com.pawland.user.exception.UserExceptionMessage.USER_NOT_FOUND;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -57,6 +57,9 @@ class ChatControllerTest {
     private UserRepository userRepository;
 
     @Autowired
+    private OrderJpaRepository orderJpaRepository;
+
+    @Autowired
     private ChatRoomRepository chatRoomRepository;
 
     @Autowired
@@ -66,6 +69,7 @@ class ChatControllerTest {
     void tearDown() {
         userRepository.deleteAll();
         productJpaRepository.deleteAllInBatch();
+        orderJpaRepository.deleteAllInBatch();
         chatRoomRepository.deleteAllInBatch();
         chatMessageRepository.deleteAllInBatch();
     }
@@ -78,18 +82,21 @@ class ChatControllerTest {
         @Test
         void createChatRoom1() throws Exception {
             // given
+            User myAccount = userRepository.findByEmail("midcondria@naver.com")
+                .orElseThrow(UserException.NotFoundUser::new);
             User seller = createUser("판매자1", "midcon2@naver.com", "asd123123");
             userRepository.save(seller);
 
             Product product = createProduct("나는짱물건", 10000, "장난감", "강아지", "새상품");
             productJpaRepository.save(product);
 
-            Long orderId = 1L;
+            Order order = new Order(seller, myAccount, product);
+            orderJpaRepository.save(order);
 
             ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
                 .sellerId(seller.getId())
                 .productId(product.getId())
-                .orderId(orderId)
+                .orderId(order.getId())
                 .build();
 
             String json = objectMapper.writeValueAsString(request);
@@ -160,6 +167,37 @@ class ChatControllerTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(USER_NOT_FOUND.getMessage()));
+        }
+
+        @DisplayName("요청한 주문 ID로 DB에서 주문 정보를 조회할 수 없으면 에러 메시지를 출력한다.")
+        @PawLandMockUser
+        @Test
+        void createChatRoom4() throws Exception {
+            // given
+            User seller = createUser("판매자1", "midcon2@naver.com", "asd123123");
+            userRepository.save(seller);
+
+            Product product = createProduct("나는짱물건", 10000, "장난감", "강아지", "새상품");
+            productJpaRepository.save(product);
+
+            Long invalidOrderId = 0L;
+
+            ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
+                .sellerId(seller.getId())
+                .productId(product.getId())
+                .orderId(invalidOrderId)
+                .build();
+
+            String json = objectMapper.writeValueAsString(request);
+
+            // expected
+            mockMvc.perform(post("/api/chat/room")
+                    .contentType(APPLICATION_JSON)
+                    .content(json)
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(ORDER_NOT_FOUND.getMessage()));
         }
     }
 

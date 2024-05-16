@@ -9,6 +9,9 @@ import com.pawland.chat.dto.response.ChatMessageResponse;
 import com.pawland.chat.dto.response.ChatRoomInfoResponse;
 import com.pawland.chat.repository.ChatMessageRepository;
 import com.pawland.chat.repository.ChatRoomRepository;
+import com.pawland.order.domain.Order;
+import com.pawland.order.exception.OrderException;
+import com.pawland.order.respository.OrderJpaRepository;
 import com.pawland.product.domain.Product;
 import com.pawland.product.exception.ProductException;
 import com.pawland.product.respository.ProductJpaRepository;
@@ -41,6 +44,9 @@ class ChatServiceTest {
     private ProductJpaRepository productJpaRepository;
 
     @Autowired
+    private OrderJpaRepository orderJpaRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -53,6 +59,7 @@ class ChatServiceTest {
     void tearDown() {
         userRepository.deleteAll();
         productJpaRepository.deleteAllInBatch();
+        orderJpaRepository.deleteAllInBatch();
         chatRoomRepository.deleteAllInBatch();
         chatMessageRepository.deleteAllInBatch();
     }
@@ -74,12 +81,13 @@ class ChatServiceTest {
                 Product product = createProduct("나는짱물건", 10000, "장난감", "강아지", "새상품");
                 productJpaRepository.save(product);
 
-                Long orderId = 1L;
+                Order order = new Order(seller, buyer, product);
+                orderJpaRepository.save(order);
 
                 ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
                     .sellerId(seller.getId())
                     .productId(product.getId())
-                    .orderId(orderId)
+                    .orderId(order.getId())
                     .build();
 
                 // when
@@ -105,16 +113,17 @@ class ChatServiceTest {
                 Product product = createProduct("나는짱물건", 10000, "장난감", "강아지", "새상품");
                 productJpaRepository.save(product);
 
-                Long orderId = 1L;
+                Order order = new Order(seller, buyer, product);
+                orderJpaRepository.save(order);
 
                 ChatRoomCreateRequest requestWithoutSellerId = ChatRoomCreateRequest.builder()
                     .productId(product.getId())
-                    .orderId(orderId)
+                    .orderId(order.getId())
                     .build();
 
                 ChatRoomCreateRequest requestWithoutProductId = ChatRoomCreateRequest.builder()
                     .sellerId(seller.getId())
-                    .orderId(orderId)
+                    .orderId(order.getId())
                     .build();
 
                 ChatRoomCreateRequest requestWithoutOrderId = ChatRoomCreateRequest.builder()
@@ -149,12 +158,13 @@ class ChatServiceTest {
                 Product product = createProduct("나는짱물건", 10000, "장난감", "강아지", "새상품");
                 productJpaRepository.save(product);
 
-                Long orderId = 1L;
+                Order order = new Order(seller, buyer, product);
+                orderJpaRepository.save(order);
 
                 ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
                     .sellerId(seller.getId())
                     .productId(product.getId())
-                    .orderId(orderId)
+                    .orderId(order.getId())
                     .build();
 
                 // when
@@ -180,17 +190,29 @@ class ChatServiceTest {
                 Product product = createProduct("나는짱물건", 10000, "장난감", "강아지", "새상품");
                 productJpaRepository.save(product);
 
-                Long InvalidSellerId = 0L;
-                Long InvalidProductId = 0L;
+                Order order = new Order(seller, buyer, product);
+                orderJpaRepository.save(order);
+
+                Long invalidSellerId = 0L;
+                Long invalidProductId = 0L;
+                Long invalidOrderId = 0L;
 
                 ChatRoomCreateRequest requestWithInvalidSellerInfo = ChatRoomCreateRequest.builder()
-                    .sellerId(InvalidSellerId)
+                    .sellerId(invalidSellerId)
                     .productId(product.getId())
+                    .orderId(order.getId())
                     .build();
 
                 ChatRoomCreateRequest requestWithInvalidProductInfo = ChatRoomCreateRequest.builder()
                     .sellerId(seller.getId())
-                    .productId(InvalidProductId)
+                    .productId(invalidProductId)
+                    .orderId(order.getId())
+                    .build();
+
+                ChatRoomCreateRequest requestWithInvalidOrderInfo = ChatRoomCreateRequest.builder()
+                    .sellerId(seller.getId())
+                    .productId(product.getId())
+                    .orderId(invalidOrderId)
                     .build();
 
                 List<ChatRoom> result = chatRoomRepository.findAll();
@@ -201,6 +223,8 @@ class ChatServiceTest {
                     .isInstanceOf(UserException.NotFoundUser.class);
                 assertThatThrownBy(() -> chatService.createChatRoom(buyer.getId(), requestWithInvalidProductInfo))
                     .isInstanceOf(ProductException.NotFoundProduct.class);
+                assertThatThrownBy(() -> chatService.createChatRoom(buyer.getId(), requestWithInvalidOrderInfo))
+                    .isInstanceOf(OrderException.NotFoundOrder.class);
             }
         }
     }
