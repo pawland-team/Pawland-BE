@@ -84,21 +84,24 @@ class ChatControllerTest {
             Product product = createProduct("나는짱물건", 10000, "장난감", "강아지", "새상품");
             productJpaRepository.save(product);
 
+            Long orderId = 1L;
+
             ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
-                    .sellerId(seller.getId())
-                    .productId(product.getId())
-                    .build();
+                .sellerId(seller.getId())
+                .productId(product.getId())
+                .orderId(orderId)
+                .build();
 
             String json = objectMapper.writeValueAsString(request);
 
             // expected
             mockMvc.perform(post("/api/chat/room")
-                            .contentType(APPLICATION_JSON)
-                            .content(json)
-                    )
-                    .andDo(print())
-                    .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.message").value("채팅방 생성 완료"));
+                    .contentType(APPLICATION_JSON)
+                    .content(json)
+                )
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.message").value("채팅방 생성 완료"));
         }
 
         @DisplayName("요청한 상품 ID로 DB에서 상품 정보를 조회할 수 없으면 에러 메시지를 출력한다.")
@@ -110,22 +113,24 @@ class ChatControllerTest {
             userRepository.save(seller);
 
             Long invalidProductId = 0L;
+            Long orderId = 1L;
 
             ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
-                    .sellerId(seller.getId())
-                    .productId(invalidProductId)
-                    .build();
+                .sellerId(seller.getId())
+                .productId(invalidProductId)
+                .orderId(orderId)
+                .build();
 
             String json = objectMapper.writeValueAsString(request);
 
             // expected
             mockMvc.perform(post("/api/chat/room")
-                            .contentType(APPLICATION_JSON)
-                            .content(json)
-                    )
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").value(PRODUCT_NOT_FOUND.getMessage()));
+                    .contentType(APPLICATION_JSON)
+                    .content(json)
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(PRODUCT_NOT_FOUND.getMessage()));
         }
 
         @DisplayName("요청한 판매자 ID로 DB에서 판매자 정보를 조회할 수 없으면 에러 메시지를 출력한다.")
@@ -137,22 +142,24 @@ class ChatControllerTest {
             productJpaRepository.save(product);
 
             Long invalidSellerId = 0L;
+            Long orderId = 1L;
 
             ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
-                    .sellerId(invalidSellerId)
-                    .productId(product.getId())
-                    .build();
+                .sellerId(invalidSellerId)
+                .productId(product.getId())
+                .orderId(orderId)
+                .build();
 
             String json = objectMapper.writeValueAsString(request);
 
             // expected
             mockMvc.perform(post("/api/chat/room")
-                            .contentType(APPLICATION_JSON)
-                            .content(json)
-                    )
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").value(USER_NOT_FOUND.getMessage()));
+                    .contentType(APPLICATION_JSON)
+                    .content(json)
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(USER_NOT_FOUND.getMessage()));
         }
     }
 
@@ -171,7 +178,7 @@ class ChatControllerTest {
             userRepository.saveAll(List.of(seller1, seller2, buyer1, buyer2));
 
             User myAccount = userRepository.findByEmail("midcondria@naver.com")
-                    .orElseThrow(UserException.NotFoundUser::new);
+                .orElseThrow(UserException.NotFoundUser::new);
 
             Product product1 = createProduct("나는짱물건1", 1000, "장난감", "강아지", "새상품");
             Product product2 = createProduct("나는짱물건2", 2000, "장난감", "강아지", "새상품");
@@ -180,18 +187,24 @@ class ChatControllerTest {
             product3.confirmPurchase(1L);
             productJpaRepository.saveAll(List.of(product1, product2, product3, product4));
 
-            ChatRoom myChatRoom1 = createChatRoom(myAccount.getId(), seller1.getId(), product1.getId());
-            ChatRoom myChatRoom2 = createChatRoom(myAccount.getId(), seller2.getId(), product2.getId());
-            ChatRoom myChatRoom3 = createChatRoom(buyer1.getId(), myAccount.getId(), product3.getId());
-            ChatRoom notMyChatRoom1 = createChatRoom(buyer1.getId(), seller2.getId(), product4.getId());
-            ChatRoom notMyChatRoom2 = createChatRoom(buyer2.getId(), seller2.getId(), product4.getId());
+            Long orderId1 = 1L;
+            Long orderId2 = 2L;
+            Long orderId3 = 3L;
+            Long orderId4 = 4L;
+            Long orderId5 = 5L;
+
+            ChatRoom myChatRoom1 = createChatRoom(myAccount.getId(), seller1.getId(), orderId1, product1.getId());
+            ChatRoom myChatRoom2 = createChatRoom(myAccount.getId(), seller2.getId(), orderId2, product2.getId());
+            ChatRoom myChatRoom3 = createChatRoom(buyer1.getId(), myAccount.getId(), orderId3, product3.getId());
+            ChatRoom notMyChatRoom1 = createChatRoom(buyer1.getId(), seller2.getId(), orderId4, product4.getId());
+            ChatRoom notMyChatRoom2 = createChatRoom(buyer2.getId(), seller2.getId(), orderId5, product4.getId());
             chatRoomRepository.saveAll(List.of(myChatRoom1, myChatRoom2, myChatRoom3, notMyChatRoom1, notMyChatRoom2));
 
             // expected
             mockMvc.perform(get("/api/chat/room"))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.length()").value(3));
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(3));
         }
 
         @DisplayName("내가 참여하고 있는 채팅방이 없을 시 빈 리스트를 반환한다.")
@@ -205,21 +218,24 @@ class ChatControllerTest {
             userRepository.saveAll(List.of(seller1, seller2, buyer1, buyer2));
 
             User myAccount = userRepository.findByEmail("midcondria@naver.com")
-                    .orElseThrow(UserException.NotFoundUser::new);
+                .orElseThrow(UserException.NotFoundUser::new);
 
             Product product1 = createProduct("나는짱물건1", 1000, "장난감", "강아지", "새상품");
             Product product2 = createProduct("나는짱물건2", 2000, "장난감", "강아지", "새상품");
             productJpaRepository.saveAll(List.of(product1, product2));
 
-            ChatRoom notMyChatRoom1 = createChatRoom(buyer1.getId(), seller1.getId(), product1.getId());
-            ChatRoom notMyChatRoom2 = createChatRoom(buyer2.getId(), seller2.getId(), product2.getId());
+            Long orderId1 = 1L;
+            Long orderId2 = 2L;
+
+            ChatRoom notMyChatRoom1 = createChatRoom(buyer1.getId(), seller1.getId(), orderId1, product1.getId());
+            ChatRoom notMyChatRoom2 = createChatRoom(buyer2.getId(), seller2.getId(), orderId2, product2.getId());
             chatRoomRepository.saveAll(List.of(notMyChatRoom1, notMyChatRoom2));
 
             // expected
             mockMvc.perform(get("/api/chat/room"))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$").isEmpty());
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
         }
     }
 
@@ -238,8 +254,9 @@ class ChatControllerTest {
                     .orElseThrow(UserException.NotFoundUser::new);
                 Long opponentUserId = 2L;
                 Long productId = 1L;
+                Long orderId = 1L;
 
-                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, productId);
+                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, orderId, productId);
                 chatRoomRepository.save(chatRoom);
 
                 List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 11)
@@ -268,8 +285,9 @@ class ChatControllerTest {
                     .orElseThrow(UserException.NotFoundUser::new);
                 Long opponentUserId = 2L;
                 Long productId = 1L;
+                Long orderId = 1L;
 
-                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, productId);
+                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, orderId, productId);
                 chatRoomRepository.save(chatRoom);
 
                 List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 10)
@@ -298,8 +316,9 @@ class ChatControllerTest {
                     .orElseThrow(UserException.NotFoundUser::new);
                 Long opponentUserId = 2L;
                 Long productId = 1L;
+                Long orderId = 1L;
 
-                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, productId);
+                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, orderId, productId);
                 chatRoomRepository.save(chatRoom);
 
                 List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 5)
@@ -329,8 +348,9 @@ class ChatControllerTest {
                     .orElseThrow(UserException.NotFoundUser::new);
                 Long opponentUserId = 2L;
                 Long productId = 1L;
+                Long orderId = 1L;
 
-                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, productId);
+                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, orderId, productId);
                 chatRoomRepository.save(chatRoom);
 
                 // expected
@@ -353,8 +373,9 @@ class ChatControllerTest {
                     .orElseThrow(UserException.NotFoundUser::new);
                 Long opponentUserId = 2L;
                 Long productId = 1L;
+                Long orderId = 1L;
 
-                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, productId);
+                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, orderId, productId);
                 chatRoomRepository.save(chatRoom);
 
                 List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 12)
@@ -384,8 +405,9 @@ class ChatControllerTest {
                     .orElseThrow(UserException.NotFoundUser::new);
                 Long opponentUserId = 2L;
                 Long productId = 1L;
+                Long orderId = 1L;
 
-                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, productId);
+                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, orderId, productId);
                 chatRoomRepository.save(chatRoom);
 
                 List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 11)
@@ -415,8 +437,9 @@ class ChatControllerTest {
                     .orElseThrow(UserException.NotFoundUser::new);
                 Long opponentUserId = 2L;
                 Long productId = 1L;
+                Long orderId = 1L;
 
-                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, productId);
+                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, orderId, productId);
                 chatRoomRepository.save(chatRoom);
 
                 List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 5)
@@ -446,8 +469,9 @@ class ChatControllerTest {
                     .orElseThrow(UserException.NotFoundUser::new);
                 Long opponentUserId = 2L;
                 Long productId = 1L;
+                Long orderId = 1L;
 
-                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, productId);
+                ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, orderId, productId);
                 chatRoomRepository.save(chatRoom);
 
                 List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 5)
@@ -471,28 +495,29 @@ class ChatControllerTest {
 
     private static User createUser(String nickname, String email, String password) {
         return User.builder()
-                .nickname(nickname)
-                .email(email)
-                .password(password)
-                .build();
+            .nickname(nickname)
+            .email(email)
+            .password(password)
+            .build();
     }
 
     private Product createProduct(String name, int price, String category, String species, String condition) {
         return Product.builder()
-                .name(name)
-                .price(price)
-                .category(category)
-                .species(species)
-                .condition(condition)
-                .build();
+            .name(name)
+            .price(price)
+            .category(category)
+            .species(species)
+            .condition(condition)
+            .build();
     }
 
-    private static ChatRoom createChatRoom(Long buyerId, Long sellerId, Long productId) {
+    private static ChatRoom createChatRoom(Long buyerId, Long sellerId, Long orderId, Long productId) {
         ChatRoom chatRoom = ChatRoom.builder()
-                .buyerId(buyerId)
-                .sellerId(sellerId)
-                .productId(productId)
-                .build();
+            .buyerId(buyerId)
+            .sellerId(sellerId)
+            .orderId(orderId)
+            .productId(productId)
+            .build();
         return chatRoom;
     }
 

@@ -27,13 +27,17 @@ public class ChatRoom extends BaseTimeEntity {
     private Long sellerId;
 
     @NotNull
+    private Long orderId;
+
+    @NotNull
     private Long productId;
 
     @Builder
-    public ChatRoom(Long id, Long sellerId, Long buyerId, Long productId) {
+    public ChatRoom(Long id, Long sellerId, Long buyerId, Long orderId, Long productId) {
         this.id = id;
         this.sellerId = sellerId;
         this.buyerId = buyerId;
+        this.orderId = orderId;
         this.productId = productId;
     }
 }

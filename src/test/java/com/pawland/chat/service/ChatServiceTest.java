@@ -74,9 +74,12 @@ class ChatServiceTest {
                 Product product = createProduct("나는짱물건", 10000, "장난감", "강아지", "새상품");
                 productJpaRepository.save(product);
 
+                Long orderId = 1L;
+
                 ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
                     .sellerId(seller.getId())
                     .productId(product.getId())
+                    .orderId(orderId)
                     .build();
 
                 // when
@@ -135,9 +138,12 @@ class ChatServiceTest {
                 Product product = createProduct("나는짱물건", 10000, "장난감", "강아지", "새상품");
                 productJpaRepository.save(product);
 
+                Long orderId = 1L;
+
                 ChatRoomCreateRequest request = ChatRoomCreateRequest.builder()
                     .sellerId(seller.getId())
                     .productId(product.getId())
+                    .orderId(orderId)
                     .build();
 
                 // when
@@ -209,11 +215,17 @@ class ChatServiceTest {
             product3.confirmPurchase(1L);
             productJpaRepository.saveAll(List.of(product1, product2, product3, product4));
 
-            ChatRoom myChatRoom1 = createChatRoom(myAccount.getId(), seller1.getId(), product1.getId());
-            ChatRoom myChatRoom2 = createChatRoom(myAccount.getId(), seller2.getId(), product2.getId());
-            ChatRoom myChatRoom3 = createChatRoom(buyer1.getId(), myAccount.getId(), product3.getId());
-            ChatRoom notMyChatRoom1 = createChatRoom(buyer1.getId(), seller2.getId(), product4.getId());
-            ChatRoom notMyChatRoom2 = createChatRoom(buyer2.getId(), seller2.getId(), product4.getId());
+            Long orderId1 = 1L;
+            Long orderId2 = 2L;
+            Long orderId3 = 3L;
+            Long orderId4 = 4L;
+            Long orderId5 = 5L;
+
+            ChatRoom myChatRoom1 = createChatRoom(myAccount.getId(), seller1.getId(), orderId1, product1.getId());
+            ChatRoom myChatRoom2 = createChatRoom(myAccount.getId(), seller2.getId(), orderId2, product2.getId());
+            ChatRoom myChatRoom3 = createChatRoom(buyer1.getId(), myAccount.getId(), orderId3, product3.getId());
+            ChatRoom notMyChatRoom1 = createChatRoom(buyer1.getId(), seller2.getId(), orderId4, product4.getId());
+            ChatRoom notMyChatRoom2 = createChatRoom(buyer2.getId(), seller2.getId(), orderId5, product4.getId());
             chatRoomRepository.saveAll(List.of(myChatRoom1, myChatRoom2, myChatRoom3, notMyChatRoom1, notMyChatRoom2));
 
             // when
@@ -247,8 +259,11 @@ class ChatServiceTest {
             Product product2 = createProduct("나는짱물건2", 2000, "장난감", "강아지", "새상품");
             productJpaRepository.saveAll(List.of(product1, product2));
 
-            ChatRoom notMyChatRoom1 = createChatRoom(buyer1.getId(), seller1.getId(), product1.getId());
-            ChatRoom notMyChatRoom2 = createChatRoom(buyer2.getId(), seller2.getId(), product2.getId());
+            Long orderId1 = 1L;
+            Long orderId2 = 2L;
+
+            ChatRoom notMyChatRoom1 = createChatRoom(buyer1.getId(), seller1.getId(), orderId1, product1.getId());
+            ChatRoom notMyChatRoom2 = createChatRoom(buyer2.getId(), seller2.getId(), orderId2, product2.getId());
             chatRoomRepository.saveAll(List.of(notMyChatRoom1, notMyChatRoom2));
 
             // when
@@ -597,10 +612,11 @@ class ChatServiceTest {
             .build();
     }
 
-    private static ChatRoom createChatRoom(Long buyerId, Long sellerId, Long productId) {
+    private static ChatRoom createChatRoom(Long buyerId, Long sellerId, Long orderId, Long productId) {
         ChatRoom chatRoom = ChatRoom.builder()
             .buyerId(buyerId)
             .sellerId(sellerId)
+            .orderId(orderId)
             .productId(productId)
             .build();
         return chatRoom;
