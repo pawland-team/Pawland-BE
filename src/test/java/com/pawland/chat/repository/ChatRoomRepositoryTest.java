@@ -86,9 +86,9 @@ class ChatRoomRepositoryTest {
             assertThat(result).extracting("productInfo")
                 .extracting("price", "productName", "saleState", "purchaser")
                 .containsExactlyInAnyOrder(
-                    tuple(1000,"나는짱물건1", SELLING, null),
-                    tuple(2000,"나는짱물건2", SELLING, null),
-                    tuple(3000,"나는짱물건3", SELLING, 1L)
+                    tuple(1000,"나는짱물건1", "판매중", null),
+                    tuple(2000,"나는짱물건2", "판매중", null),
+                    tuple(3000,"나는짱물건3", "판매중", 1L)
                 );
         }
 
