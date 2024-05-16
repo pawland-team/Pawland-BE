@@ -24,6 +24,7 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepositoryCustom {
         return jpaQueryFactory
             .select(Projections.constructor(ChatRoomInfoResponse.class,
                 chatRoom.id.as("roomId"),
+                chatRoom.orderId,
                 Projections.constructor(ChatRoomInfoResponse.UserInfo.class,
                     user.id,
                     user.nickname,
