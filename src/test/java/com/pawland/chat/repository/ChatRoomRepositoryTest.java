@@ -78,6 +78,8 @@ class ChatRoomRepositoryTest {
 
             // then
             assertThat(result).hasSize(3);
+            assertThat(result).extracting("orderId")
+                .containsExactlyInAnyOrder(1L, 2L, 3L);
             assertThat(result).extracting("opponentUser")
                 .extracting("nickname")
                 .containsExactlyInAnyOrder("판매자1", "판매자2", "구매자1");

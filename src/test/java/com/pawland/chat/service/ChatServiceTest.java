@@ -63,7 +63,7 @@ class ChatServiceTest {
         @DisplayName("요청 값 관련 테스트")
         @Nested
         class createChatRoom2 {
-            @DisplayName("요청 값에 구매자 ID, 판매자 ID, 상품 ID가 모두 들어있으면 성공한다.")
+            @DisplayName("요청 값에 판매자 ID, 상품 ID, 주문 ID가 모두 들어있으면 성공한다.")
             @Test
             void createChatRoom1() {
                 // given
@@ -105,12 +105,21 @@ class ChatServiceTest {
                 Product product = createProduct("나는짱물건", 10000, "장난감", "강아지", "새상품");
                 productJpaRepository.save(product);
 
+                Long orderId = 1L;
+
                 ChatRoomCreateRequest requestWithoutSellerId = ChatRoomCreateRequest.builder()
                     .productId(product.getId())
+                    .orderId(orderId)
                     .build();
 
                 ChatRoomCreateRequest requestWithoutProductId = ChatRoomCreateRequest.builder()
                     .sellerId(seller.getId())
+                    .orderId(orderId)
+                    .build();
+
+                ChatRoomCreateRequest requestWithoutOrderId = ChatRoomCreateRequest.builder()
+                    .sellerId(seller.getId())
+                    .productId(product.getId())
                     .build();
 
                 List<ChatRoom> result = chatRoomRepository.findAll();
@@ -120,6 +129,8 @@ class ChatServiceTest {
                 assertThatThrownBy(() -> chatService.createChatRoom(buyer.getId(), requestWithoutSellerId))
                     .isInstanceOf(RuntimeException.class);
                 assertThatThrownBy(() -> chatService.createChatRoom(buyer.getId(), requestWithoutProductId))
+                    .isInstanceOf(RuntimeException.class);
+                assertThatThrownBy(() -> chatService.createChatRoom(buyer.getId(), requestWithoutOrderId))
                     .isInstanceOf(RuntimeException.class);
             }
         }
@@ -233,6 +244,8 @@ class ChatServiceTest {
 
             // then
             assertThat(result).hasSize(3);
+            assertThat(result).extracting("orderId")
+                .containsExactlyInAnyOrder(1L, 2L, 3L);
             assertThat(result).extracting("opponentUser")
                 .extracting("nickname")
                 .containsExactlyInAnyOrder("판매자1", "판매자2", "구매자1");
