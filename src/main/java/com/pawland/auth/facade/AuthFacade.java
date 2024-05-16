@@ -4,6 +4,7 @@ import com.pawland.auth.dto.request.SignupRequest;
 import com.pawland.auth.dto.request.VerifyCodeRequest;
 import com.pawland.auth.service.AuthService;
 import com.pawland.global.config.security.JwtUtils;
+import com.pawland.global.domain.DefaultImage;
 import com.pawland.mail.service.MailVerificationService;
 import com.pawland.user.domain.User;
 import com.pawland.user.service.UserService;
@@ -46,6 +47,7 @@ public class AuthFacade {
         User user = User.builder()
             .email(request.getEmail())
             .password(passwordEncoder.encode(request.getPassword()))
+            .profileImage(DefaultImage.getRandomProfileImage())
             .nickname(request.getNickname())
             .build();
         userService.register(user);
