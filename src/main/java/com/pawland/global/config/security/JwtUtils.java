@@ -35,15 +35,25 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(byteJwtKey);
     }
 
-    public String generateJwtCookie(String name, Date dateTime) {
+    public String generateJwtCookie(String email, Date dateTime) {
         SecretKey secretKey = getSecretKey();
         String jwt = Jwts.builder()
-            .subject(name)
+            .subject(email)
             .issuedAt(dateTime)
             .expiration(new Date(dateTime.getTime() + 24L * 60 * 60 * 1000)) // 하루짜리 jwt
             .signWith(secretKey)
             .compact();
+        return createCookie(jwt).toString();
+    }
 
+    public String expireJwtCookie(String email) {
+        SecretKey secretKey = getSecretKey();
+        String jwt = Jwts.builder()
+            .subject(email)
+            .issuedAt(new Date())
+            .expiration(new Date())
+            .signWith(secretKey)
+            .compact();
         return createCookie(jwt).toString();
     }
 

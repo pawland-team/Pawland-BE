@@ -1,11 +1,12 @@
 package com.pawland.auth.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import jakarta.validation.constraints.NotBlank;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString
+@Schema(name = "회원가입 요청")
 public class SignupRequest {
 
     @NotBlank(message = "이메일을 입력해주세요.")
