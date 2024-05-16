@@ -53,12 +53,13 @@ public class PostController {
     @ApiResponse(responseCode = "201", description = "게시글 조회 성공")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<PostResponse>> getPosts(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                                       @RequestParam(required = true, defaultValue = "1") int page,
+                                                       @RequestParam(required = true) int page,
+                                                       @RequestParam(required = true) int size,
                                                        @RequestParam(required = false) String content,
                                                        @RequestParam(required = false) List<String> region,
                                                        @RequestParam(required = false) String orderBy) {
         Long userId = Optional.ofNullable(userPrincipal).map(UserPrincipal::getUserId).orElse(null);
-        return ResponseEntity.ok(postService.getPosts(userId, PostSearchRequest.builder().page(page).content(content).region(region).orderBy(orderBy).build()));
+        return ResponseEntity.ok(postService.getPosts(userId, PostSearchRequest.builder().page(page).size(size).content(content).region(region).orderBy(orderBy).build()));
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -78,8 +79,8 @@ public class PostController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "내가 쓴글 조회", description = "글쓴이가 자신인 글을 조회 합니다.")
     @GetMapping("/my-post")
-    public ResponseEntity<Page<PostResponse>> getMyPosts(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(required = true) int page, @RequestParam(required = false) String orderBy) {
-        return ResponseEntity.ok(postService.getMyPosts(userPrincipal.getUserId(), PostSearchRequest.builder().page(page).orderBy(orderBy).build()));
+    public ResponseEntity<Page<PostResponse>> getMyPosts(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(required = true) int page,@RequestParam(required = true)int size, @RequestParam(required = false) String orderBy) {
+        return ResponseEntity.ok(postService.getMyPosts(userPrincipal.getUserId(), PostSearchRequest.builder().page(page).size(size).orderBy(orderBy).build()));
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
