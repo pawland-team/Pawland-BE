@@ -27,6 +27,7 @@ public class OrderService {
     private final UserRepository userRepository;
     private final ProductJpaRepository productJpaRepository;
 
+    @Transactional
     public OrderResponse createOrder(Long buyerId, Long productId) {
         User buyer = getUserById(buyerId);
         Product product = getProductById(productId);
