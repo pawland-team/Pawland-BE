@@ -29,6 +29,7 @@ public class AuthService {
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public User oauth2Login(String code, String provider) {
         validateProvider(provider);
         ClientRegistration registration = clientRegistrationRepository.findByRegistrationId(provider);
@@ -102,7 +103,6 @@ public class AuthService {
         return userRepository.findByNickname(nickname).isPresent();
     }
 
-    @Transactional
     private User updateOrSave(User uerProfile) {
         User oauth2User = userRepository.findByEmail(uerProfile.getEmail())
             .map(user -> user.updateOauth2Profile(uerProfile))

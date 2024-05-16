@@ -19,10 +19,14 @@ public class ChatRoomCreateRequest {
     @NotNull
     private Long productId;
 
+    @NotNull
+    private Long orderId;
+
     @Builder
-    public ChatRoomCreateRequest(Long sellerId, Long productId) {
+    public ChatRoomCreateRequest(Long sellerId, Long productId, Long orderId) {
         this.sellerId = sellerId;
         this.productId = productId;
+        this.orderId = orderId;
     }
 
     public ChatRoom toChatRoomWithMyId(Long buyerId) {
@@ -30,6 +34,7 @@ public class ChatRoomCreateRequest {
             .buyerId(buyerId)
             .sellerId(sellerId)
             .productId(productId)
+            .orderId(orderId)
             .build();
     }
 }

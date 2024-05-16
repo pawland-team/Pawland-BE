@@ -9,11 +9,13 @@ import lombok.*;
 public class ChatRoomInfoResponse {
 
     private Long roomId;
+    private Long orderId;
     private UserInfo opponentUser;
     private ProductInfo productInfo;
 
-    public ChatRoomInfoResponse(Long roomId, UserInfo opponentUser, ProductInfo productInfo) {
+    public ChatRoomInfoResponse(Long roomId, Long orderId, UserInfo opponentUser, ProductInfo productInfo) {
         this.roomId = roomId;
+        this.orderId = orderId;
         this.opponentUser = opponentUser;
         this.productInfo = productInfo;
     }

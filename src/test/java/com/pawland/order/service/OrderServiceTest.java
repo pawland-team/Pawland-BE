@@ -78,6 +78,7 @@ class OrderServiceTest {
 
     @DisplayName("주문 생성 성공")
     @Test
+    @Transactional
     void createOrder() {
         //given
         User seller = list.get(0);
