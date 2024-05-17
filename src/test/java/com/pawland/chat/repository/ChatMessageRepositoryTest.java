@@ -21,7 +21,7 @@ import static org.assertj.core.groups.Tuple.tuple;
 
 @DataJpaTest
 @Import(QueryDslConfig.class)
-@ActiveProfiles("test")
+@ActiveProfiles("local")
 class ChatMessageRepositoryTest {
 
     @Autowired
