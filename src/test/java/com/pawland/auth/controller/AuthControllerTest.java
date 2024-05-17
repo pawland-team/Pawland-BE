@@ -563,7 +563,7 @@ class AuthControllerTest {
             User oauth2User = OAuthAttributes.builder()
                     .email(email + "/" + LoginType.KAKAO.value())
                     .nickname("임시 닉네임")
-                    .profileImage(DefaultImage.DEFAULT_PROFILE_IMAGE.value())
+                    .profileImage(DefaultImage.DEFAULT_PROFILE_IMAGE_1.value())
                     .provider(LoginType.KAKAO.value())
                     .build()
                     .toUser();

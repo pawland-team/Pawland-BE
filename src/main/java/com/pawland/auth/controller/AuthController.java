@@ -90,7 +90,6 @@ public class AuthController {
     @PostMapping(value = "/signup", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiMessageResponse> signup(@Valid @RequestBody SignupRequest request) {
         String jwtCookie = authFacade.signup(request);
-
         return ResponseEntity
             .status(CREATED)
             .header(HttpHeaders.SET_COOKIE, jwtCookie)

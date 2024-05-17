@@ -53,7 +53,9 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(UserException.NotFoundUser::new);
 
-        checkNicknameDuplicate(request.getNickname());
+        if (isNicknameChanged(request.getNickname(), user)) {
+            checkNicknameDuplicate(request.getNickname());
+        }
         user.updateProfile(request.toUser());
         return new UserInfoUpdateResponse(user);
     }
@@ -62,5 +64,9 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(UserException.NotFoundUser::new);
 
         return new UserInfoResponse(user);
+    }
+
+    private static boolean isNicknameChanged(String requestNickname, User user) {
+        return !requestNickname.equals(user.getNickname());
     }
 }

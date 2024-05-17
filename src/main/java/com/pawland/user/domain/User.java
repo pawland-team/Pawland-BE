@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.pawland.global.domain.DefaultImage.DEFAULT_PROFILE_IMAGE;
 import static com.pawland.user.domain.LoginType.NORMAL;
 
 @Entity
@@ -53,7 +52,7 @@ public class User extends BaseTimeEntity {
     private LoginType type = NORMAL;
 
     @NotNull
-    private String profileImage = DEFAULT_PROFILE_IMAGE.value();
+    private String profileImage = "";
 
     @OneToMany(mappedBy = "buyer", orphanRemoval = true)
     private List<Order> orderList = new ArrayList<>();    // 주문 내역
