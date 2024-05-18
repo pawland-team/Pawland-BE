@@ -16,8 +16,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+
+import static com.pawland.order.exception.OrderExceptionMessage.ALREADY_EXISTS_ORDER;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +38,11 @@ public class OrderService {
         Product product = getProductById(productId);
 
         Order order = new Order(product.getSeller(), buyer, product);
+
+        Optional<Order> foundOrder = orderJpaRepository.findByBuyerIdAndProductId(buyerId, productId);
+        if (foundOrder.isPresent()) {
+            throw new AccessDeniedException(ALREADY_EXISTS_ORDER.getMessage());
+        }
 
         orderJpaRepository.save(order);
 

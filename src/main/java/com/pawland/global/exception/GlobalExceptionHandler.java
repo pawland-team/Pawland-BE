@@ -2,10 +2,12 @@ package com.pawland.global.exception;
 
 import com.pawland.global.dto.ApiMessageResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailSendException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(PawLandException.class)
@@ -21,6 +24,17 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
             .status(e.getStatusCode())
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ApiMessageResponse(e.getMessage()));
+    }
+
+    @ResponseStatus(HttpStatus.FOUND)
+    @ExceptionHandler(AccessDeniedException.class)
+    @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "302", description = "이미 같은 리소스가 존재합니다.")
+    public ResponseEntity<ApiMessageResponse> accessDeniedExceptionHandler(AccessDeniedException e) {
+        return ResponseEntity
+            .status(HttpStatus.FOUND)
             .contentType(MediaType.APPLICATION_JSON)
             .body(new ApiMessageResponse(e.getMessage()));
     }
