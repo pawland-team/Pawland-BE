@@ -582,7 +582,7 @@ class AuthControllerTest {
                     )
                     .andDo(print())
                     .andExpect(status().isFound())
-                    .andExpect(redirectedUrl(appConfig.getFrontTestUrl()))
+                    .andExpect(redirectedUrl(appConfig.getFrontDeployUrl()))
                     .andExpect(jsonPath("$.message").value("소셜 로그인에 성공했습니다."))
                     .andExpect(cookie().exists("jwt"));
         }
