@@ -40,7 +40,9 @@ public class ChatService {
     }
 
     public List<ChatRoomInfoResponse> getChatRoomList(Long userId) {
-        return chatRoomRepository.getMyChatRoomList(userId);
+        return chatRoomRepository.getMyChatRoomList(userId).stream()
+            .map(roomInfo -> roomInfo.of(getLastMessage(roomInfo.getRoomId())))
+            .toList();
     }
 
     @Transactional
@@ -59,6 +61,11 @@ public class ChatService {
         } else {
             return ChatMessageHistoryResponse.of(null, messageList);
         }
+    }
+
+    private ChatMessage getLastMessage(Long roomId) {
+        return chatMessageRepository.getLastMessage(roomId)
+            .orElse(null);
     }
 
     private void validateChatRoomCreateRequest(ChatRoomCreateRequest request) {

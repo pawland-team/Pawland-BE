@@ -121,7 +121,7 @@ public class AuthController {
         return ResponseEntity
             .status(HttpStatus.FOUND)
             .header(HttpHeaders.SET_COOKIE, jwtCookie)
-            .header(HttpHeaders.LOCATION, appConfig.getFrontTestUrl())
+            .header(HttpHeaders.LOCATION, appConfig.getFrontDeployUrl())
             .body(new ApiMessageResponse("소셜 로그인에 성공했습니다."));
     }
 
