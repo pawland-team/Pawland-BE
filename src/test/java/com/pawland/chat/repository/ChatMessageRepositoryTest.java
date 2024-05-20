@@ -173,11 +173,11 @@ class ChatMessageRepositoryTest {
                 assertThat(result.size()).isEqualTo(5L);
                 assertThat(result).extracting("roomId", "message", "senderId", "messageTime")
                     .containsExactly(
+                        tuple(1L, "내용7", 1L, LocalDateTime.parse("2024-05-11T21:00:00.007")),
                         tuple(1L, "내용6", 2L, LocalDateTime.parse("2024-05-11T21:00:00.006")),
                         tuple(1L, "내용5", 1L, LocalDateTime.parse("2024-05-11T21:00:00.005")),
                         tuple(1L, "내용4", 2L, LocalDateTime.parse("2024-05-11T21:00:00.004")),
-                        tuple(1L, "내용3", 1L, LocalDateTime.parse("2024-05-11T21:00:00.003")),
-                        tuple(1L, "내용2", 2L, LocalDateTime.parse("2024-05-11T21:00:00.002"))
+                        tuple(1L, "내용3", 1L, LocalDateTime.parse("2024-05-11T21:00:00.003"))
                     );
             }
 
@@ -234,16 +234,17 @@ class ChatMessageRepositoryTest {
                 );
 
                 // then
-                assertThat(result.size()).isEqualTo(3L);
+                assertThat(result.size()).isEqualTo(4L);
                 assertThat(result).extracting("roomId", "message", "senderId", "messageTime")
                     .containsExactly(
+                        tuple(1L, "내용4", 2L, LocalDateTime.parse("2024-05-11T21:00:00.004")),
                         tuple(1L, "내용3", 1L, LocalDateTime.parse("2024-05-11T21:00:00.003")),
                         tuple(1L, "내용2", 2L, LocalDateTime.parse("2024-05-11T21:00:00.002")),
                         tuple(1L, "내용1", 1L, LocalDateTime.parse("2024-05-11T21:00:00.001"))
                     );
             }
 
-            @DisplayName("이전 채팅 데이터 수가 0이면 빈 리스트를 반환한다.")
+            @DisplayName("cursorId가 마지막 채팅일 시 마지막 메시지를 반환한다.")
             @Test
             void getChatMessageHistory4() {
                 // given
@@ -264,7 +265,11 @@ class ChatMessageRepositoryTest {
                 );
 
                 // then
-                assertThat(result.size()).isEqualTo(0L);
+                assertThat(result.size()).isEqualTo(1L);
+                assertThat(result).extracting("roomId", "message", "senderId", "messageTime")
+                    .containsExactly(
+                        tuple(1L, "내용1", 1L, LocalDateTime.parse("2024-05-11T21:00:00.001"))
+                    );
             }
         }
     }

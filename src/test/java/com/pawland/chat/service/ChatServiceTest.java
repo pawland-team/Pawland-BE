@@ -30,7 +30,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static com.pawland.product.domain.Status.SELLING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.groups.Tuple.tuple;
@@ -520,10 +519,11 @@ class ChatServiceTest {
                 );
 
                 // then
-                assertThat(result.getNextCursor()).isEqualTo("2024-05-11T21:00:00.001");
+                assertThat(result.getNextCursor()).isEqualTo("2024-05-11T21:00:00.002");
                 assertThat(result.getMessageList().size()).isEqualTo(10L);
                 assertThat(result.getMessageList()).extracting("message", "sender", "messageTime")
                     .containsExactly(
+                        tuple("내용12", "2", "2024-05-11T21:00:00.012"),
                         tuple("내용11", "1", "2024-05-11T21:00:00.011"),
                         tuple("내용10", "2", "2024-05-11T21:00:00.010"),
                         tuple("내용9", "1", "2024-05-11T21:00:00.009"),
@@ -532,8 +532,7 @@ class ChatServiceTest {
                         tuple("내용6", "2", "2024-05-11T21:00:00.006"),
                         tuple("내용5", "1", "2024-05-11T21:00:00.005"),
                         tuple("내용4", "2", "2024-05-11T21:00:00.004"),
-                        tuple("내용3", "1", "2024-05-11T21:00:00.003"),
-                        tuple("내용2", "2", "2024-05-11T21:00:00.002")
+                        tuple("내용3", "1", "2024-05-11T21:00:00.003")
                     );
             }
 
@@ -544,7 +543,7 @@ class ChatServiceTest {
                 Long roomId = 1L;
                 Long userId1 = 1L;
                 Long userId2 = 2L;
-                List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 11)
+                List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 10)
                     .mapToObj(i -> i % 2 == 1
                         ? createChatMessage(roomId, "내용" + i, userId1, "2024-05-11T21:00:00.0" + String.format("%02d", i))
                         : createChatMessage(roomId, "내용" + i, userId2, "2024-05-11T21:00:00.0" + String.format("%02d", i))
@@ -554,7 +553,7 @@ class ChatServiceTest {
 
                 // when
                 ChatMessageHistoryResponse result = chatService.getChatMessageHistory(
-                    roomId.toString(), "2024-05-11T21:00:00.011"
+                    roomId.toString(), "2024-05-11T21:00:00.010"
                 );
 
                 // then
@@ -597,16 +596,17 @@ class ChatServiceTest {
 
                 // then
                 assertThat(result.getNextCursor()).isNull();
-                assertThat(result.getMessageList().size()).isEqualTo(3L);
+                assertThat(result.getMessageList().size()).isEqualTo(4L);
                 assertThat(result.getMessageList()).extracting("message", "sender", "messageTime")
                     .containsExactly(
+                        tuple("내용4", "2", "2024-05-11T21:00:00.004"),
                         tuple("내용3", "1", "2024-05-11T21:00:00.003"),
                         tuple("내용2", "2", "2024-05-11T21:00:00.002"),
                         tuple("내용1", "1", "2024-05-11T21:00:00.001")
                     );
             }
 
-            @DisplayName("이전 채팅 데이터 수가 0이면 빈 리스트를 반환하고, nextCursor 값은 null이다.")
+            @DisplayName("cursorId가 마지막 채팅이면 마지막 메시지를 반환하고, nextCursor 값은 null이다.")
             @Test
             void getChatMessageHistory4() {
                 // given
@@ -628,7 +628,11 @@ class ChatServiceTest {
 
                 // then
                 assertThat(result.getNextCursor()).isNull();
-                assertThat(result.getMessageList().size()).isEqualTo(0L);
+                assertThat(result.getMessageList().size()).isEqualTo(1L);
+                assertThat(result.getMessageList()).extracting("message", "sender", "messageTime")
+                    .containsExactly(
+                        tuple("내용1", "1", "2024-05-11T21:00:00.001")
+                    );
             }
         }
     }
