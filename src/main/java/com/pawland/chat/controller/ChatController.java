@@ -44,8 +44,8 @@ public class ChatController {
     public ResponseEntity<List<ChatRoomInfoResponse>> getChatRoomList(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         List<ChatRoomInfoResponse> chatRoomList = chatService.getChatRoomList(userPrincipal.getUserId());
         return ResponseEntity
-                .status(OK)
-                .body(chatRoomList);
+            .status(OK)
+            .body(chatRoomList);
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -58,8 +58,8 @@ public class ChatController {
                                                              @Valid @RequestBody ChatRoomCreateRequest request) {
         chatService.createChatRoom(userPrincipal.getUserId(), request);
         return ResponseEntity
-                .status(CREATED)
-                .body(new ApiMessageResponse("채팅방 생성 완료"));
+            .status(CREATED)
+            .body(new ApiMessageResponse("채팅방 생성 완료"));
     }
 
     @PreAuthorize("hasRole('ROLE_USER') && hasPermission(#roomId, 'CHATROOM', 'READ')")
@@ -67,8 +67,8 @@ public class ChatController {
     @ApiResponse(responseCode = "200", description = "채팅 내역 조회 성공")
     @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     @GetMapping("/previous/{roomId}")
-    public ResponseEntity<ChatMessageHistoryResponse> getPreviousChatMessage(@PathVariable String roomId,
-                                                            @RequestParam(required = false) String messageTime) {
+    public ResponseEntity<ChatMessageHistoryResponse> getPreviousMessage(@PathVariable String roomId,
+                                                                         @RequestParam(required = false) String messageTime) {
         ChatMessageHistoryResponse chatMessageHistory = chatService.getChatMessageHistory(roomId, messageTime);
         return ResponseEntity
             .status(OK)

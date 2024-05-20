@@ -24,7 +24,7 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepositoryCustom {
             .selectFrom(chatMessage)
             .where(
                 roomIdEq(roomId),
-                messageTimeLt(messageTime)
+                messageTimeLoe(messageTime)
             )
             .orderBy(chatMessage.messageTime.desc())
             .limit(pageSize)
@@ -36,11 +36,11 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepositoryCustom {
         return hasText(roomId) ? chatMessage.roomId.eq(roomIdToLong) : null;
     }
 
-    private BooleanExpression messageTimeLt(String messageTime) {
+    private BooleanExpression messageTimeLoe(String messageTime) {
         if (messageTime == null) {
             return null;
         }
         LocalDateTime cursorId = LocalDateTime.parse(messageTime);
-        return chatMessage.messageTime.lt(cursorId);
+        return chatMessage.messageTime.loe(cursorId);
     }
 }

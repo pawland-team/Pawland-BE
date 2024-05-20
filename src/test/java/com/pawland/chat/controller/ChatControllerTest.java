@@ -416,7 +416,7 @@ class ChatControllerTest {
                 ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, orderId, productId);
                 chatRoomRepository.save(chatRoom);
 
-                List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 12)
+                List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 11)
                     .mapToObj(i -> i % 2 == 1
                         ? createChatMessage(chatRoom.getId(), "내용" + i, myAccount.getId(), "2024-05-11T21:00:00.0" + String.format("%02d", i))
                         : createChatMessage(chatRoom.getId(), "내용" + i, opponentUserId, "2024-05-11T21:00:00.0" + String.format("%02d", i))
@@ -426,7 +426,7 @@ class ChatControllerTest {
 
                 // expected
                 mockMvc.perform(get("/api/chat/previous/{roomId}", chatRoom.getId())
-                        .param("messageTime", "2024-05-11T21:00:00.012"))
+                        .param("messageTime", "2024-05-11T21:00:00.011"))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.nextCursor").value("2024-05-11T21:00:00.001"))
@@ -448,7 +448,7 @@ class ChatControllerTest {
                 ChatRoom chatRoom = createChatRoom(myAccount.getId(), opponentUserId, orderId, productId);
                 chatRoomRepository.save(chatRoom);
 
-                List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 11)
+                List<ChatMessage> chatMessages = IntStream.rangeClosed(1, 10)
                     .mapToObj(i -> i % 2 == 1
                         ? createChatMessage(chatRoom.getId(), "내용" + i, myAccount.getId(), "2024-05-11T21:00:00.0" + String.format("%02d", i))
                         : createChatMessage(chatRoom.getId(), "내용" + i, opponentUserId, "2024-05-11T21:00:00.0" + String.format("%02d", i))
@@ -458,7 +458,7 @@ class ChatControllerTest {
 
                 // expected
                 mockMvc.perform(get("/api/chat/previous/{roomId}", chatRoom.getId())
-                        .param("messageTime", "2024-05-11T21:00:00.011"))
+                        .param("messageTime", "2024-05-11T21:00:00.010"))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.nextCursor", Matchers.nullValue()))
@@ -490,16 +490,16 @@ class ChatControllerTest {
 
                 // expected
                 mockMvc.perform(get("/api/chat/previous/{roomId}", chatRoom.getId())
-                        .param("messageTime", "2024-05-11T21:00:00.004"))
+                        .param("messageTime", "2024-05-11T21:00:00.005"))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.nextCursor", Matchers.nullValue()))
-                    .andExpect(jsonPath("$.messageList.length()").value(3L))
-                    .andExpect(jsonPath("$.messageList[0].messageTime").value("2024-05-11T21:00:00.003"))
-                    .andExpect(jsonPath("$.messageList[2].messageTime").value("2024-05-11T21:00:00.001"));
+                    .andExpect(jsonPath("$.messageList.length()").value(5L))
+                    .andExpect(jsonPath("$.messageList[0].messageTime").value("2024-05-11T21:00:00.005"))
+                    .andExpect(jsonPath("$.messageList[4].messageTime").value("2024-05-11T21:00:00.001"));
             }
 
-            @DisplayName("이전 채팅 데이터 수가 0이면 빈 리스트를 반환하고, nextCursor 값은 null이다.")
+            @DisplayName("cursorId가 마지막 메시지를 가리키면 마지막 메시지를 반환하고, nextCursor 값은 null이다.")
             @Test
             void getPreviousChatMessage4() throws Exception {
                 // given
@@ -526,7 +526,8 @@ class ChatControllerTest {
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.nextCursor", Matchers.nullValue()))
-                    .andExpect(jsonPath("$.messageList.length()").value(0L));
+                    .andExpect(jsonPath("$.messageList.length()").value(1L))
+                    .andExpect(jsonPath("$.messageList[0].messageTime").value("2024-05-11T21:00:00.001"));
             }
         }
     }
